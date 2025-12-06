@@ -1,4 +1,4 @@
-module github.com/cs161-staff/project2-starter-code
+module github.com/loaringlyc/secfs
 
 go 1.20
 
