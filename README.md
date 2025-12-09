@@ -71,8 +71,6 @@ These 8 functions will be implemented as part of the `User` class. The user clas
 
 All 8 functions have `err` as one of their return values. The function could fail due to functionality issues (e.g. a user supplies an invalid argument), or security issues (e.g. an attacker has tampered with data that prevents your function from executing correctly). 
 
-Note that:
-
 > [!NOTE]
 >
 > - There is **no frontend** for this project, and all users need to interact with the system by running a copy of the code.

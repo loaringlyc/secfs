@@ -105,11 +105,31 @@ func someUsefulThings() {
 	_ = fmt.Sprintf("%s_%d", "file", 1)
 }
 
+// Compute the userUUID from rootKey
+func getUUIDByInfo(rootKey []byte) (userUUID uuid.UUID, err error) {
+	var uuidBytes []byte
+	uuidBytes, err = userlib.HashKDF(rootKey, []byte("user-uuid"))
+	if err != nil {
+		return uuid.Nil, err
+	}
+	userUUID, err = uuid.FromBytes(uuidBytes[:16])
+	if err != nil {
+		return uuid.Nil, err
+	}
+	return userUUID, nil
+}
+
 // This is the type definition for the User struct.
 // A Go struct is like a Python or Java class - it can have attributes
 // (e.g. like the Username attribute) and methods (e.g. like the StoreFile method below).
 type User struct {
 	Username string
+
+	PkeEncKey userlib.PKEEncKey
+	PkeDecKey userlib.PKEDecKey
+
+	DsSigKey userlib.DSSignKey
+	DsVerKey userlib.DSVerifyKey
 
 	// You can add other attributes here if you want! But note that in order for attributes to
 	// be included when this struct is serialized to/from JSON, they must be capitalized.
@@ -119,18 +139,142 @@ type User struct {
 	// begins with a lowercase letter).
 }
 
+type UserRecord struct {
+	Ciphertext []byte
+	Hash []byte
+}
+
 // NOTE: The following methods have toy (insecure!) implementations.
 
 func InitUser(username string, password string) (userdataptr *User, err error) {
 	var userdata User
 	userdata.Username = username
+
+	// Generate root key from password & username (used as salt)
+	var rootKey []byte = userlib.Argon2Key([]byte(password), []byte(username), 16)
+
+	// Generate keys for public key encryption
+	userdata.PkeEncKey, userdata.PkeDecKey, err = userlib.PKEKeyGen()
+	if err != nil {
+		return nil, err
+	}
+	err = userlib.KeystoreSet(username + "_pke", userdata.PkeEncKey)
+	if err != nil {
+		return nil, err
+	}
+
+	// Generate keys for data sign
+	userdata.DsSigKey, userdata.DsVerKey, err = userlib.DSKeyGen()
+	if err != nil {
+		return nil, err
+	}
+	err = userlib.KeystoreSet(username + "_ds", userdata.DsVerKey)
+	if err != nil {
+		return nil, err
+	}
+
+	// Encrypt private keys
+	var userInfoEncKey []byte
+	userInfoEncKey, err = userlib.HashKDF(rootKey, []byte("user-info-encryption"))
+	if err != nil {
+		return nil, err
+	}
+	var iv []byte = userlib.RandomBytes(16)
+	var userBytes []byte
+	userBytes, err = json.Marshal(userdata)
+	if err != nil {
+		return nil, err
+	}
+	var ciphertext []byte = userlib.SymEnc(userInfoEncKey, iv, userBytes)
+
+	// Hash the ciphertext to make sure it hasn't be changed
+	var hashKey []byte
+	hashKey, err = userlib.HashKDF(rootKey, []byte("ciphertext-hash"))
+	if err != nil {
+		return nil, err
+	}
+	var hashRes []byte
+	hashRes, err = userlib.HMACEval(hashKey, ciphertext)
+	if err != nil {
+		return nil, err
+	}
+
+	// pack into a user record instance and store
+	record := UserRecord {
+		Ciphertext: ciphertext,
+		Hash: hashRes,
+	}
+	data, err := json.Marshal(record)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get userUUID and store
+	var userUUID uuid.UUID
+	userUUID, err = getUUIDByInfo(rootKey)
+	if err != nil {
+		return nil, err
+	}
+	userlib.DatastoreSet(userUUID, data)
+	
 	return &userdata, nil
 }
 
 func GetUser(username string, password string) (userdataptr *User, err error) {
+	var rootKey []byte = userlib.Argon2Key([]byte(password), []byte(username), 16)
+	var userUUID userlib.UUID
+	userUUID, err = getUUIDByInfo(rootKey)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get ciphertext 
+	storedData, ok := userlib.DatastoreGet(userUUID)
+	if !ok || storedData == nil {
+		return nil, errors.New("cannot find user information")
+	}
+
+	// Get user record
+	var record UserRecord
+	err = json.Unmarshal(storedData, &record)
+	if err != nil {
+		return nil, err
+	}
+
+	// Check data integrity
+	var hashKey []byte
+	hashKey, err = userlib.HashKDF(rootKey, []byte("ciphertext-hash"))
+	if err != nil {
+		return nil, err
+	}
+	var hashResExp []byte
+	hashResExp, err = userlib.HMACEval(hashKey, record.Ciphertext)
+	if err != nil {
+		return nil, err
+	}
+	if !userlib.HMACEqual(hashResExp, record.Hash) {
+		return nil, errors.New("user data has been tampered")
+	}
+
+	// Decrypt user data
+	var userInfoEncKey []byte
+	userInfoEncKey, err = userlib.HashKDF(rootKey, []byte("user-info-encryption"))
+	if err != nil {
+		return nil, err
+	}
+	if len(record.Ciphertext) < userlib.AESBlockSizeBytes {
+		return nil, errors.New("ciphertext is less than the length of one cipher block")
+	}
+	userBytes := userlib.SymDec(userInfoEncKey, record.Ciphertext) // TODO: nosense codes?
+
+	// Deserialize bytes to User structure
 	var userdata User
-	userdataptr = &userdata
-	return userdataptr, nil
+	err = json.Unmarshal(userBytes, &userdata)
+	if err != nil {
+		return nil, err
+	}
+
+	return &userdata, nil
 }
 
 func (userdata *User) StoreFile(filename string, content []byte) (err error) {
