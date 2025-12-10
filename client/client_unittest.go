@@ -48,9 +48,9 @@ var _ = Describe("Client Unit Tests", func() {
 	})
 
 	Describe("Unit Tests", func() {
-		Specify("Simple Test: somefunction", func() {
-			someUsefulThings()
-		})
+		// Specify("Simple Test: somefunction", func() {
+		// 	someUsefulThings()
+		// })
 
 		Specify("Basic Test: Check that the Username field is set for a new user", func() {
 			userlib.DebugMsg("Initializing user Alice.")

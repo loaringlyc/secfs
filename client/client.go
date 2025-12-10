@@ -141,7 +141,7 @@ type User struct {
 
 type UserRecord struct {
 	Ciphertext []byte
-	Hash []byte
+	Hash       []byte
 }
 
 // NOTE: The following methods have toy (insecure!) implementations.
@@ -158,7 +158,7 @@ func InitUser(username string, password string) (userdataptr *User, err error) {
 	if err != nil {
 		return nil, err
 	}
-	err = userlib.KeystoreSet(username + "_pke", userdata.PkeEncKey)
+	err = userlib.KeystoreSet(username+"_pke", userdata.PkeEncKey)
 	if err != nil {
 		return nil, err
 	}
@@ -168,7 +168,7 @@ func InitUser(username string, password string) (userdataptr *User, err error) {
 	if err != nil {
 		return nil, err
 	}
-	err = userlib.KeystoreSet(username + "_ds", userdata.DsVerKey)
+	err = userlib.KeystoreSet(username+"_ds", userdata.DsVerKey)
 	if err != nil {
 		return nil, err
 	}
@@ -185,11 +185,13 @@ func InitUser(username string, password string) (userdataptr *User, err error) {
 	if err != nil {
 		return nil, err
 	}
+	userInfoEncKey = userInfoEncKey[:16]
 	var ciphertext []byte = userlib.SymEnc(userInfoEncKey, iv, userBytes)
 
 	// Hash the ciphertext to make sure it hasn't be changed
 	var hashKey []byte
 	hashKey, err = userlib.HashKDF(rootKey, []byte("ciphertext-hash"))
+	hashKey = hashKey[:16]
 	if err != nil {
 		return nil, err
 	}
@@ -200,9 +202,9 @@ func InitUser(username string, password string) (userdataptr *User, err error) {
 	}
 
 	// pack into a user record instance and store
-	record := UserRecord {
+	record := UserRecord{
 		Ciphertext: ciphertext,
-		Hash: hashRes,
+		Hash:       hashRes,
 	}
 	data, err := json.Marshal(record)
 	if err != nil {
@@ -216,7 +218,7 @@ func InitUser(username string, password string) (userdataptr *User, err error) {
 		return nil, err
 	}
 	userlib.DatastoreSet(userUUID, data)
-	
+
 	return &userdata, nil
 }
 
@@ -228,7 +230,7 @@ func GetUser(username string, password string) (userdataptr *User, err error) {
 		return nil, err
 	}
 
-	// Get ciphertext 
+	// Get ciphertext
 	storedData, ok := userlib.DatastoreGet(userUUID)
 	if !ok || storedData == nil {
 		return nil, errors.New("cannot find user information")
@@ -244,6 +246,7 @@ func GetUser(username string, password string) (userdataptr *User, err error) {
 	// Check data integrity
 	var hashKey []byte
 	hashKey, err = userlib.HashKDF(rootKey, []byte("ciphertext-hash"))
+	hashKey = hashKey[:16]
 	if err != nil {
 		return nil, err
 	}
@@ -259,6 +262,7 @@ func GetUser(username string, password string) (userdataptr *User, err error) {
 	// Decrypt user data
 	var userInfoEncKey []byte
 	userInfoEncKey, err = userlib.HashKDF(rootKey, []byte("user-info-encryption"))
+	userInfoEncKey = userInfoEncKey[:16]
 	if err != nil {
 		return nil, err
 	}
