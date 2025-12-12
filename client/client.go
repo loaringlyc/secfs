@@ -23,7 +23,7 @@ import (
 	// hex.EncodeToString(...) is useful for converting []byte to string
 
 	// Useful for string manipulation
-	"strings"
+	_ "strings"
 
 	// Useful for formatting strings (e.g. `fmt.Sprintf`).
 	"fmt"
@@ -105,10 +105,90 @@ func someUsefulThings() {
 	_ = fmt.Sprintf("%s_%d", "file", 1)
 }
 
-// Compute the userUUID from rootKey
-func getUUIDByInfo(rootKey []byte) (userUUID uuid.UUID, err error) {
+/*
+********************************************
+**      Global Stucts and Functions       **
+********************************************
+ */
+
+type DatastoreEntry struct {
+	Ciphertext []byte
+	Hash       []byte
+}
+
+func encryptData(encKey []byte, hashKey []byte, msg []byte) (encBytes []byte, err error) {
+	var entry = DatastoreEntry{}
+
+	// encypt text
+	if len(encKey) != 16 {
+		return []byte{}, errors.New("encryption key for SymEnc must be 16 bytes")
+	}
+	iv := userlib.RandomBytes(16)
+	entry.Ciphertext = userlib.SymEnc(encKey, iv, msg)
+
+	// hash ciphertext
+	if len(hashKey) != 16 {
+		return []byte{}, errors.New("encryption key for HMACEval must be 16 bytes")
+	}
+	var hashRes []byte
+	hashRes, err = userlib.HMACEval(hashKey, entry.Ciphertext)
+	if err != nil {
+		return []byte{}, err
+	}
+	entry.Hash = hashRes
+
+	// Serialize
+	encBytes, err = json.Marshal(entry)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	return encBytes, nil
+}
+
+func verifyAndDecryptData(hashKey []byte, encKey []byte, storedData []byte) (plainBytes []byte, err error) {
+	// Get datastore entry
+	var entry DatastoreEntry
+	err = json.Unmarshal(storedData, &entry)
+	if err != nil {
+		return nil, err
+	}
+
+	// Check integrity
+	if len(hashKey) != 16 {
+		return []byte{}, errors.New("encryption key for HMACEval must be 16 bytes")
+	}
+	var hashResExp []byte
+	hashResExp, err = userlib.HMACEval(hashKey, entry.Ciphertext)
+	if err != nil {
+		return []byte{}, err
+	}
+	if !userlib.HMACEqual(hashResExp, entry.Hash) {
+		return []byte{}, errors.New("stored data has been tampered")
+	}
+
+	// Decrypt data
+	if len(encKey) != 16 {
+		return []byte{}, errors.New("encryption key for SymEnc must be 16 bytes")
+	}
+	if len(entry.Ciphertext) < userlib.AESBlockSizeBytes {
+		return nil, errors.New("ciphertext is less than the length of one cipher block")
+	}
+	plainBytes = userlib.SymDec(encKey, entry.Ciphertext) // TODO: nosense codes?
+	return plainBytes, nil
+}
+
+/*
+********************************************
+**   User Struct and User Authentication  **
+**          UserInit, GetUser             **
+********************************************
+ */
+
+// Compute the userUUID from passwdKey
+func getUUIDByInfo(passwdKey []byte) (userUUID uuid.UUID, err error) {
 	var uuidBytes []byte
-	uuidBytes, err = userlib.HashKDF(rootKey, []byte("user-uuid"))
+	uuidBytes, err = userlib.HashKDF(passwdKey, []byte("user-uuid"))
 	if err != nil {
 		return uuid.Nil, err
 	}
@@ -125,6 +205,8 @@ func getUUIDByInfo(rootKey []byte) (userUUID uuid.UUID, err error) {
 type User struct {
 	Username string
 
+	SourceKey []byte
+
 	PkeEncKey userlib.PKEEncKey
 	PkeDecKey userlib.PKEDecKey
 
@@ -139,19 +221,16 @@ type User struct {
 	// begins with a lowercase letter).
 }
 
-type UserRecord struct {
-	Ciphertext []byte
-	Hash       []byte
-}
-
 // NOTE: The following methods have toy (insecure!) implementations.
 
 func InitUser(username string, password string) (userdataptr *User, err error) {
 	var userdata User
 	userdata.Username = username
 
+	userdata.SourceKey = userlib.RandomBytes(16)
+
 	// Generate root key from password & username (used as salt)
-	var rootKey []byte = userlib.Argon2Key([]byte(password), []byte(username), 16)
+	var passwdKey []byte = userlib.Argon2Key([]byte(password), []byte(username), 16)
 
 	// Generate keys for public key encryption
 	userdata.PkeEncKey, userdata.PkeDecKey, err = userlib.PKEKeyGen()
@@ -173,103 +252,72 @@ func InitUser(username string, password string) (userdataptr *User, err error) {
 		return nil, err
 	}
 
-	// Encrypt private keys
-	var userInfoEncKey []byte
-	userInfoEncKey, err = userlib.HashKDF(rootKey, []byte("user-info-encryption"))
-	if err != nil {
-		return nil, err
-	}
-	var iv []byte = userlib.RandomBytes(16)
+	// Get user bytes, encryption key and hash key
 	var userBytes []byte
 	userBytes, err = json.Marshal(userdata)
 	if err != nil {
 		return nil, err
 	}
-	userInfoEncKey = userInfoEncKey[:16]
-	var ciphertext []byte = userlib.SymEnc(userInfoEncKey, iv, userBytes)
 
-	// Hash the ciphertext to make sure it hasn't be changed
+	var userInfoEncKey []byte
+	userInfoEncKey, err = userlib.HashKDF(passwdKey, []byte("user-info-encryption"))
+	if err != nil {
+		return nil, err
+	}
 	var hashKey []byte
-	hashKey, err = userlib.HashKDF(rootKey, []byte("ciphertext-hash"))
-	hashKey = hashKey[:16]
-	if err != nil {
-		return nil, err
-	}
-	var hashRes []byte
-	hashRes, err = userlib.HMACEval(hashKey, ciphertext)
+	hashKey, err = userlib.HashKDF(passwdKey, []byte("ciphertext-hash"))
 	if err != nil {
 		return nil, err
 	}
 
-	// pack into a user record instance and store
-	record := UserRecord{
-		Ciphertext: ciphertext,
-		Hash:       hashRes,
-	}
-	data, err := json.Marshal(record)
+	// Get encryption results
+	var encRes []byte
+	encRes, err = encryptData(userInfoEncKey[:16], hashKey[:16], userBytes) // Symmetric Encryption use 16-byte key
 	if err != nil {
 		return nil, err
 	}
 
 	// Get userUUID and store
 	var userUUID uuid.UUID
-	userUUID, err = getUUIDByInfo(rootKey)
+	userUUID, err = getUUIDByInfo(passwdKey)
 	if err != nil {
 		return nil, err
 	}
-	userlib.DatastoreSet(userUUID, data)
+	userlib.DatastoreSet(userUUID, encRes)
 
 	return &userdata, nil
 }
 
 func GetUser(username string, password string) (userdataptr *User, err error) {
-	var rootKey []byte = userlib.Argon2Key([]byte(password), []byte(username), 16)
+	var passwdKey []byte = userlib.Argon2Key([]byte(password), []byte(username), 16)
 	var userUUID userlib.UUID
-	userUUID, err = getUUIDByInfo(rootKey)
+	userUUID, err = getUUIDByInfo(passwdKey)
 	if err != nil {
 		return nil, err
 	}
 
 	// Get ciphertext
-	storedData, ok := userlib.DatastoreGet(userUUID)
-	if !ok || storedData == nil {
+	storedUserData, ok := userlib.DatastoreGet(userUUID)
+	if !ok || storedUserData == nil {
 		return nil, errors.New("cannot find user information")
 	}
 
-	// Get user record
-	var record UserRecord
-	err = json.Unmarshal(storedData, &record)
-	if err != nil {
-		return nil, err
-	}
-
-	// Check data integrity
+	// Check data integrity and decrypt user data
 	var hashKey []byte
-	hashKey, err = userlib.HashKDF(rootKey, []byte("ciphertext-hash"))
-	hashKey = hashKey[:16]
+	hashKey, err = userlib.HashKDF(passwdKey, []byte("ciphertext-hash"))
 	if err != nil {
 		return nil, err
 	}
-	var hashResExp []byte
-	hashResExp, err = userlib.HMACEval(hashKey, record.Ciphertext)
-	if err != nil {
-		return nil, err
-	}
-	if !userlib.HMACEqual(hashResExp, record.Hash) {
-		return nil, errors.New("user data has been tampered")
-	}
-
-	// Decrypt user data
 	var userInfoEncKey []byte
-	userInfoEncKey, err = userlib.HashKDF(rootKey, []byte("user-info-encryption"))
-	userInfoEncKey = userInfoEncKey[:16]
+	userInfoEncKey, err = userlib.HashKDF(passwdKey, []byte("user-info-encryption"))
 	if err != nil {
 		return nil, err
 	}
-	if len(record.Ciphertext) < userlib.AESBlockSizeBytes {
-		return nil, errors.New("ciphertext is less than the length of one cipher block")
+	var userBytes []byte
+	userBytes, err = verifyAndDecryptData(hashKey[:16], userInfoEncKey[:16], storedUserData)
+	if err != nil {
+		return nil, err
 	}
-	userBytes := userlib.SymDec(userInfoEncKey, record.Ciphertext) // TODO: nosense codes?
 
 	// Deserialize bytes to User structure
 	var userdata User
@@ -281,33 +329,215 @@ func GetUser(username string, password string) (userdataptr *User, err error) {
 	return &userdata, nil
 }
 
+/*
+********************************************
+**            File Operations             **
+**   StoreFile, AppendToFile, LoadFile    **
+********************************************
+ */
+
+type FileNode struct {
+	Content []byte
+	Next    uuid.UUID
+}
+
+func getNodeByUUID(sourceKey []byte, nodeUUID uuid.UUID) (currNode FileNode, err error) {
+	// Get nodeBytes
+	userlib.DebugMsg("[getNodeByUUID] Getting bytes for fileNode with UUID: %v", nodeUUID)
+	nodeStoredBytes, ok := userlib.DatastoreGet(nodeUUID)
+	if !ok {
+		return FileNode{}, errors.New("cannot find current UUID in datastore: " + nodeUUID.String())
+	}
+
+	// Verify and get plaintext of curr fileNode
+	userlib.DebugMsg("[getNodeByUUID] Verify and decrypt the filenode with UUID: %v", nodeUUID)
+	var hashKey, fileNodeEncKey []byte
+	fileNodeEncKey, hashKey, err = getFileNodeKeys(sourceKey, nodeUUID)
+	if err != nil {
+		return FileNode{}, err
+	}
+
+	var nodeBytes []byte
+	nodeBytes, err = verifyAndDecryptData(hashKey[:16], fileNodeEncKey[:16], nodeStoredBytes)
+	if err != nil {
+		return FileNode{}, err
+	}
+
+	// Deserialize the bytes
+	var currFileNode FileNode
+	err = json.Unmarshal(nodeBytes, &currFileNode)
+	if err != nil {
+		return FileNode{}, err
+	}
+	userlib.DebugMsg("[getNodeByUUID] Get fileNode with content: %s", currFileNode)
+
+	return currFileNode, nil
+}
+
+// Return 64-byte keys! May need truncate!
+func getFileNodeKeys(sourceKey []byte, nodeUUID uuid.UUID) (nodeEncKey []byte, hashKey []byte, err error) {
+	hashKey, err = userlib.HashKDF(sourceKey, []byte("ciphertext-hash-"+nodeUUID.String()))
+	if err != nil {
+		return []byte{}, []byte{}, err
+	}
+	nodeEncKey, err = userlib.HashKDF(sourceKey, []byte("file-encryption-"+nodeUUID.String()))
+	if err != nil {
+		return []byte{}, []byte{}, err
+	}
+	return
+}
+
 func (userdata *User) StoreFile(filename string, content []byte) (err error) {
-	storageKey, err := uuid.FromBytes(userlib.Hash([]byte(filename + userdata.Username))[:16])
+	// Get file uuid by filename & username
+	nodeUUID, err := uuid.FromBytes(userlib.Hash([]byte(filename + userdata.Username))[:16])
 	if err != nil {
 		return err
 	}
-	contentBytes, err := json.Marshal(content)
+
+	// Get data to be stored
+	userlib.DebugMsg("[StoreFile] Create a fileNode for nodeUUID: %v", nodeUUID)
+	var fileNode = FileNode{
+		Content: content,
+		Next:    uuid.Nil,
+	}
+	var plainData []byte
+	plainData, err = json.Marshal(fileNode)
 	if err != nil {
 		return err
 	}
-	userlib.DatastoreSet(storageKey, contentBytes)
+
+	userlib.DebugMsg("[StoreFile] Encrypt data for nodeUUID: %v", nodeUUID)
+	// Serialize and encrypt
+	var nodeEncKey, hashKey []byte
+	nodeEncKey, hashKey, err = getFileNodeKeys(userdata.SourceKey, nodeUUID)
+	if err != nil {
+		return err
+	}
+
+	// Get encryption result
+	var fileEncRes []byte
+	fileEncRes, err = encryptData(nodeEncKey[:16], hashKey[:16], plainData)
+	if err != nil {
+		return err
+	}
+
+	userlib.DatastoreSet(nodeUUID, fileEncRes)
 	return
 }
 
 func (userdata *User) AppendToFile(filename string, content []byte) error {
+	var err error
+	// Data to be stored
+	var thisUUID uuid.UUID
+	thisUUID, err = uuid.FromBytes(userlib.RandomBytes(16))
+	if err != nil {
+		return err
+	}
+
+	userlib.DebugMsg("[AppendToFile] Create a new fileNode for nodeUUID: %v", thisUUID)
+	var newFileNode = FileNode{
+		Content: content,
+		Next:    uuid.Nil,
+	}
+	var plainNodeBytes []byte
+	plainNodeBytes, err = json.Marshal(newFileNode)
+	if err != nil {
+		return err
+	}
+
+	userlib.DebugMsg("[AppendToFile] Encrypt data for nodeUUID: %v", thisUUID)
+	// Serialize and encrypt
+	var nodeEncKey, hashKey []byte
+	nodeEncKey, hashKey, err = getFileNodeKeys(userdata.SourceKey, thisUUID)
+	if err != nil {
+		return err
+	}
+
+	// Get encryption result and store
+	var nodeEncRes []byte
+	nodeEncRes, err = encryptData(nodeEncKey[:16], hashKey[:16], plainNodeBytes)
+	if err != nil {
+		return err
+	}
+	userlib.DatastoreSet(thisUUID, nodeEncRes)
+
+	// Get UUID of first file node
+	userlib.DebugMsg("[AppendToFile] Find first fileNode for file: %v", filename)
+	var firstNodeUUID uuid.UUID
+	firstNodeUUID, err = uuid.FromBytes(userlib.Hash([]byte(filename + userdata.Username))[:16])
+	if err != nil {
+		return err
+	}
+
+	// Get the node to be modified
+	userlib.DebugMsg("[AppendToFile] Find last fileNode for file: %v", filename)
+	var currNode FileNode
+	currNode, err = getNodeByUUID(userdata.SourceKey, firstNodeUUID)
+	if err != nil {
+		return err
+	}
+	var currNodeUUID = firstNodeUUID
+	var nextNodeUUID = currNode.Next
+	for nextNodeUUID != uuid.Nil {
+		currNodeUUID = nextNodeUUID
+		currNode, err = getNodeByUUID(userdata.SourceKey, currNodeUUID)
+		if err != nil {
+			return err
+		}
+		nextNodeUUID = currNode.Next
+	}
+
+	// Change previous content
+	userlib.DebugMsg("[AppendToFile] Change last fileNode content with nodeUUID: %v", currNodeUUID)
+	currNode.Next = thisUUID
+	plainNodeBytes, err = json.Marshal(currNode)
+	if err != nil {
+		return err
+	}
+	userlib.DebugMsg("[AppendToFile] Change last fileNode to: %v", currNode)
+
+	userlib.DebugMsg("[AppendToFile] Encrypt and store fileNode with nodeUUID: %v", currNodeUUID)
+	nodeEncKey, hashKey, err = getFileNodeKeys(userdata.SourceKey, currNodeUUID)
+	if err != nil {
+		return err
+	}
+
+	nodeEncRes, err = encryptData(nodeEncKey[:16], hashKey[:16], plainNodeBytes)
+	if err != nil {
+		return err
+	}
+	userlib.DatastoreSet(currNodeUUID, nodeEncRes)
+
 	return nil
 }
 
 func (userdata *User) LoadFile(filename string) (content []byte, err error) {
-	storageKey, err := uuid.FromBytes(userlib.Hash([]byte(filename + userdata.Username))[:16])
+	// Get first node
+	var firstNodeUUID uuid.UUID
+	firstNodeUUID, err = uuid.FromBytes(userlib.Hash([]byte(filename + userdata.Username))[:16])
 	if err != nil {
 		return nil, err
 	}
-	dataJSON, ok := userlib.DatastoreGet(storageKey)
-	if !ok {
-		return nil, errors.New(strings.ToTitle("file not found"))
+
+	// Loop over the nodes
+	var currNode FileNode
+	var currUUID, nextUUID uuid.UUID
+	currUUID = firstNodeUUID
+	currNode, err = getNodeByUUID(userdata.SourceKey, currUUID)
+	if err != nil {
+		return []byte{}, err
 	}
-	err = json.Unmarshal(dataJSON, &content)
+	content = append(content, currNode.Content...)
+	nextUUID = currNode.Next
+	for nextUUID != uuid.Nil {
+		currNode, err = getNodeByUUID(userdata.SourceKey, nextUUID)
+		if err != nil {
+			return []byte{}, err
+		}
+		content = append(content, currNode.Content...)
+		nextUUID = currNode.Next
+	}
+
 	return content, err
 }
 
