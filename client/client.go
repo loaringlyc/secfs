@@ -186,7 +186,7 @@ func verifyAndDecryptData(hashKey []byte, encKey []byte, storedData []byte) (pla
  */
 
 // Compute the userUUID from passwdKey
-func getUUIDByInfo(passwdKey []byte) (userUUID uuid.UUID, err error) {
+func getUserUUIDByInfo(passwdKey []byte) (userUUID uuid.UUID, err error) {
 	var uuidBytes []byte
 	uuidBytes, err = userlib.HashKDF(passwdKey, []byte("user-uuid"))
 	if err != nil {
@@ -279,7 +279,7 @@ func InitUser(username string, password string) (userdataptr *User, err error) {
 
 	// Get userUUID and store
 	var userUUID uuid.UUID
-	userUUID, err = getUUIDByInfo(passwdKey)
+	userUUID, err = getUserUUIDByInfo(passwdKey)
 	if err != nil {
 		return nil, err
 	}
@@ -291,7 +291,7 @@ func InitUser(username string, password string) (userdataptr *User, err error) {
 func GetUser(username string, password string) (userdataptr *User, err error) {
 	var passwdKey []byte = userlib.Argon2Key([]byte(password), []byte(username), 16)
 	var userUUID userlib.UUID
-	userUUID, err = getUUIDByInfo(passwdKey)
+	userUUID, err = getUserUUIDByInfo(passwdKey)
 	if err != nil {
 		return nil, err
 	}
@@ -341,6 +341,19 @@ type FileNode struct {
 	Next    uuid.UUID
 }
 
+// Return 64-byte keys! May need truncate!
+func getFileNodeKeys(sourceKey []byte, nodeUUID uuid.UUID) (nodeEncKey []byte, hashKey []byte, err error) {
+	hashKey, err = userlib.HashKDF(sourceKey, []byte("ciphertext-hash-"+nodeUUID.String()))
+	if err != nil {
+		return []byte{}, []byte{}, err
+	}
+	nodeEncKey, err = userlib.HashKDF(sourceKey, []byte("file-encryption-"+nodeUUID.String()))
+	if err != nil {
+		return []byte{}, []byte{}, err
+	}
+	return
+}
+
 func getNodeByUUID(sourceKey []byte, nodeUUID uuid.UUID) (currNode FileNode, err error) {
 	// Get nodeBytes
 	userlib.DebugMsg("[getNodeByUUID] Getting bytes for fileNode with UUID: %v", nodeUUID)
@@ -374,19 +387,6 @@ func getNodeByUUID(sourceKey []byte, nodeUUID uuid.UUID) (currNode FileNode, err
 	return currFileNode, nil
 }
 
-// Return 64-byte keys! May need truncate!
-func getFileNodeKeys(sourceKey []byte, nodeUUID uuid.UUID) (nodeEncKey []byte, hashKey []byte, err error) {
-	hashKey, err = userlib.HashKDF(sourceKey, []byte("ciphertext-hash-"+nodeUUID.String()))
-	if err != nil {
-		return []byte{}, []byte{}, err
-	}
-	nodeEncKey, err = userlib.HashKDF(sourceKey, []byte("file-encryption-"+nodeUUID.String()))
-	if err != nil {
-		return []byte{}, []byte{}, err
-	}
-	return
-}
-
 func (userdata *User) StoreFile(filename string, content []byte) (err error) {
 	// Get file uuid by filename & username
 	nodeUUID, err := uuid.FromBytes(userlib.Hash([]byte(filename + userdata.Username))[:16])
@@ -406,10 +406,18 @@ func (userdata *User) StoreFile(filename string, content []byte) (err error) {
 		return err
 	}
 
+	// Get file encrypt key
 	userlib.DebugMsg("[StoreFile] Encrypt data for nodeUUID: %v", nodeUUID)
+	var fileSourceKey []byte
+	fileSourceKey, err = userlib.HashKDF(userdata.SourceKey, []byte("file-"+filename))
+	if err != nil {
+		return err
+	}
+	fileSourceKey = fileSourceKey[:16]
+
 	// Serialize and encrypt
 	var nodeEncKey, hashKey []byte
-	nodeEncKey, hashKey, err = getFileNodeKeys(userdata.SourceKey, nodeUUID)
+	nodeEncKey, hashKey, err = getFileNodeKeys(fileSourceKey, nodeUUID)
 	if err != nil {
 		return err
 	}
@@ -445,10 +453,18 @@ func (userdata *User) AppendToFile(filename string, content []byte) error {
 		return err
 	}
 
-	userlib.DebugMsg("[AppendToFile] Encrypt data for nodeUUID: %v", thisUUID)
+	// Get encrypt source key
+	var fileSourceKey []byte
+	fileSourceKey, err = userlib.HashKDF(userdata.SourceKey, []byte("file-"+filename))
+	if err != nil {
+		return err
+	}
+	fileSourceKey = fileSourceKey[:16]
+
 	// Serialize and encrypt
+	userlib.DebugMsg("[AppendToFile] Encrypt data for nodeUUID: %v", thisUUID)
 	var nodeEncKey, hashKey []byte
-	nodeEncKey, hashKey, err = getFileNodeKeys(userdata.SourceKey, thisUUID)
+	nodeEncKey, hashKey, err = getFileNodeKeys(fileSourceKey, thisUUID)
 	if err != nil {
 		return err
 	}
@@ -472,7 +488,7 @@ func (userdata *User) AppendToFile(filename string, content []byte) error {
 	// Get the node to be modified
 	userlib.DebugMsg("[AppendToFile] Find last fileNode for file: %v", filename)
 	var currNode FileNode
-	currNode, err = getNodeByUUID(userdata.SourceKey, firstNodeUUID)
+	currNode, err = getNodeByUUID(fileSourceKey, firstNodeUUID)
 	if err != nil {
 		return err
 	}
@@ -480,7 +496,7 @@ func (userdata *User) AppendToFile(filename string, content []byte) error {
 	var nextNodeUUID = currNode.Next
 	for nextNodeUUID != uuid.Nil {
 		currNodeUUID = nextNodeUUID
-		currNode, err = getNodeByUUID(userdata.SourceKey, currNodeUUID)
+		currNode, err = getNodeByUUID(fileSourceKey, currNodeUUID)
 		if err != nil {
 			return err
 		}
@@ -497,7 +513,7 @@ func (userdata *User) AppendToFile(filename string, content []byte) error {
 	userlib.DebugMsg("[AppendToFile] Change last fileNode to: %v", currNode)
 
 	userlib.DebugMsg("[AppendToFile] Encrypt and store fileNode with nodeUUID: %v", currNodeUUID)
-	nodeEncKey, hashKey, err = getFileNodeKeys(userdata.SourceKey, currNodeUUID)
+	nodeEncKey, hashKey, err = getFileNodeKeys(fileSourceKey, currNodeUUID)
 	if err != nil {
 		return err
 	}
@@ -519,18 +535,26 @@ func (userdata *User) LoadFile(filename string) (content []byte, err error) {
 		return nil, err
 	}
 
+	// Get file encrypt source key
+	var fileSourceKey []byte
+	fileSourceKey, err = userlib.HashKDF(userdata.SourceKey, []byte("file-"+filename))
+	if err != nil {
+		return []byte{}, err
+	}
+	fileSourceKey = fileSourceKey[:16]
+
 	// Loop over the nodes
 	var currNode FileNode
 	var currUUID, nextUUID uuid.UUID
 	currUUID = firstNodeUUID
-	currNode, err = getNodeByUUID(userdata.SourceKey, currUUID)
+	currNode, err = getNodeByUUID(fileSourceKey, currUUID)
 	if err != nil {
 		return []byte{}, err
 	}
 	content = append(content, currNode.Content...)
 	nextUUID = currNode.Next
 	for nextUUID != uuid.Nil {
-		currNode, err = getNodeByUUID(userdata.SourceKey, nextUUID)
+		currNode, err = getNodeByUUID(fileSourceKey, nextUUID)
 		if err != nil {
 			return []byte{}, err
 		}
@@ -543,6 +567,7 @@ func (userdata *User) LoadFile(filename string) (content []byte, err error) {
 
 func (userdata *User) CreateInvitation(filename string, recipientUsername string) (
 	invitationPtr uuid.UUID, err error) {
+	
 	return
 }
 
