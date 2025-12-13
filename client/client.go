@@ -221,6 +221,11 @@ type User struct {
 	// begins with a lowercase letter).
 }
 
+type UserFileList struct {
+	FileList map[string]uuid.UUID
+	KeyList  map[string][]byte // 16 bytes
+}
+
 // NOTE: The following methods have toy (insecure!) implementations.
 
 func InitUser(username string, password string) (userdataptr *User, err error) {
@@ -232,6 +237,7 @@ func InitUser(username string, password string) (userdataptr *User, err error) {
 	// Generate root key from password & username (used as salt)
 	var passwdKey []byte = userlib.Argon2Key([]byte(password), []byte(username), 16)
 
+	userlib.DebugMsg("[InitUser] Generate non-symmetric keys for user: " + username)
 	// Generate keys for public key encryption
 	userdata.PkeEncKey, userdata.PkeDecKey, err = userlib.PKEKeyGen()
 	if err != nil {
@@ -252,6 +258,7 @@ func InitUser(username string, password string) (userdataptr *User, err error) {
 		return nil, err
 	}
 
+	userlib.DebugMsg("[InitUser] Encrypt and store user data for user: " + username)
 	// Get user bytes, encryption key and hash key
 	var userBytes []byte
 	userBytes, err = json.Marshal(userdata)
@@ -284,6 +291,24 @@ func InitUser(username string, password string) (userdataptr *User, err error) {
 		return nil, err
 	}
 	userlib.DatastoreSet(userUUID, encRes)
+
+	userlib.DebugMsg("[InitUser] Encrypt and store user file list for user: " + username)
+	// Encrypt and store file list information
+	var fileList = UserFileList{
+		FileList: make(map[string]uuid.UUID), // initialize empty map
+		KeyList:  make(map[string][]byte),
+	}
+
+	// Get filelist uuid and store
+	var fileListUUID uuid.UUID
+	fileListUUID, err = uuid.FromBytes(userlib.Hash([]byte("file-list-" + username))[:16])
+	if err != nil {
+		return nil, err
+	}
+	err = storeFileList(fileList, userdata.SourceKey, fileListUUID)
+	if err != nil {
+		return nil, err
+	}
 
 	return &userdata, nil
 }
@@ -341,9 +366,110 @@ type FileNode struct {
 	Next    uuid.UUID
 }
 
-// Return 64-byte keys! May need truncate!
-func getFileNodeKeys(sourceKey []byte, nodeUUID uuid.UUID) (nodeEncKey []byte, hashKey []byte, err error) {
-	hashKey, err = userlib.HashKDF(sourceKey, []byte("ciphertext-hash-"+nodeUUID.String()))
+type FileMetadata struct {
+	Owner string
+
+	FirstFileNode uuid.UUID
+}
+
+// Used for file list
+func getFileListKeys(sourceKey []byte) (listEncKey []byte, listHashKey []byte, err error) {
+	listEncKey, err = userlib.HashKDF(sourceKey, []byte("user-file-list-enc"))
+	if err != nil {
+		return []byte{}, []byte{}, err
+	}
+	listHashKey, err = userlib.HashKDF(sourceKey, []byte("user-file-list-hash"))
+	if err != nil {
+		return []byte{}, []byte{}, err
+	}
+	return listEncKey[:16], listHashKey[:16], nil // return 16 bytes keys
+}
+
+func getFileListByUUID(fileListUUID uuid.UUID, sourceKey []byte) (fileList UserFileList, err error) {
+	fileListEncBytes, exist := userlib.DatastoreGet(fileListUUID)
+	if !exist {
+		return UserFileList{}, errors.New("cannot find file list with UUID: " + fileListUUID.String())
+	}
+
+	// Get file list related keys
+	fileListEncKey, fileListHashKey, err := getFileListKeys(sourceKey)
+	if err != nil {
+		return UserFileList{}, err
+	}
+	fileListBytes, err := verifyAndDecryptData(fileListHashKey, fileListEncKey, fileListEncBytes)
+	if err != nil {
+		return UserFileList{}, err
+	}
+
+	err = json.Unmarshal(fileListBytes, &fileList)
+	if err != nil {
+		return UserFileList{}, err
+	}
+
+	return fileList, nil
+}
+
+func storeFileList(fileList UserFileList, sourceKey []byte, listUUID uuid.UUID) (err error) {
+	fileListBytes, err := json.Marshal(fileList)
+	if err != nil {
+		return err
+	}
+	// Get file list related keys
+	fileListEncKey, fileListHashKey, err := getFileListKeys(sourceKey)
+	if err != nil {
+		return err
+	}
+	fileListEncBytes, err := encryptData(fileListEncKey, fileListHashKey, fileListBytes)
+	if err != nil {
+		return err
+	}
+	userlib.DatastoreSet(listUUID, fileListEncBytes)
+	return nil
+}
+
+func getMetadataByUUID(metadataUUID uuid.UUID, sourceKey []byte) (metadata FileMetadata, err error) {
+	metadataEncBytes, exist := userlib.DatastoreGet(metadataUUID)
+	if !exist {
+		return FileMetadata{}, errors.New("cannot find file metadata in datastore")
+	}
+	metaEncKey, metaHashKey, err := getFileNodeKeys(sourceKey, metadataUUID)
+	if err != nil {
+		return FileMetadata{}, err
+	}
+	metadataBytes, err := verifyAndDecryptData(metaHashKey, metaEncKey, metadataEncBytes)
+	if err != nil {
+		return FileMetadata{}, err
+	}
+
+	err = json.Unmarshal(metadataBytes, &metadata)
+	if err != nil {
+		return FileMetadata{}, err
+	}
+	return metadata, nil
+}
+
+func storeMetadata(metadata FileMetadata, sourceKey []byte, metadataUUID uuid.UUID) (err error) {
+	metadataBytes, err := json.Marshal(metadata)
+	if err != nil {
+		return err
+	}
+
+	// Encrypt and store newly created metadata
+	metaEncKey, metaHashKey, err := getFileNodeKeys(sourceKey, metadataUUID)
+	if err != nil {
+		return err
+	}
+	metadataEncBytes, err := encryptData(metaEncKey, metaHashKey, metadataBytes)
+	if err != nil {
+		return err
+	}
+	userlib.DatastoreSet(metadataUUID, metadataEncBytes)
+	return nil
+}
+
+// Used for fileNode & file metadata
+func getFileNodeKeys(sourceKey []byte, nodeUUID uuid.UUID) (nodeEncKey []byte, nodeHashKey []byte, err error) {
+	nodeHashKey, err = userlib.HashKDF(sourceKey, []byte("ciphertext-hash-"+nodeUUID.String()))
 	if err != nil {
 		return []byte{}, []byte{}, err
 	}
@@ -351,7 +477,7 @@ func getFileNodeKeys(sourceKey []byte, nodeUUID uuid.UUID) (nodeEncKey []byte, h
 	if err != nil {
 		return []byte{}, []byte{}, err
 	}
-	return
+	return nodeEncKey[:16], nodeHashKey[:16], nil // Return 16-byte keys
 }
 
 func getNodeByUUID(sourceKey []byte, nodeUUID uuid.UUID) (currNode FileNode, err error) {
@@ -364,14 +490,14 @@ func getNodeByUUID(sourceKey []byte, nodeUUID uuid.UUID) (currNode FileNode, err
 
 	// Verify and get plaintext of curr fileNode
 	userlib.DebugMsg("[getNodeByUUID] Verify and decrypt the filenode with UUID: %v", nodeUUID)
-	var hashKey, fileNodeEncKey []byte
-	fileNodeEncKey, hashKey, err = getFileNodeKeys(sourceKey, nodeUUID)
+	var nodeHashKey, fileNodeEncKey []byte
+	fileNodeEncKey, nodeHashKey, err = getFileNodeKeys(sourceKey, nodeUUID)
 	if err != nil {
 		return FileNode{}, err
 	}
 
 	var nodeBytes []byte
-	nodeBytes, err = verifyAndDecryptData(hashKey[:16], fileNodeEncKey[:16], nodeStoredBytes)
+	nodeBytes, err = verifyAndDecryptData(nodeHashKey, fileNodeEncKey, nodeStoredBytes)
 	if err != nil {
 		return FileNode{}, err
 	}
@@ -388,10 +514,76 @@ func getNodeByUUID(sourceKey []byte, nodeUUID uuid.UUID) (currNode FileNode, err
 }
 
 func (userdata *User) StoreFile(filename string, content []byte) (err error) {
-	// Get file uuid by filename & username
-	nodeUUID, err := uuid.FromBytes(userlib.Hash([]byte(filename + userdata.Username))[:16])
+	userlib.DebugMsg("[StoreFile] Get user file list from datastore for user: %v", userdata.Username)
+	// Get user file list
+	var fileListUUID uuid.UUID
+	fileListUUID, err = uuid.FromBytes(userlib.Hash([]byte("file-list-" + userdata.Username))[:16])
 	if err != nil {
 		return err
+	}
+
+	var fileList UserFileList
+	fileList, err = getFileListByUUID(fileListUUID, userdata.SourceKey)
+	if err != nil {
+		return err
+	}
+
+	// Encrypt source key for this file
+	// 	For shared files, different users have same metadata
+	// 	Temporary set to self file source key
+	var fileSourceKey []byte
+	fileSourceKey, err = userlib.HashKDF(userdata.SourceKey, []byte("file-"+filename))
+	if err != nil {
+		return err
+	}
+	fileSourceKey = fileSourceKey[:16]
+
+	// Get node UUID for new node
+	var nodeUUID uuid.UUID
+	nodeUUID, err = uuid.FromBytes(userlib.RandomBytes(16))
+	if err != nil {
+		return err
+	}
+
+	// Get or update file metadata
+	metadataUUID, exist := fileList.FileList[filename]
+	if !exist { // first created, use self file source key
+		userlib.DebugMsg("[StoreFile] Create metadata for new file: %v", filename)
+		// Create metadata UUID and update fileList
+		metadataUUID, err = uuid.FromBytes(userlib.RandomBytes(16))
+		if err != nil {
+			return err
+		}
+		fileList.FileList[filename] = metadataUUID
+		fileList.KeyList[filename] = fileSourceKey
+
+		var metadata = FileMetadata{
+			Owner:         userdata.Username,
+			FirstFileNode: nodeUUID,
+		}
+		storeMetadata(metadata, fileSourceKey, metadataUUID)
+
+		userlib.DebugMsg("[StoreFile] Store updated user file list to datastore for user: %v", userdata.Username)
+		err = storeFileList(fileList, userdata.SourceKey, fileListUUID)
+		if err != nil {
+			return err
+		}
+	} else { // metadata already exist
+		userlib.DebugMsg("[StoreFile] Get stored metadata for file: %v", filename)
+
+		fileSourceKey, exist = fileList.KeyList[filename]
+		if !exist {
+			return errors.New("cannot find encrypt source key for file: " + filename)
+		}
+		var metadata FileMetadata
+		metadata, err = getMetadataByUUID(metadataUUID, fileSourceKey)
+		if err != nil {
+			return err
+		}
+
+		userlib.DebugMsg("[StoreFile] Determine the place to store file node")
+		nodeUUID = metadata.FirstFileNode // ensure no change of metadata
+		// TODO: delete pre stored file nodes
 	}
 
 	// Get data to be stored
@@ -406,9 +598,8 @@ func (userdata *User) StoreFile(filename string, content []byte) (err error) {
 		return err
 	}
 
-	// Get file encrypt key
+	// Get file encrypt key and store
 	userlib.DebugMsg("[StoreFile] Encrypt data for nodeUUID: %v", nodeUUID)
-	var fileSourceKey []byte
 	fileSourceKey, err = userlib.HashKDF(userdata.SourceKey, []byte("file-"+filename))
 	if err != nil {
 		return err
@@ -424,7 +615,7 @@ func (userdata *User) StoreFile(filename string, content []byte) (err error) {
 
 	// Get encryption result
 	var fileEncRes []byte
-	fileEncRes, err = encryptData(nodeEncKey[:16], hashKey[:16], plainData)
+	fileEncRes, err = encryptData(nodeEncKey, hashKey, plainData)
 	if err != nil {
 		return err
 	}
@@ -433,8 +624,44 @@ func (userdata *User) StoreFile(filename string, content []byte) (err error) {
 	return
 }
 
-func (userdata *User) AppendToFile(filename string, content []byte) error {
-	var err error
+func (userdata *User) AppendToFile(filename string, content []byte) (err error) {
+	userlib.DebugMsg("[AppendToFile] Get user file list from datastore for user: %v", userdata.Username)
+	// Get user file list
+	var fileListUUID uuid.UUID
+	fileListUUID, err = uuid.FromBytes(userlib.Hash([]byte("file-list-" + userdata.Username))[:16])
+	if err != nil {
+		return err
+	}
+
+	var fileList UserFileList
+	fileList, err = getFileListByUUID(fileListUUID, userdata.SourceKey)
+	if err != nil {
+		return err
+	}
+
+	userlib.DebugMsg("[AppendToFile] Get metadata for file: %v", filename)
+	// Get encryption source key for file
+	var exist bool
+	var fileSourceKey []byte
+	fileSourceKey, exist = fileList.KeyList[filename]
+	if !exist {
+		return errors.New("cannot find file encryption source key for file: " + filename)
+	}
+
+	// Get encryption bytes and decrypt
+	var metadataUUID uuid.UUID
+	metadataUUID, exist = fileList.FileList[filename]
+	if !exist {
+		return errors.New("cannot find file metadata UUID in file list for file: " + filename)
+	}
+
+	var metadata FileMetadata
+	metadata, err = getMetadataByUUID(metadataUUID, fileSourceKey)
+	if err != nil {
+		return err
+	}
+
+	userlib.DebugMsg("[AppendToFile] Store new file node for file: %v", filename)
 	// Data to be stored
 	var thisUUID uuid.UUID
 	thisUUID, err = uuid.FromBytes(userlib.RandomBytes(16))
@@ -442,7 +669,7 @@ func (userdata *User) AppendToFile(filename string, content []byte) error {
 		return err
 	}
 
-	userlib.DebugMsg("[AppendToFile] Create a new fileNode for nodeUUID: %v", thisUUID)
+	userlib.DebugMsg("[AppendToFile] Create and store the new fileNode with nodeUUID: %v", thisUUID)
 	var newFileNode = FileNode{
 		Content: content,
 		Next:    uuid.Nil,
@@ -453,16 +680,7 @@ func (userdata *User) AppendToFile(filename string, content []byte) error {
 		return err
 	}
 
-	// Get encrypt source key
-	var fileSourceKey []byte
-	fileSourceKey, err = userlib.HashKDF(userdata.SourceKey, []byte("file-"+filename))
-	if err != nil {
-		return err
-	}
-	fileSourceKey = fileSourceKey[:16]
-
 	// Serialize and encrypt
-	userlib.DebugMsg("[AppendToFile] Encrypt data for nodeUUID: %v", thisUUID)
 	var nodeEncKey, hashKey []byte
 	nodeEncKey, hashKey, err = getFileNodeKeys(fileSourceKey, thisUUID)
 	if err != nil {
@@ -471,7 +689,7 @@ func (userdata *User) AppendToFile(filename string, content []byte) error {
 
 	// Get encryption result and store
 	var nodeEncRes []byte
-	nodeEncRes, err = encryptData(nodeEncKey[:16], hashKey[:16], plainNodeBytes)
+	nodeEncRes, err = encryptData(nodeEncKey, hashKey, plainNodeBytes)
 	if err != nil {
 		return err
 	}
@@ -479,10 +697,10 @@ func (userdata *User) AppendToFile(filename string, content []byte) error {
 
 	// Get UUID of first file node
 	userlib.DebugMsg("[AppendToFile] Find first fileNode for file: %v", filename)
-	var firstNodeUUID uuid.UUID
-	firstNodeUUID, err = uuid.FromBytes(userlib.Hash([]byte(filename + userdata.Username))[:16])
-	if err != nil {
-		return err
+	var firstNodeUUID = metadata.FirstFileNode
+	if firstNodeUUID == uuid.Nil {
+		userlib.DebugMsg("metadata: %v", metadata)
+		return errors.New("find first file node to be uuid.Nil in metadata")
 	}
 
 	// Get the node to be modified
@@ -510,15 +728,13 @@ func (userdata *User) AppendToFile(filename string, content []byte) error {
 	if err != nil {
 		return err
 	}
-	userlib.DebugMsg("[AppendToFile] Change last fileNode to: %v", currNode)
-
-	userlib.DebugMsg("[AppendToFile] Encrypt and store fileNode with nodeUUID: %v", currNodeUUID)
+	// userlib.DebugMsg("[AppendToFile] Change last fileNode to: %v", currNode)
 	nodeEncKey, hashKey, err = getFileNodeKeys(fileSourceKey, currNodeUUID)
 	if err != nil {
 		return err
 	}
 
-	nodeEncRes, err = encryptData(nodeEncKey[:16], hashKey[:16], plainNodeBytes)
+	nodeEncRes, err = encryptData(nodeEncKey, hashKey, plainNodeBytes)
 	if err != nil {
 		return err
 	}
@@ -528,20 +744,47 @@ func (userdata *User) AppendToFile(filename string, content []byte) error {
 }
 
 func (userdata *User) LoadFile(filename string) (content []byte, err error) {
-	// Get first node
-	var firstNodeUUID uuid.UUID
-	firstNodeUUID, err = uuid.FromBytes(userlib.Hash([]byte(filename + userdata.Username))[:16])
-	if err != nil {
-		return nil, err
-	}
-
-	// Get file encrypt source key
-	var fileSourceKey []byte
-	fileSourceKey, err = userlib.HashKDF(userdata.SourceKey, []byte("file-"+filename))
+	userlib.DebugMsg("[LoadFile] Get user file list from datastore for user: %v", userdata.Username)
+	// Get user file list
+	var fileListUUID uuid.UUID
+	fileListUUID, err = uuid.FromBytes(userlib.Hash([]byte("file-list-" + userdata.Username))[:16])
 	if err != nil {
 		return []byte{}, err
 	}
-	fileSourceKey = fileSourceKey[:16]
+
+	var fileList UserFileList
+	fileList, err = getFileListByUUID(fileListUUID, userdata.SourceKey)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	userlib.DebugMsg("[LoadFile] Get metadata for file: %v", filename)
+	// Get encryption source key for file
+	var exist bool
+	var fileSourceKey []byte
+	fileSourceKey, exist = fileList.KeyList[filename]
+	if !exist {
+		return []byte{}, errors.New("cannot find file encryption source key for file: " + filename)
+	}
+
+	// Get encryption bytes and decrypt
+	var metadataUUID uuid.UUID
+	metadataUUID, exist = fileList.FileList[filename]
+	if !exist {
+		return []byte{}, errors.New("cannot find file metadata UUID in file list for file: " + filename)
+	}
+
+	var metadata FileMetadata
+	metadata, err = getMetadataByUUID(metadataUUID, fileSourceKey)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	// Get first node
+	var firstNodeUUID = metadata.FirstFileNode
+	if firstNodeUUID == uuid.Nil {
+		return nil, errors.New("find first file node to be uuid.Nil in metadata")
+	}
 
 	// Loop over the nodes
 	var currNode FileNode
@@ -567,7 +810,7 @@ func (userdata *User) LoadFile(filename string) (content []byte, err error) {
 
 func (userdata *User) CreateInvitation(filename string, recipientUsername string) (
 	invitationPtr uuid.UUID, err error) {
-	
+
 	return
 }
 
