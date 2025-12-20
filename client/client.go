@@ -107,7 +107,72 @@ func someUsefulThings() {
 
 /*
 ********************************************
-**      Global Stucts and Functions       **
+**        Data Structures Stucts          **
+********************************************
+ */
+
+// This is the type definition for the User struct.
+// A Go struct is like a Python or Java class - it can have attributes
+// (e.g. like the Username attribute) and methods (e.g. like the StoreFile method below).
+type User struct {
+	Username string
+
+	SourceKey []byte
+
+	PkeEncKey userlib.PKEEncKey
+	PkeDecKey userlib.PKEDecKey
+
+	DsSigKey userlib.DSSignKey
+	DsVerKey userlib.DSVerifyKey
+
+	// You can add other attributes here if you want! But note that in order for attributes to
+	// be included when this struct is serialized to/from JSON, they must be capitalized.
+	// On the flipside, if you have an attribute that you want to be able to access from
+	// this struct's methods, but you DON'T want that value to be included in the serialized value
+	// of this struct that's stored in datastore, then you can use a "private" variable (e.g. one that
+	// begins with a lowercase letter).
+}
+
+type FileNode struct {
+	Content []byte
+	Next    uuid.UUID
+}
+
+type ShareEntry struct {
+	Sender         string
+	Receiver       string
+	InvitationUUID uuid.UUID
+}
+
+type FileMetadata struct {
+	Owner     string
+	ShareList []ShareEntry // All sharing information
+
+	FirstFileNode uuid.UUID
+	FileSourceKey []byte
+}
+
+
+type FileEntry struct {
+	Status string // owned, shared
+
+	MetadataUUID      uuid.UUID // owned -> metadata, shared -> invitation
+	MetadataSourceKey []byte    // 16 bytes
+}
+
+type UserFileList struct {
+	EntryList map[string]FileEntry
+}
+
+
+type Invitation struct {
+	FileMetadataUUID  uuid.UUID
+	MetadataSourceKey []byte
+}
+
+/*
+********************************************
+**            Global Functions            **
 ********************************************
  */
 
@@ -174,7 +239,7 @@ func verifyAndDecryptData(hashKey []byte, encKey []byte, storedData []byte) (pla
 	if len(entry.Ciphertext) < userlib.AESBlockSizeBytes {
 		return nil, errors.New("ciphertext is less than the length of one cipher block")
 	}
-	plainBytes = userlib.SymDec(encKey, entry.Ciphertext) // TODO: nosense codes?
+	plainBytes = userlib.SymDec(encKey, entry.Ciphertext) // TODO: if encounter nosense codes?
 	return plainBytes, nil
 }
 
@@ -197,33 +262,6 @@ func getUserUUIDByInfo(passwdKey []byte) (userUUID uuid.UUID, err error) {
 		return uuid.Nil, err
 	}
 	return userUUID, nil
-}
-
-// This is the type definition for the User struct.
-// A Go struct is like a Python or Java class - it can have attributes
-// (e.g. like the Username attribute) and methods (e.g. like the StoreFile method below).
-type User struct {
-	Username string
-
-	SourceKey []byte
-
-	PkeEncKey userlib.PKEEncKey
-	PkeDecKey userlib.PKEDecKey
-
-	DsSigKey userlib.DSSignKey
-	DsVerKey userlib.DSVerifyKey
-
-	// You can add other attributes here if you want! But note that in order for attributes to
-	// be included when this struct is serialized to/from JSON, they must be capitalized.
-	// On the flipside, if you have an attribute that you want to be able to access from
-	// this struct's methods, but you DON'T want that value to be included in the serialized value
-	// of this struct that's stored in datastore, then you can use a "private" variable (e.g. one that
-	// begins with a lowercase letter).
-}
-
-type UserFileList struct {
-	FileList map[string]uuid.UUID
-	KeyList  map[string][]byte // 16 bytes
 }
 
 // NOTE: The following methods have toy (insecure!) implementations.
@@ -295,8 +333,7 @@ func InitUser(username string, password string) (userdataptr *User, err error) {
 	userlib.DebugMsg("[InitUser] Encrypt and store user file list for user: " + username)
 	// Encrypt and store file list information
 	var fileList = UserFileList{
-		FileList: make(map[string]uuid.UUID), // initialize empty map
-		KeyList:  make(map[string][]byte),
+		EntryList: make(map[string]FileEntry), // initialize empty map
 	}
 
 	// Get filelist uuid and store
@@ -361,18 +398,7 @@ func GetUser(username string, password string) (userdataptr *User, err error) {
 ********************************************
  */
 
-type FileNode struct {
-	Content []byte
-	Next    uuid.UUID
-}
-
-type FileMetadata struct {
-	Owner string
-
-	FirstFileNode uuid.UUID
-}
-
-// Used for file list
+/* File List Related */
 func getFileListKeys(sourceKey []byte) (listEncKey []byte, listHashKey []byte, err error) {
 	listEncKey, err = userlib.HashKDF(sourceKey, []byte("user-file-list-enc"))
 	if err != nil {
@@ -427,12 +453,25 @@ func storeFileList(fileList UserFileList, sourceKey []byte, listUUID uuid.UUID) 
 	return nil
 }
 
+/* Metadata Related */
+func getMetadataKeys(sourceKey []byte) (metadataEncKey []byte, metadataHashKey []byte, err error) {
+	metadataEncKey, err = userlib.HashKDF(sourceKey, []byte("metadata-enc"))
+	if err != nil {
+		return []byte{}, []byte{}, err
+	}
+	metadataHashKey, err = userlib.HashKDF(sourceKey, []byte("metadata-hash"))
+	if err != nil {
+		return []byte{}, []byte{}, err
+	}
+	return metadataEncKey[:16], metadataHashKey[:16], nil // return 16 bytes keys
+}
+
 func getMetadataByUUID(metadataUUID uuid.UUID, sourceKey []byte) (metadata FileMetadata, err error) {
 	metadataEncBytes, exist := userlib.DatastoreGet(metadataUUID)
 	if !exist {
 		return FileMetadata{}, errors.New("cannot find file metadata in datastore")
 	}
-	metaEncKey, metaHashKey, err := getFileNodeKeys(sourceKey, metadataUUID)
+	metaEncKey, metaHashKey, err := getMetadataKeys(sourceKey)
 	if err != nil {
 		return FileMetadata{}, err
 	}
@@ -455,7 +494,7 @@ func storeMetadata(metadata FileMetadata, sourceKey []byte, metadataUUID uuid.UU
 	}
 
 	// Encrypt and store newly created metadata
-	metaEncKey, metaHashKey, err := getFileNodeKeys(sourceKey, metadataUUID)
+	metaEncKey, metaHashKey, err := getMetadataKeys(sourceKey)
 	if err != nil {
 		return err
 	}
@@ -467,8 +506,9 @@ func storeMetadata(metadata FileMetadata, sourceKey []byte, metadataUUID uuid.UU
 	return nil
 }
 
-// Used for fileNode & file metadata
+/* File Node Related */
 func getFileNodeKeys(sourceKey []byte, nodeUUID uuid.UUID) (nodeEncKey []byte, nodeHashKey []byte, err error) {
+	// Different node has different keys
 	nodeHashKey, err = userlib.HashKDF(sourceKey, []byte("ciphertext-hash-"+nodeUUID.String()))
 	if err != nil {
 		return []byte{}, []byte{}, err
@@ -532,11 +572,6 @@ func (userdata *User) StoreFile(filename string, content []byte) (err error) {
 	// 	For shared files, different users have same metadata
 	// 	Temporary set to self file source key
 	var fileSourceKey []byte
-	fileSourceKey, err = userlib.HashKDF(userdata.SourceKey, []byte("file-"+filename))
-	if err != nil {
-		return err
-	}
-	fileSourceKey = fileSourceKey[:16]
 
 	// Get node UUID for new node
 	var nodeUUID uuid.UUID
@@ -546,7 +581,8 @@ func (userdata *User) StoreFile(filename string, content []byte) (err error) {
 	}
 
 	// Get or update file metadata
-	metadataUUID, exist := fileList.FileList[filename]
+	var metadataUUID uuid.UUID
+	fileEntry, exist := fileList.EntryList[filename]
 	if !exist { // first created, use self file source key
 		userlib.DebugMsg("[StoreFile] Create metadata for new file: %v", filename)
 		// Create metadata UUID and update fileList
@@ -554,35 +590,48 @@ func (userdata *User) StoreFile(filename string, content []byte) (err error) {
 		if err != nil {
 			return err
 		}
-		fileList.FileList[filename] = metadataUUID
-		fileList.KeyList[filename] = fileSourceKey
+		metadataSourceKey := userlib.RandomBytes(16)
+		fileEntry = FileEntry{
+			Status:            "owned",
+			MetadataUUID:      metadataUUID,
+			MetadataSourceKey: metadataSourceKey,
+		}
+		fileList.EntryList[filename] = fileEntry
 
+		// init file sourcekey
+		fileSourceKey, err = userlib.HashKDF(userdata.SourceKey, []byte("file-"+filename))
+		if err != nil {
+			return err
+		}
+		fileSourceKey = fileSourceKey[:16]
+
+		// store new metadata
 		var metadata = FileMetadata{
 			Owner:         userdata.Username,
+			ShareList:     []ShareEntry{},
 			FirstFileNode: nodeUUID,
+			FileSourceKey: fileSourceKey,
 		}
-		storeMetadata(metadata, fileSourceKey, metadataUUID)
+		storeMetadata(metadata, metadataSourceKey, metadataUUID)
 
 		userlib.DebugMsg("[StoreFile] Store updated user file list to datastore for user: %v", userdata.Username)
-		err = storeFileList(fileList, userdata.SourceKey, fileListUUID)
+		err = storeFileList(fileList, userdata.SourceKey, fileListUUID) // FileList use sourcekey from userdata for convenience
 		if err != nil {
 			return err
 		}
 	} else { // metadata already exist
 		userlib.DebugMsg("[StoreFile] Get stored metadata for file: %v", filename)
 
-		fileSourceKey, exist = fileList.KeyList[filename]
-		if !exist {
-			return errors.New("cannot find encrypt source key for file: " + filename)
-		}
+		metadataSourceKey := fileEntry.MetadataSourceKey
 		var metadata FileMetadata
-		metadata, err = getMetadataByUUID(metadataUUID, fileSourceKey)
+		metadata, err = getMetadataByUUID(metadataUUID, metadataSourceKey)
 		if err != nil {
 			return err
 		}
 
 		userlib.DebugMsg("[StoreFile] Determine the place to store file node")
-		nodeUUID = metadata.FirstFileNode // ensure no change of metadata
+		nodeUUID = metadata.FirstFileNode // ensure no change of metadata for convenience
+		fileSourceKey = metadata.FileSourceKey // use previous setting
 		// TODO: delete pre stored file nodes
 	}
 
@@ -641,25 +690,21 @@ func (userdata *User) AppendToFile(filename string, content []byte) (err error) 
 
 	userlib.DebugMsg("[AppendToFile] Get metadata for file: %v", filename)
 	// Get encryption source key for file
-	var exist bool
-	var fileSourceKey []byte
-	fileSourceKey, exist = fileList.KeyList[filename]
+	fileEntry, exist := fileList.EntryList[filename]
 	if !exist {
 		return errors.New("cannot find file encryption source key for file: " + filename)
 	}
 
 	// Get encryption bytes and decrypt
-	var metadataUUID uuid.UUID
-	metadataUUID, exist = fileList.FileList[filename]
-	if !exist {
-		return errors.New("cannot find file metadata UUID in file list for file: " + filename)
-	}
+	var metadataUUID = fileEntry.MetadataUUID
+	var metadataSourceKey = fileEntry.MetadataSourceKey
 
 	var metadata FileMetadata
-	metadata, err = getMetadataByUUID(metadataUUID, fileSourceKey)
+	metadata, err = getMetadataByUUID(metadataUUID, metadataSourceKey)
 	if err != nil {
 		return err
 	}
+	var fileSourceKey = metadata.FileSourceKey
 
 	userlib.DebugMsg("[AppendToFile] Store new file node for file: %v", filename)
 	// Data to be stored
@@ -759,28 +804,22 @@ func (userdata *User) LoadFile(filename string) (content []byte, err error) {
 	}
 
 	userlib.DebugMsg("[LoadFile] Get metadata for file: %v", filename)
-	// Get encryption source key for file
-	var exist bool
-	var fileSourceKey []byte
-	fileSourceKey, exist = fileList.KeyList[filename]
+	// Get metadata for file
+	fileEntry, exist := fileList.EntryList[filename]
 	if !exist {
-		return []byte{}, errors.New("cannot find file encryption source key for file: " + filename)
+		return []byte{}, errors.New("cannot find file entry for file: " + filename)
 	}
-
-	// Get encryption bytes and decrypt
-	var metadataUUID uuid.UUID
-	metadataUUID, exist = fileList.FileList[filename]
-	if !exist {
-		return []byte{}, errors.New("cannot find file metadata UUID in file list for file: " + filename)
-	}
-
+	var metadataUUID = fileEntry.MetadataUUID
+	var metadataSourceKey = fileEntry.MetadataSourceKey
+	
 	var metadata FileMetadata
-	metadata, err = getMetadataByUUID(metadataUUID, fileSourceKey)
+	metadata, err = getMetadataByUUID(metadataUUID, metadataSourceKey)
 	if err != nil {
 		return []byte{}, err
 	}
 
 	// Get first node
+	var fileSourceKey = metadata.FileSourceKey
 	var firstNodeUUID = metadata.FirstFileNode
 	if firstNodeUUID == uuid.Nil {
 		return nil, errors.New("find first file node to be uuid.Nil in metadata")
@@ -807,6 +846,12 @@ func (userdata *User) LoadFile(filename string) (content []byte, err error) {
 
 	return content, err
 }
+
+/*
+********************************************
+**        File  Share  Functions          **
+********************************************
+ */
 
 func (userdata *User) CreateInvitation(filename string, recipientUsername string) (
 	invitationPtr uuid.UUID, err error) {

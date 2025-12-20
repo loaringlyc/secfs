@@ -88,9 +88,9 @@ Because users may log in in different devices, our implementation is stateless, 
 
 The high-level goal is that the users could store their data on an untrusted server. Other users should not be able to access their data, and even if the server is malicious, it should not be able to access their data. 
 
-**Datastore Adversary**: The Datastore Adversary is an attacker who can read and modify all name-value pairs, and add new name-value pairs, on Datastore. It can 1) compare the difference of snapshots to see which name-value pairs changed as a result of the function call; 2) see when a user calls a function; 3) see what the inputs and outputs to the functions that call Datastore APIs are. But it cannot 1) collude with other users; 2) perform any rollback attacks. 
+**Datastore Adversary**: The Datastore Adversary is an attacker who can read and modify all name-value pairs, and add new name-value pairs, on Datastore. He/She can 1) compare the difference of snapshots to see which name-value pairs changed as a result of the function call; 2) see when a user calls a function; 3) see what the inputs and outputs to the functions that call Datastore APIs are. But it cannot 1) collude with other users; 2) perform any rollback attacks. 
 
-**Revoked User Adversary**: 
+**Revoked User Adversary**: The Revoked User Adversary is an attacker who wants to re-obtain access (his/her only goal) to the file once he/she has his/her access revoked. He/She can 1) call functions with different arguments, e.g. calling `DatastoreGet` or `AcceptInvitation` again; 2) write down any values that they have previously seen, because the adversary has one copy of code on his/her own computer. But 1) do not have a global view of the datastore; 2) will not perform any rollback attacks.
 
 ### Library Functions
 
