@@ -1,0 +1,677 @@
+
+
+<!DOCTYPE html>
+
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+
+  <link rel="stylesheet" href="../../assets/css/just-the-docs-default.css">
+
+  <link rel="stylesheet" href="../../assets/css/just-the-docs-head-nav.css" id="jtd-head-nav-stylesheet">
+
+  <style id="jtd-nav-activation">
+  
+
+    .site-nav > ul.nav-list:first-child > li > a,
+    
+    .site-nav > ul.nav-list:first-child > li > ul > li:not(:nth-child(7)) > a,
+    .site-nav > ul.nav-list:first-child > li > ul > li > ul > li a {
+      background-image: none;
+    }
+
+    .site-nav > ul.nav-list:not(:first-child) a,
+    .site-nav li.external a {
+      background-image: none;
+    }
+
+    .site-nav > ul.nav-list:first-child > li:nth-child(7) > ul > li:nth-child(7) > a {
+      font-weight: 600;
+      text-decoration: none;
+    }.site-nav > ul.nav-list:first-child > li:nth-child(7) > button svg,
+    .site-nav > ul.nav-list:first-child > li:nth-child(7) > ul > li:nth-child(7) > button svg {
+      transform: rotate(-90deg);
+    }.site-nav > ul.nav-list:first-child > li.nav-list-item:nth-child(7) > ul.nav-list,
+    .site-nav > ul.nav-list:first-child > li.nav-list-item:nth-child(7) > ul.nav-list > li.nav-list-item:nth-child(7) > ul.nav-list {
+      display: block;
+    }
+  </style>
+
+  
+
+  
+    <script src="../../assets/js/vendor/lunr.min.js"></script>
+  
+
+  <script src="../../assets/js/just-the-docs.js"></script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <link rel="icon" href="../../favicon.ico" type="image/x-icon">
+
+
+
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>File Operations | CS 161 Fall 2025</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="File Operations" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Computer Security at UC Berkeley" />
+<meta property="og:description" content="Computer Security at UC Berkeley" />
+<link rel="canonical" href="index.html" />
+<meta property="og:url" content="https://fa25.cs161.org/proj2/files/" />
+<meta property="og:site_name" content="CS 161 Fall 2025" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="File Operations" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"Computer Security at UC Berkeley","headline":"File Operations","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://fa25.cs161.org/"}},"url":"https://fa25.cs161.org/proj2/files/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  <link
+  rel="preload"
+  href="https://fa25.cs161.org/assets/css/just-the-docs-dark.css"
+  as="style"
+>
+
+<!-- Intentionally duplicates the default theme stylesheet so there's a fallback when changing themes -->
+<link
+  id="jtdThemeCSS"
+  rel="stylesheet"
+  href="../../assets/css/just-the-docs-default.css"
+>
+
+<script>
+  /* Script to enable persistent dark mode. */
+
+  jtd.getTheme = function () {
+    var cssFileHref = (
+      document.getElementById('jtdThemeCSS') || document.querySelector('[rel="stylesheet"]')
+    ).getAttribute('href');
+    return cssFileHref.substring(cssFileHref.lastIndexOf('-') + 1, cssFileHref.length - 4);
+  };
+
+  jtd.setTheme = function (theme) {
+    var cssFile = document.getElementById('jtdThemeCSS') || document.querySelector('[rel="stylesheet"]');
+    cssFile.setAttribute('href', cssFile.getAttribute('href').replace(jtd.getTheme(), theme));
+  };
+
+  let toggleDark = () => {
+    let setDark = jtd.getTheme() !== 'dark';
+    document.documentElement.setAttribute('data-theme', setDark ? 'dark' : 'default');
+    document.documentElement.setAttribute('data-theme', setDark ? 'dark' : 'default');
+    jtd.setTheme(setDark ? 'dark' : 'default');
+    localStorage.setItem('darkMode', String(setDark));
+
+    if (typeof calendar !== 'undefined') {
+      calendar.setColorScheme(setDark ? 'dark' : 'light');
+    }
+  };
+
+  if (localStorage.getItem('darkMode') === 'true') {
+    toggleDark();
+  }
+</script>
+
+<!-- Script for LaTeX rendering. -->
+<link
+  rel="stylesheet"
+  href="../../assets/katex/katex.min.css"
+>
+<script defer src="../../assets/katex/katex.min.js"></script>
+<script>
+  function renderKaTeX() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '$', right: '$', display: false },
+        { left: '\\(', right: '\\)', display: false },
+        { left: '\\[', right: '\\]', display: true },
+      ],
+    });
+  }
+</script>
+<script
+  defer
+  src="../../assets/katex/contrib/auto-render.min.js"
+  onload="renderKaTeX();"
+></script>
+
+
+</head>
+
+<body>
+  <a class="skip-to-main" href="index.html#main-content">Skip to main content</a>
+  <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+  <symbol id="svg-link" viewBox="0 0 24 24">
+  <title>Link</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-link">
+    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+  </svg>
+</symbol>
+
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+  <title>Menu</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu">
+    <line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line>
+  </svg>
+</symbol>
+
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+  <title>Expand</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+    <polyline points="9 18 15 12 9 6"></polyline>
+  </svg>
+</symbol>
+
+  <!-- Feather. MIT License: https://github.com/feathericons/feather/blob/master/LICENSE -->
+<symbol id="svg-external-link" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link">
+  <title id="svg-external-link-title">(external link)</title>
+  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line>
+</symbol>
+
+  
+    <symbol id="svg-doc" viewBox="0 0 24 24">
+  <title>Document</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file">
+    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline>
+  </svg>
+</symbol>
+
+    <symbol id="svg-search" viewBox="0 0 24 24">
+  <title>Search</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search">
+    <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+  </svg>
+</symbol>
+
+  
+  
+    <!-- Bootstrap Icons. MIT License: https://github.com/twbs/icons/blob/main/LICENSE.md -->
+<symbol id="svg-copy" viewBox="0 0 16 16">
+  <title>Copy</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard" viewBox="0 0 16 16">
+    <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+    <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+  </svg>
+</symbol>
+<symbol id="svg-copied" viewBox="0 0 16 16">
+  <title>Copied</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-check-fill" viewBox="0 0 16 16">
+    <path d="M6.5 0A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3Zm3 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3Z"/>
+    <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1A2.5 2.5 0 0 1 9.5 5h-3A2.5 2.5 0 0 1 4 2.5v-1Zm6.854 7.354-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L7.5 10.793l2.646-2.647a.5.5 0 0 1 .708.708Z"/>
+  </svg>
+</symbol>
+
+  
+</svg>
+
+  
+    <div class="side-bar">
+  <div class="site-header" role="banner">
+    <a href="https://fa25.cs161.org/" class="site-title lh-tight">
+
+
+  CS 161 Fall 2025
+
+</a>
+    <button id="menu-button" class="site-button btn-reset" aria-label="Toggle menu" aria-pressed="false">
+      <svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><use xlink:href="#svg-menu"></use></svg>
+    </button>
+  </div>
+
+  <nav aria-label="Main" id="site-nav" class="site-nav">
+  
+  
+    <ul class="nav-list"><li class="nav-list-item"><a href="https://fa25.cs161.org/exam/" class="nav-list-link">Exam Logistics</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/calendar/" class="nav-list-link">Calendar</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/policies/" class="nav-list-link">Policies</a></li><li class="nav-list-item"><button class="nav-list-expander btn-reset" aria-label="toggle items in Resources category" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use xlink:href="#svg-arrow-right"></use></svg>
+      </button><a href="https://fa25.cs161.org/resources/" class="nav-list-link">Resources</a><ul class="nav-list"><li class="nav-list-item"><a href="https://fa25.cs161.org/resources/faqs/" class="nav-list-link">Spring 2026 FAQs</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/resources/instructional-machine/" class="nav-list-link">Instructional Machine Setup</a></li></ul></li><li class="nav-list-item"><a href="https://fa25.cs161.org/staff/" class="nav-list-link">Staff</a></li><li class="nav-list-item"><button class="nav-list-expander btn-reset" aria-label="toggle items in Project 1 category" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use xlink:href="#svg-arrow-right"></use></svg>
+      </button><a href="https://fa25.cs161.org/proj1/" class="nav-list-link">Project 1</a><ul class="nav-list"><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/getting-started/" class="nav-list-link">Getting Started</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/customizing/" class="nav-list-link">Customizing</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q1/" class="nav-list-link">Question 1: Remus</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q2/" class="nav-list-link">Question 2: Spica</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q3/" class="nav-list-link">Question 3: Polaris</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q4/" class="nav-list-link">Question 4: Vega</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q5/" class="nav-list-link">Question 5: Deneb</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q6/" class="nav-list-link">Question 6: Antares</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q7/" class="nav-list-link">Question 7: Rigel</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/deliverables/" class="nav-list-link">Deliverables</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/vm-debugging/" class="nav-list-link">Troubleshooting</a></li></ul></li><li class="nav-list-item"><button class="nav-list-expander btn-reset" aria-label="toggle items in Project 2 category" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use xlink:href="#svg-arrow-right"></use></svg>
+      </button><a href="../index.html" class="nav-list-link">Project 2</a><ul class="nav-list"><li class="nav-list-item"><a href="../story/index.html" class="nav-list-link">Story</a></li><li class="nav-list-item"><a href="../policies.html" class="nav-list-link">Project 2 Policies and Deliverables</a></li><li class="nav-list-item"><a href="../getting-started.html" class="nav-list-link">Getting Started</a></li><li class="nav-list-item"><a href="../overview/index.html" class="nav-list-link">Design Overview</a></li><li class="nav-list-item"><a href="../library.html" class="nav-list-link">Library Functions</a></li><li class="nav-list-item"><a href="../userauth/index.html" class="nav-list-link">Users And User Authentication</a></li><li class="nav-list-item"><a href="index.html" class="nav-list-link">File Operations</a></li><li class="nav-list-item"><a href="../sharing/index.html" class="nav-list-link">Sharing and Revocation</a></li><li class="nav-list-item"><a href="../troubleshooting.html" class="nav-list-link">Debugging and Errors</a></li><li class="nav-list-item"><a href="../advice/index.html" class="nav-list-link">Advice and Tips</a></li><li class="nav-list-item"><a href="../appendix/index.html" class="nav-list-link">Appendix</a></li></ul></li><li class="nav-list-item"><button class="nav-list-expander btn-reset" aria-label="toggle items in Project 3 category" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use xlink:href="#svg-arrow-right"></use></svg>
+      </button><a href="https://fa25.cs161.org/proj3/" class="nav-list-link">Project 3</a><ul class="nav-list"><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/story/" class="nav-list-link">Story</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/getting-started/" class="nav-list-link">Getting Started</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/tips/" class="nav-list-link">General Tips</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag1/" class="nav-list-link">Flag 1: dev</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag2/" class="nav-list-link">Flag 2: ip.txt</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag3/" class="nav-list-link">Flag 3: shomil</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag4/" class="nav-list-link">Flag 4: nicholas</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag5/" class="nav-list-link">Flag 5: cs161</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag6/" class="nav-list-link">Flag 6: delete</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag7/" class="nav-list-link">Flag 7: admin</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag8/" class="nav-list-link">Flag 8: config</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/deliverables/" class="nav-list-link">Deliverables</a></li></ul></li></ul>
+  
+</nav>
+
+
+
+
+  
+  
+    <div class="site-footer">
+	Report an <a href="https://dap.berkeley.edu/get-help/report-web-accessibility-issue">accessibility issue</a>.
+
+	<br><br>
+
+	This site uses <a href="https://github.com/just-the-docs/just-the-docs">Just the Docs</a>, a documentation theme for Jekyll.
+</div>
+  
+</div>
+
+  
+  <div class="main" id="top">
+    <div id="main-header" class="main-header">
+  
+    
+
+<div class="search" role="search">
+  <div class="search-input-wrap">
+    <input type="text" id="search-input" class="search-input" tabindex="0" placeholder="Search CS 161 Fall 2025" aria-label="Search CS 161 Fall 2025" autocomplete="off">
+    <label for="search-input" class="search-label"><svg viewBox="0 0 24 24" class="search-icon"><use xlink:href="#svg-search"></use></svg></label>
+  </div>
+  <div id="search-results" class="search-results"></div>
+</div>
+
+  
+  
+  
+    <nav aria-label="Auxiliary" class="aux-nav">
+  <ul class="aux-nav-list">
+    
+      <li class="aux-nav-list-item">
+        <a href="index.html#" class="site-button"
+          
+        >
+          Dark Mode
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://textbook.cs161.org" class="site-button"
+          
+        >
+          Textbook
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://edstem.org/us/courses/83260" class="site-button"
+          
+        >
+          Ed
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://oh.cs161.org" class="site-button"
+          
+        >
+          OH Queue
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://forms.gle/uaFdyWWqnPkW9Uhg6" class="site-button"
+          
+        >
+          Extensions
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://forms.gle/bW9nen9oHGNUzWo69" class="site-button"
+          
+        >
+          Anonymous Feedback
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://calendar.app.google/9quTrjViGAGPG47Z8" class="site-button"
+          
+        >
+          Student Support
+        </a>
+      </li>
+    
+  </ul>
+</nav>
+
+  
+</div>
+
+    <div class="main-content-wrap">
+      <nav aria-label="Breadcrumb" class="breadcrumb-nav">
+  <ol class="breadcrumb-nav-list">
+    <li class="breadcrumb-nav-list-item"><a href="../index.html">Project 2</a></li>
+    <li class="breadcrumb-nav-list-item"><span>File Operations</span></li>
+  </ol>
+</nav>
+
+
+      <div id="main-content" class="main-content">
+        <main>
+          
+            <div class="content-container">
+    <nav class="content-nav nav-list js-toc" aria-label="In-page navigation">
+      <ul class="nav-list"><li class="nav-list-item"><a href="index.html#design-requirements-namespacing" class="nav-list-link">Design Requirements: Namespacing</a></li><li class="nav-list-item"><a href="index.html#design-requirements-files" class="nav-list-link">Design Requirements: Files</a></li><li class="nav-list-item"><a href="index.html#userstorefile" class="nav-list-link">User.StoreFile</a></li><li class="nav-list-item"><a href="index.html#userloadfile" class="nav-list-link">User.LoadFile</a></li><li class="nav-list-item"><a href="index.html#userappendtofile" class="nav-list-link">User.AppendToFile</a></li><li class="nav-list-item"><a href="index.html#design-requirements-bandwidth--append-efficiency" class="nav-list-link">Design Requirements: Bandwidth &amp; Append Efficiency</a></li></ul>
+    </nav>
+  <div class="content">
+<h1 id="file-operations">
+  
+  
+    <a href="index.html#file-operations" class="anchor-heading" aria-labelledby="file-operations"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> File Operations
+  
+  
+</h1>
+    
+
+<p>In this section, you’ll design three instance methods to support creating new files or overwriting the contents of existing files, reading file contents, and appending content to the end of existing files.</p>
+<h2 id="design-requirements-namespacing">
+  
+  
+    <a href="index.html#design-requirements-namespacing" class="anchor-heading" aria-labelledby="design-requirements-namespacing"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Design Requirements: Namespacing
+  
+  
+</h2>
+    
+
+<p>Note that different users can have files with the same name. A user’s <em>namespace</em> is defined as all of the filenames they are using. One user’s namespace could contain a filename that another user is also using. In that other user’s namespace, that same filename could refer to a different file (or the same file, if it was shared - more details about sharing later).</p>
+
+<blockquote class="EXAMPLE">
+  <p>This example scenario illustrates how file storage and namespacing works.</p>
+
+  <ul>
+    <li>EvanBot calls <code class="language-plaintext highlighter-rouge">StoreFile("foods.txt", "pancakes")</code>.
+      <ul>
+        <li>Assuming that EvanBot has never stored to foods.txt before, this creates a new file called foods.txt in EvanBot’s personal namespace.</li>
+      </ul>
+    </li>
+    <li>EvanBot calls <code class="language-plaintext highlighter-rouge">LoadFile("foods.txt")</code> and sees “pancakes”.</li>
+    <li>EvanBot calls <code class="language-plaintext highlighter-rouge">StoreFile("foods.txt", "cookies")</code>.
+      <ul>
+        <li>Because foods.txt is an existing file, this call should overwrite the entire file with the new contents.</li>
+      </ul>
+    </li>
+    <li>EvanBot calls <code class="language-plaintext highlighter-rouge">LoadFile("foods.txt")</code> and sees “cookies”.</li>
+    <li>EvanBot calls <code class="language-plaintext highlighter-rouge">LoadFile("drinks.txt")</code> and sees an error, because there is no file named drinks.txt in EvanBot’s personal namespace.</li>
+    <li>EvanBot calls <code class="language-plaintext highlighter-rouge">AppendToFile("foods.txt", " and pancakes")</code>.
+      <ul>
+        <li>Instead of overwriting the entire file, this should append additional contents to the end of an existing file.</li>
+      </ul>
+    </li>
+    <li>EvanBot calls <code class="language-plaintext highlighter-rouge">LoadFile("foods.txt")</code> and sees “cookies and pancakes”.</li>
+    <li>EvanBot calls <code class="language-plaintext highlighter-rouge">AppendToFile("foods.txt", " and hash browns")</code>.</li>
+    <li>EvanBot calls <code class="language-plaintext highlighter-rouge">LoadFile("foods.txt")</code> and sees “cookies and pancakes and hash browns”.</li>
+    <li>EvanBot calls <code class="language-plaintext highlighter-rouge">StoreFile("foods.txt", "pancakes")</code>.
+      <ul>
+        <li>This overwrites the entire file (including appends) with the new contents.</li>
+      </ul>
+    </li>
+    <li>EvanBot calls <code class="language-plaintext highlighter-rouge">LoadFile("foods.txt")</code> and sees “pancakes”.</li>
+    <li>EvanBot calls <code class="language-plaintext highlighter-rouge">AppendToFile("drinks.txt", "and cookies")</code> and sees an error, because there is no file named drinks.txt in EvanBot’s personal namespace.</li>
+    <li>CodaBot calls <code class="language-plaintext highlighter-rouge">StoreFile("foods.txt", "waffles")</code>.
+      <ul>
+        <li>Note that this creates a new file in CodaBot’s personal namespace named foods.txt. This should not interfere with the foods.txt file in EvanBot’s namespace, which is a different file.</li>
+      </ul>
+    </li>
+    <li>CodaBot calls <code class="language-plaintext highlighter-rouge">LoadFile("foods.txt")</code> and sees “waffles”.</li>
+    <li>EvanBot calls <code class="language-plaintext highlighter-rouge">LoadFile("foods.txt")</code> and sees “pancakes”.</li>
+  </ul>
+</blockquote>
+<h2 id="design-requirements-files">
+  
+  
+    <a href="index.html#design-requirements-files" class="anchor-heading" aria-labelledby="design-requirements-files"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Design Requirements: Files
+  
+  
+</h2>
+    
+
+<p>Confidentiality of data:</p>
+<ul>
+  <li>You must ensure that no information is leaked about these 3 pieces of data:
+    <ul>
+      <li>File contents for all files.</li>
+      <li>Filenames for all files.</li>
+      <li>The length of the filenames for all files.</li>
+    </ul>
+  </li>
+  <li>You must also ensure that no information is leaked that could be directly or indirectly used to learn these 3 pieces of data.
+    <ul>
+      <li>For example, if you have a secret key that you’re using to encrypt some file contents, you’ll need to ensure that secret key is not leaked either.</li>
+    </ul>
+  </li>
+  <li>You may leak information about any other values besides the ones listed above.
+    <ul>
+      <li>For example: It’s okay if an adversary learns usernames, length of a file, how many files a user has, etc.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Integrity of data:</p>
+<ul>
+  <li>You must be able to detect when an attacker has tampered with the contents of a file.</li>
+</ul>
+
+<p>Filenames:</p>
+<ul>
+  <li>Filenames can be any string with 0 or more characters (not necessarily alphanumeric, and could be the empty string).</li>
+  <li>Different users can have files with the same filename, but they could refer to different files.</li>
+</ul>
+
+<blockquote class="QUESTION">
+  <p><strong>File Storage and Retrieval</strong>: How does a user store and retrieve files?</p>
+
+  <p>EvanBot is logged in and stores a file. How does the file get stored in Datastore? What key(s) and UUIDs do you use? How do you access the file at a later time?</p>
+</blockquote>
+<h2 id="userstorefile">
+  
+  
+    <a href="index.html#userstorefile" class="anchor-heading" aria-labelledby="userstorefile"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> User.StoreFile
+  
+  
+</h2>
+    
+
+<p>This instance method is used to both create a file for the first time, or to overwrite an existing file entirely with new contents. To use this method, the user passes in the filename to identify the file, as well as the contents that they wish to store.</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">User</span><span class="o">.</span><span class="n">StoreFile</span><span class="p">(</span><span class="n">filename</span> <span class="kt">string</span><span class="p">,</span> <span class="n">content</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span> <span class="p">(</span><span class="n">err</span> <span class="kt">error</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Given a <code class="language-plaintext highlighter-rouge">filename</code> in the personal namespace of the caller, this function persistently stores the given <code class="language-plaintext highlighter-rouge">content</code> for future retrieval using the same <code class="language-plaintext highlighter-rouge">filename</code>.</p>
+
+<p>If the given <code class="language-plaintext highlighter-rouge">filename</code> already exists in the personal namespace of the caller, then the content of the corresponding file is overwritten.</p>
+
+<p>The client must allow <code class="language-plaintext highlighter-rouge">content</code> to be any arbitrary sequence of bytes, including the empty sequence.</p>
+
+<p>Note that calling <code class="language-plaintext highlighter-rouge">StoreFile</code> after malicious tampering has occurred is undefined behavior, and will not be tested.</p>
+
+<p>Note that calling <code class="language-plaintext highlighter-rouge">StoreFile</code> on a file whose access has been revoked is undefined behavior, and will not be tested.</p>
+<h2 id="userloadfile">
+  
+  
+    <a href="index.html#userloadfile" class="anchor-heading" aria-labelledby="userloadfile"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> User.LoadFile
+  
+  
+</h2>
+    
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">User</span><span class="o">.</span><span class="n">LoadFile</span><span class="p">(</span><span class="n">filename</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="n">content</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">,</span> <span class="n">err</span> <span class="kt">error</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Given a <code class="language-plaintext highlighter-rouge">filename</code> in the personal namespace of the caller, this function downloads and returns the <code class="language-plaintext highlighter-rouge">content</code> of the corresponding file.</p>
+
+<p>Note that, in the case of sharing files, the corresponding file may or may not be owned by the caller.</p>
+
+<p><strong>Returns an error if:</strong></p>
+
+<ol>
+  <li>The given <code class="language-plaintext highlighter-rouge">filename</code> does not exist in the personal file namespace of the caller.</li>
+  <li>The integrity of the downloaded content cannot be verified (indicating there have been unauthorized modifications to the file).</li>
+  <li>Loading the file cannot succeed due to any other malicious action.</li>
+</ol>
+<h2 id="userappendtofile">
+  
+  
+    <a href="index.html#userappendtofile" class="anchor-heading" aria-labelledby="userappendtofile"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> User.AppendToFile
+  
+  
+</h2>
+    
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">User</span><span class="o">.</span><span class="n">AppendToFile</span><span class="p">(</span><span class="n">filename</span> <span class="kt">string</span><span class="p">,</span> <span class="n">content</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span> <span class="p">(</span><span class="n">err</span> <span class="kt">error</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Given a <code class="language-plaintext highlighter-rouge">filename</code> in the personal namespace of the caller, this function appends the given <code class="language-plaintext highlighter-rouge">content</code> to the end of the corresponding file.</p>
+
+<p><code class="language-plaintext highlighter-rouge">content</code> can be any arbitrary sequence of 0 or more bytes.</p>
+
+<p>Note that, in the case of sharing files, the corresponding file may or may not be owned by the caller.</p>
+
+<p>You are <strong>not</strong> required to check the integrity of the existing file before appending the new <code class="language-plaintext highlighter-rouge">content</code> (integrity verification is allowed, but not required).</p>
+
+<p><strong>Returns an error if:</strong></p>
+
+<ol>
+  <li>The given <code class="language-plaintext highlighter-rouge">filename</code> does not exist in the personal file namespace of the caller.</li>
+  <li>Appending the file cannot succeed due to any other malicious action.</li>
+</ol>
+<h2 id="design-requirements-bandwidth--append-efficiency">
+  
+  
+    <a href="index.html#design-requirements-bandwidth--append-efficiency" class="anchor-heading" aria-labelledby="design-requirements-bandwidth--append-efficiency"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Design Requirements: Bandwidth &amp; Append Efficiency
+  
+  
+</h2>
+    
+
+<p>All functions except for <code class="language-plaintext highlighter-rouge">AppendToFile</code> have no efficiency requirements, as long as they don’t time out the autograder. You can submit your code to Gradescope to check that you aren’t timing out the autograder (~20 minutes).</p>
+
+<p>The efficiency requirement for appending is measured in terms of bandwidth, <em>not</em> in terms of time complexity or space complexity, which you may have seen in other classes. This means that your append can use unlimited amounts of local compute (e.g. you can encrypt and decrypt as much data as you’d like).</p>
+
+<p>Recall that DataStore and KeyStore are remote databases. This means that when you call DataStoreGet, you are downloading <em>all</em> data at the specified UUID from DataStore to the local device running your code. Similarly, when you call <code class="language-plaintext highlighter-rouge">DataStoreSet</code>, you are uploading <em>all</em> the specified data from your local device running your code to DataStore. The only efficiency requirement for<code class="language-plaintext highlighter-rouge">AppendToFile</code> is that the total amount of data uploaded with calls to <code class="language-plaintext highlighter-rouge">DataStoreSet</code> and downloaded with calls to <code class="language-plaintext highlighter-rouge">DataStoreGet</code> must be efficient.</p>
+
+<p>The bandwidth used by a call to <code class="language-plaintext highlighter-rouge">AppendToFile</code> is defined as the total size of all data in calls to <code class="language-plaintext highlighter-rouge">DataStoreSet</code> and <code class="language-plaintext highlighter-rouge">DataStoreGet</code>. All calls that are <em>not</em> <code class="language-plaintext highlighter-rouge">DataStoreSet</code> or <code class="language-plaintext highlighter-rouge">DataStoreGet</code> do not affect the total bandwidth.</p>
+
+<p>The total bandwidth should only scale with the size of the append (i.e. the number of bytes in the <code class="language-plaintext highlighter-rouge">content</code> argument to <code class="language-plaintext highlighter-rouge">AppendToFile</code>). In other words, if you are appending <em>n</em> bytes to the file, it’s okay (and unavoidable) that you’ll need to upload at least <em>n</em> bytes of data to the Datastore.</p>
+
+<p>Your total append bandwidth can additionally include some small constant factor. We cannot reveal the exact number, but an example of a reasonable constant would be 3,000 bytes on every call to append.</p>
+
+<p>The total bandwidth should not scale with (including but not limited to):</p>
+<ul>
+  <li>Total file size</li>
+  <li>Number of files</li>
+  <li>Length of the filename</li>
+  <li>Number of appends</li>
+  <li>Size of previous append</li>
+  <li>Length of username</li>
+  <li>Length of password</li>
+  <li>Number of users the file is shared with</li>
+</ul>
+
+<blockquote class="EXAMPLE">
+  <p>Here is one way to consider whether your design scales with the number of appends. Suppose we call <code class="language-plaintext highlighter-rouge">AppendToFile</code> on a file 10,000 times, appending 1 byte every time. The 1,000th and 10,000th call to <code class="language-plaintext highlighter-rouge">AppendToFile</code> should use the same total bandwidth as the 1st append operation. This should also be true for the case of appending an arbitrary number of bytes repetitively, 10,000 times (even 0!). Specifically, when a scheme scales with the number of appends, this means that the amount of bandwidth used is <em>directly</em> proportional to the number of appends that have occurred, not just the fact that appends have happened. This means if someone appended 0 bytes to a file 10,000 times (called <code class="language-plaintext highlighter-rouge">AppendToFile</code> with an empty string passed in), the 1,000th and 10,000th call to <code class="language-plaintext highlighter-rouge">AppendToFile</code> should use the same total bandwidth as the 1st. If the bandwidth increases even though the string appended is always the empty string (and hence, nothing actually changed about the file), then this design would scale with the number of appends.</p>
+
+  <p>Here is one way to consider whether your design scales with the size of the previous append. Suppose we call <code class="language-plaintext highlighter-rouge">AppendToFile</code> to append 1 terabyte of data to a file. Then, we call <code class="language-plaintext highlighter-rouge">AppendToFile</code> again on the same file to append another 100 bytes. The total bandwidth of the second call to append should not include the 1 terabyte of bandwidth from the previous (first) append.</p>
+
+  <p>In general, one way to check for efficiency is to imagine a graph where the x-axis is the potential scaling factor (e.g. file size), and the y-axis is the total bandwidth. The plot of scaling factor vs. total bandwidth should be a flat line, not an upwards sloping line.</p>
+</blockquote>
+
+<blockquote class="EXAMPLE">
+  <p>As an analogy, imagine that the users of this system have a limited phone data plan. We want to avoid excessive charges to their data plan, so we want to avoid downloading or uploading unnecessary data when appending.</p>
+
+  <p>For example, a naive implementation would involve:</p>
+
+  <ol>
+    <li>The user calls DataStoreGet to download the entire contents of the file.</li>
+    <li>The user decrypts the file locally.</li>
+    <li>The user appends the contents locally.</li>
+    <li>The user encrypts the entire file contents.</li>
+    <li>The user calls DataStoreSet to upload the entire file to DataStore.</li>
+  </ol>
+
+  <p>Note for steps 2 &amp; 4: These parts do not count against bandwidth efficiency. Recall, only DataStoreGet and DataStoreSet count for bandwidth calculation, and local computations do not count against efficiency requirements.</p>
+
+  <p>This implementation is inefficient because in step 1, the call to DataStoreGet downloads the entire file. This implementation is additionally inefficient due to step 5, where we call DataStoreSet and upload the entire file contents.</p>
+
+  <p>For example, if we had a 10 terabyte file, and we wanted to append 100 bytes to the file, the implementation above would have a total bandwidth of 20 terabytes + 100 bytes. An efficient implementation would use 100 bytes of bandwidth (possibly plus some constant).</p>
+</blockquote>
+
+<blockquote class="QUESTION">
+  <p><strong>Efficient Append</strong>: What is the total bandwidth used in a call to append?</p>
+
+  <p>List out every piece of data that you need to upload (DatastoreSet) or download (DatastoreGet) from Datastore in a call to append, and the size of each piece of data. Is the total a constant, or does it scale?</p>
+</blockquote>
+
+  </div>
+</div>
+
+          
+
+          
+            
+          
+        </main>
+        
+
+  <hr>
+  <footer>
+    
+
+    
+
+
+
+
+
+
+
+
+
+<script>
+  (function () {
+    var navList = document.querySelector('.aux-nav-list');
+    if (!navList || !navList.firstElementChild) return;
+    var darkToggle = navList.firstElementChild;
+    darkToggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      toggleDark();
+    });
+  })();
+</script>
+
+<script src="../../assets/js/tocbot.min.js"></script>
+<script>
+  // Tries to mirror the HTML TOC
+  tocbot.init({
+    tocSelector: '.js-toc',
+    contentSelector: '.content',
+    headingSelector: 'h2,h3,h4,h5,h6',
+    ignoreSelector: '.no_toc',
+    hasInnerContainers: true,
+    linkClass: 'nav-list-link',
+    activeLinkClass: 'active',
+    listClass: 'nav-list',
+    listItemClass: 'nav-list-item',
+    activeListItemClass: 'active',
+    collapseDepth: 3,
+    scrollSmooth: false,
+  });
+</script>
+
+
+    
+  </footer>
+
+
+      </div>
+    </div>
+    
+      
+
+<div class="search-overlay"></div>
+
+    
+  </div>
+
+  
+</body>
+</html>
+

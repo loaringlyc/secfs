@@ -1,0 +1,1022 @@
+
+
+<!DOCTYPE html>
+
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+
+  <link rel="stylesheet" href="../../assets/css/just-the-docs-default.css">
+
+  <link rel="stylesheet" href="../../assets/css/just-the-docs-head-nav.css" id="jtd-head-nav-stylesheet">
+
+  <style id="jtd-nav-activation">
+  
+
+    .site-nav > ul.nav-list:first-child > li > a,
+    
+    .site-nav > ul.nav-list:first-child > li > ul > li:not(:nth-child(5)) > a,
+    .site-nav > ul.nav-list:first-child > li > ul > li > ul > li a {
+      background-image: none;
+    }
+
+    .site-nav > ul.nav-list:not(:first-child) a,
+    .site-nav li.external a {
+      background-image: none;
+    }
+
+    .site-nav > ul.nav-list:first-child > li:nth-child(7) > ul > li:nth-child(5) > a {
+      font-weight: 600;
+      text-decoration: none;
+    }.site-nav > ul.nav-list:first-child > li:nth-child(7) > button svg,
+    .site-nav > ul.nav-list:first-child > li:nth-child(7) > ul > li:nth-child(5) > button svg {
+      transform: rotate(-90deg);
+    }.site-nav > ul.nav-list:first-child > li.nav-list-item:nth-child(7) > ul.nav-list,
+    .site-nav > ul.nav-list:first-child > li.nav-list-item:nth-child(7) > ul.nav-list > li.nav-list-item:nth-child(5) > ul.nav-list {
+      display: block;
+    }
+  </style>
+
+  
+
+  
+    <script src="../../assets/js/vendor/lunr.min.js"></script>
+  
+
+  <script src="../../assets/js/just-the-docs.js"></script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <link rel="icon" href="../../favicon.ico" type="image/x-icon">
+
+
+
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Library Functions | CS 161 Fall 2025</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="Library Functions" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Computer Security at UC Berkeley" />
+<meta property="og:description" content="Computer Security at UC Berkeley" />
+<link rel="canonical" href="../library.html" />
+<meta property="og:url" content="https://fa25.cs161.org/proj2/library/" />
+<meta property="og:site_name" content="CS 161 Fall 2025" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Library Functions" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"Computer Security at UC Berkeley","headline":"Library Functions","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://fa25.cs161.org/"}},"url":"https://fa25.cs161.org/proj2/library/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  <link
+  rel="preload"
+  href="https://fa25.cs161.org/assets/css/just-the-docs-dark.css"
+  as="style"
+>
+
+<!-- Intentionally duplicates the default theme stylesheet so there's a fallback when changing themes -->
+<link
+  id="jtdThemeCSS"
+  rel="stylesheet"
+  href="../../assets/css/just-the-docs-default.css"
+>
+
+<script>
+  /* Script to enable persistent dark mode. */
+
+  jtd.getTheme = function () {
+    var cssFileHref = (
+      document.getElementById('jtdThemeCSS') || document.querySelector('[rel="stylesheet"]')
+    ).getAttribute('href');
+    return cssFileHref.substring(cssFileHref.lastIndexOf('-') + 1, cssFileHref.length - 4);
+  };
+
+  jtd.setTheme = function (theme) {
+    var cssFile = document.getElementById('jtdThemeCSS') || document.querySelector('[rel="stylesheet"]');
+    cssFile.setAttribute('href', cssFile.getAttribute('href').replace(jtd.getTheme(), theme));
+  };
+
+  let toggleDark = () => {
+    let setDark = jtd.getTheme() !== 'dark';
+    document.documentElement.setAttribute('data-theme', setDark ? 'dark' : 'default');
+    document.documentElement.setAttribute('data-theme', setDark ? 'dark' : 'default');
+    jtd.setTheme(setDark ? 'dark' : 'default');
+    localStorage.setItem('darkMode', String(setDark));
+
+    if (typeof calendar !== 'undefined') {
+      calendar.setColorScheme(setDark ? 'dark' : 'light');
+    }
+  };
+
+  if (localStorage.getItem('darkMode') === 'true') {
+    toggleDark();
+  }
+</script>
+
+<!-- Script for LaTeX rendering. -->
+<link
+  rel="stylesheet"
+  href="../../assets/katex/katex.min.css"
+>
+<script defer src="../../assets/katex/katex.min.js"></script>
+<script>
+  function renderKaTeX() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '$', right: '$', display: false },
+        { left: '\\(', right: '\\)', display: false },
+        { left: '\\[', right: '\\]', display: true },
+      ],
+    });
+  }
+</script>
+<script
+  defer
+  src="../../assets/katex/contrib/auto-render.min.js"
+  onload="renderKaTeX();"
+></script>
+
+
+</head>
+
+<body>
+  <a class="skip-to-main" href="../library.html#main-content">Skip to main content</a>
+  <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+  <symbol id="svg-link" viewBox="0 0 24 24">
+  <title>Link</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-link">
+    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+  </svg>
+</symbol>
+
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+  <title>Menu</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu">
+    <line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line>
+  </svg>
+</symbol>
+
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+  <title>Expand</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+    <polyline points="9 18 15 12 9 6"></polyline>
+  </svg>
+</symbol>
+
+  <!-- Feather. MIT License: https://github.com/feathericons/feather/blob/master/LICENSE -->
+<symbol id="svg-external-link" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link">
+  <title id="svg-external-link-title">(external link)</title>
+  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line>
+</symbol>
+
+  
+    <symbol id="svg-doc" viewBox="0 0 24 24">
+  <title>Document</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file">
+    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline>
+  </svg>
+</symbol>
+
+    <symbol id="svg-search" viewBox="0 0 24 24">
+  <title>Search</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search">
+    <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+  </svg>
+</symbol>
+
+  
+  
+    <!-- Bootstrap Icons. MIT License: https://github.com/twbs/icons/blob/main/LICENSE.md -->
+<symbol id="svg-copy" viewBox="0 0 16 16">
+  <title>Copy</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard" viewBox="0 0 16 16">
+    <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+    <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+  </svg>
+</symbol>
+<symbol id="svg-copied" viewBox="0 0 16 16">
+  <title>Copied</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-check-fill" viewBox="0 0 16 16">
+    <path d="M6.5 0A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3Zm3 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3Z"/>
+    <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1A2.5 2.5 0 0 1 9.5 5h-3A2.5 2.5 0 0 1 4 2.5v-1Zm6.854 7.354-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L7.5 10.793l2.646-2.647a.5.5 0 0 1 .708.708Z"/>
+  </svg>
+</symbol>
+
+  
+</svg>
+
+  
+    <div class="side-bar">
+  <div class="site-header" role="banner">
+    <a href="https://fa25.cs161.org/" class="site-title lh-tight">
+
+
+  CS 161 Fall 2025
+
+</a>
+    <button id="menu-button" class="site-button btn-reset" aria-label="Toggle menu" aria-pressed="false">
+      <svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><use xlink:href="#svg-menu"></use></svg>
+    </button>
+  </div>
+
+  <nav aria-label="Main" id="site-nav" class="site-nav">
+  
+  
+    <ul class="nav-list"><li class="nav-list-item"><a href="https://fa25.cs161.org/exam/" class="nav-list-link">Exam Logistics</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/calendar/" class="nav-list-link">Calendar</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/policies/" class="nav-list-link">Policies</a></li><li class="nav-list-item"><button class="nav-list-expander btn-reset" aria-label="toggle items in Resources category" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use xlink:href="#svg-arrow-right"></use></svg>
+      </button><a href="https://fa25.cs161.org/resources/" class="nav-list-link">Resources</a><ul class="nav-list"><li class="nav-list-item"><a href="https://fa25.cs161.org/resources/faqs/" class="nav-list-link">Spring 2026 FAQs</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/resources/instructional-machine/" class="nav-list-link">Instructional Machine Setup</a></li></ul></li><li class="nav-list-item"><a href="https://fa25.cs161.org/staff/" class="nav-list-link">Staff</a></li><li class="nav-list-item"><button class="nav-list-expander btn-reset" aria-label="toggle items in Project 1 category" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use xlink:href="#svg-arrow-right"></use></svg>
+      </button><a href="https://fa25.cs161.org/proj1/" class="nav-list-link">Project 1</a><ul class="nav-list"><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/getting-started/" class="nav-list-link">Getting Started</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/customizing/" class="nav-list-link">Customizing</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q1/" class="nav-list-link">Question 1: Remus</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q2/" class="nav-list-link">Question 2: Spica</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q3/" class="nav-list-link">Question 3: Polaris</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q4/" class="nav-list-link">Question 4: Vega</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q5/" class="nav-list-link">Question 5: Deneb</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q6/" class="nav-list-link">Question 6: Antares</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q7/" class="nav-list-link">Question 7: Rigel</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/deliverables/" class="nav-list-link">Deliverables</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/vm-debugging/" class="nav-list-link">Troubleshooting</a></li></ul></li><li class="nav-list-item"><button class="nav-list-expander btn-reset" aria-label="toggle items in Project 2 category" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use xlink:href="#svg-arrow-right"></use></svg>
+      </button><a href="../index.html" class="nav-list-link">Project 2</a><ul class="nav-list"><li class="nav-list-item"><a href="../story/index.html" class="nav-list-link">Story</a></li><li class="nav-list-item"><a href="../policies.html" class="nav-list-link">Project 2 Policies and Deliverables</a></li><li class="nav-list-item"><a href="../getting-started.html" class="nav-list-link">Getting Started</a></li><li class="nav-list-item"><a href="../overview/index.html" class="nav-list-link">Design Overview</a></li><li class="nav-list-item"><a href="../library.html" class="nav-list-link">Library Functions</a></li><li class="nav-list-item"><a href="../userauth/index.html" class="nav-list-link">Users And User Authentication</a></li><li class="nav-list-item"><a href="../files/index.html" class="nav-list-link">File Operations</a></li><li class="nav-list-item"><a href="../sharing/index.html" class="nav-list-link">Sharing and Revocation</a></li><li class="nav-list-item"><a href="../troubleshooting.html" class="nav-list-link">Debugging and Errors</a></li><li class="nav-list-item"><a href="../advice/index.html" class="nav-list-link">Advice and Tips</a></li><li class="nav-list-item"><a href="../appendix/index.html" class="nav-list-link">Appendix</a></li></ul></li><li class="nav-list-item"><button class="nav-list-expander btn-reset" aria-label="toggle items in Project 3 category" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use xlink:href="#svg-arrow-right"></use></svg>
+      </button><a href="https://fa25.cs161.org/proj3/" class="nav-list-link">Project 3</a><ul class="nav-list"><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/story/" class="nav-list-link">Story</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/getting-started/" class="nav-list-link">Getting Started</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/tips/" class="nav-list-link">General Tips</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag1/" class="nav-list-link">Flag 1: dev</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag2/" class="nav-list-link">Flag 2: ip.txt</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag3/" class="nav-list-link">Flag 3: shomil</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag4/" class="nav-list-link">Flag 4: nicholas</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag5/" class="nav-list-link">Flag 5: cs161</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag6/" class="nav-list-link">Flag 6: delete</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag7/" class="nav-list-link">Flag 7: admin</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag8/" class="nav-list-link">Flag 8: config</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/deliverables/" class="nav-list-link">Deliverables</a></li></ul></li></ul>
+  
+</nav>
+
+
+
+
+  
+  
+    <div class="site-footer">
+	Report an <a href="https://dap.berkeley.edu/get-help/report-web-accessibility-issue">accessibility issue</a>.
+
+	<br><br>
+
+	This site uses <a href="https://github.com/just-the-docs/just-the-docs">Just the Docs</a>, a documentation theme for Jekyll.
+</div>
+  
+</div>
+
+  
+  <div class="main" id="top">
+    <div id="main-header" class="main-header">
+  
+    
+
+<div class="search" role="search">
+  <div class="search-input-wrap">
+    <input type="text" id="search-input" class="search-input" tabindex="0" placeholder="Search CS 161 Fall 2025" aria-label="Search CS 161 Fall 2025" autocomplete="off">
+    <label for="search-input" class="search-label"><svg viewBox="0 0 24 24" class="search-icon"><use xlink:href="#svg-search"></use></svg></label>
+  </div>
+  <div id="search-results" class="search-results"></div>
+</div>
+
+  
+  
+  
+    <nav aria-label="Auxiliary" class="aux-nav">
+  <ul class="aux-nav-list">
+    
+      <li class="aux-nav-list-item">
+        <a href="../library.html#" class="site-button"
+          
+        >
+          Dark Mode
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://textbook.cs161.org" class="site-button"
+          
+        >
+          Textbook
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://edstem.org/us/courses/83260" class="site-button"
+          
+        >
+          Ed
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://oh.cs161.org" class="site-button"
+          
+        >
+          OH Queue
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://forms.gle/uaFdyWWqnPkW9Uhg6" class="site-button"
+          
+        >
+          Extensions
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://forms.gle/bW9nen9oHGNUzWo69" class="site-button"
+          
+        >
+          Anonymous Feedback
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://calendar.app.google/9quTrjViGAGPG47Z8" class="site-button"
+          
+        >
+          Student Support
+        </a>
+      </li>
+    
+  </ul>
+</nav>
+
+  
+</div>
+
+    <div class="main-content-wrap">
+      <nav aria-label="Breadcrumb" class="breadcrumb-nav">
+  <ol class="breadcrumb-nav-list">
+    <li class="breadcrumb-nav-list-item"><a href="../index.html">Project 2</a></li>
+    <li class="breadcrumb-nav-list-item"><span>Library Functions</span></li>
+  </ol>
+</nav>
+
+
+      <div id="main-content" class="main-content">
+        <main>
+          
+            <div class="content-container">
+    <nav class="content-nav nav-list js-toc" aria-label="In-page navigation">
+      <ul class="nav-list"><li class="nav-list-item"><a href="../library.html#types" class="nav-list-link">Types</a></li><li class="nav-list-item"><a href="../library.html#keystore" class="nav-list-link">Keystore</a><ul class="nav-list"><li class="nav-list-item"><a href="../library.html#userlibkeystoreset" class="nav-list-link">userlib.KeystoreSet</a></li><li class="nav-list-item"><a href="../library.html#userlibkeystoreget" class="nav-list-link">userlib.KeystoreGet</a></li></ul></li><li class="nav-list-item"><a href="../library.html#datastore" class="nav-list-link">Datastore</a><ul class="nav-list"><li class="nav-list-item"><a href="../library.html#userlibdatastoreset" class="nav-list-link">userlib.DatastoreSet</a></li><li class="nav-list-item"><a href="../library.html#userlibdatastoreget" class="nav-list-link">userlib.DatastoreGet</a></li><li class="nav-list-item"><a href="../library.html#userlibdatastoredelete" class="nav-list-link">userlib.DatastoreDelete</a></li></ul></li><li class="nav-list-item"><a href="../library.html#uuid" class="nav-list-link">UUID</a><ul class="nav-list"><li class="nav-list-item"><a href="../library.html#uuidnew" class="nav-list-link">uuid.New</a></li><li class="nav-list-item"><a href="../library.html#uuidfrombytes" class="nav-list-link">uuid.FromBytes</a></li></ul></li><li class="nav-list-item"><a href="../library.html#json-marshal-and-unmarshal" class="nav-list-link">JSON Marshal and Unmarshal</a><ul class="nav-list"><li class="nav-list-item"><a href="../library.html#jsonmarshal" class="nav-list-link">json.Marshal</a></li><li class="nav-list-item"><a href="../library.html#jsonunmarshal" class="nav-list-link">json.Unmarshal</a></li></ul></li><li class="nav-list-item"><a href="../library.html#random-byte-generator" class="nav-list-link">Random Byte Generator</a><ul class="nav-list"><li class="nav-list-item"><a href="../library.html#userlibrandombyte" class="nav-list-link">userlib.RandomByte</a></li></ul></li><li class="nav-list-item"><a href="../library.html#hash-functions" class="nav-list-link">Hash Functions</a><ul class="nav-list"><li class="nav-list-item"><a href="../library.html#userlibhash" class="nav-list-link">userlib.Hash</a></li><li class="nav-list-item"><a href="../library.html#userlibhashkdf" class="nav-list-link">userlib.HashKDF</a></li><li class="nav-list-item"><a href="../library.html#userlibargon2key" class="nav-list-link">userlib.Argon2Key</a></li></ul></li><li class="nav-list-item"><a href="../library.html#symmetric-key-cryptography" class="nav-list-link">Symmetric-Key Cryptography</a><ul class="nav-list"><li class="nav-list-item"><a href="../library.html#userlibsymenc" class="nav-list-link">userlib.SymEnc</a></li><li class="nav-list-item"><a href="../library.html#userlibsymdec" class="nav-list-link">userlib.SymDec</a></li><li class="nav-list-item"><a href="../library.html#userlibhmaceval" class="nav-list-link">userlib.HMACEval</a></li><li class="nav-list-item"><a href="../library.html#userlibhmacequal" class="nav-list-link">userlib.HMACEqual</a></li></ul></li><li class="nav-list-item"><a href="../library.html#public-key-cryptography" class="nav-list-link">Public-Key Cryptography</a><ul class="nav-list"><li class="nav-list-item"><a href="../library.html#userlibpkekeygen" class="nav-list-link">userlib.PKEKeyGen</a></li><li class="nav-list-item"><a href="../library.html#userlibpkeenc" class="nav-list-link">userlib.PKEEnc</a></li><li class="nav-list-item"><a href="../library.html#userlibpkedec" class="nav-list-link">userlib.PKEDec</a></li><li class="nav-list-item"><a href="../library.html#userlibdskeygen" class="nav-list-link">userlib.DSKeyGen</a></li><li class="nav-list-item"><a href="../library.html#userlibdssign" class="nav-list-link">userlib.DSSign</a></li><li class="nav-list-item"><a href="../library.html#userlibdsverify" class="nav-list-link">userlib.DSVerify</a></li></ul></li></ul>
+    </nav>
+  <div class="content">
+<h1 id="library-functions">
+  
+  
+    <a href="../library.html#library-functions" class="anchor-heading" aria-labelledby="library-functions"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Library Functions
+  
+  
+</h1>
+    
+
+<p>In this section, we provide documentation for some cryptographic functions and some utility helper functions that you can use at any time in your design. These functions have already been implemented for you in <a href="https://github.com/cs161-staff/project2-userlib/">the project2-userlib library</a>, which will be imported for you in the starter code.</p>
+
+<p>Please carefully <strong>read through the provided functions while coming up with your design</strong> so that you are aware of what is possible to actually implement in code.</p>
+
+<p>You cannot import any libraries besides what we’ve already imported in the starter code. You should not need any external libraries for this project.</p>
+
+<p>You should not write your own cryptographic functions for this project. For example, you shouldn’t write code to implement AES-CTR yourself. Instead, you should call the existing <code class="language-plaintext highlighter-rouge">SymEnc</code> function that we’ve provided.</p>
+
+<p>As discussed in class, you should avoid any unsafe cryptographic design patterns, such as reusing the same keys in different algorithms (see the tips section for more details), or using MAC-then-encrypt.</p>
+
+<blockquote class="QUESTION">
+  <p><strong>Helper functions</strong>: As you come up with a design, think about any helper functions you might write in addition to the cryptographic functions included here.</p>
+
+  <p>Having helper functions can simplify your code. Consider authenticated encryption, hybrid encryption, etc.</p>
+</blockquote>
+<h2 id="types">
+  
+  
+    <a href="../library.html#types" class="anchor-heading" aria-labelledby="types"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Types
+  
+  
+</h2>
+    
+<p>As you read through the functions, it may be useful to take note of the following datatypes:</p>
+
+<ul class="no-bullet">
+  <li><code class="language-plaintext highlighter-rouge">PKEEncKey</code>: An RSA public key. Recall that public keys are used to encrypt data.</li>
+  <li><code class="language-plaintext highlighter-rouge">PKEDecKey</code>: An RSA private key. Recall that private keys are used to decrypt data.</li>
+  <li><code class="language-plaintext highlighter-rouge">DSSignKey</code>: An RSA signing key. Recall that signing keys are used to create digital signatures.</li>
+  <li><code class="language-plaintext highlighter-rouge">DSVerifyKey</code>: An RSA verification key. Recall that verification keys are used to verify digital signatures.</li>
+  <li><code class="language-plaintext highlighter-rouge">uuid.UUID</code>: A UUID created through <code class="language-plaintext highlighter-rouge">uuid.New</code> or <code class="language-plaintext highlighter-rouge">uuid.FromBytes</code>, used as a key for the Datastore.</li>
+  <li><code class="language-plaintext highlighter-rouge">[]bytes</code>: An array of arbitrary bytes. You must turn other types into an array of bytes using <code class="language-plaintext highlighter-rouge">json.Marshal</code>.</li>
+</ul>
+<h2 id="keystore">
+  
+  
+    <a href="../library.html#keystore" class="anchor-heading" aria-labelledby="keystore"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Keystore
+  
+  
+</h2>
+    
+<h3 class="big-heading" id="userlibkeystoreset">
+  
+  
+    <a href="../library.html#userlibkeystoreset" class="anchor-heading" aria-labelledby="userlibkeystoreset"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> <code class="language-plaintext highlighter-rouge">userlib.KeystoreSet</code>
+  
+  
+</h3>
+    
+
+<p style="margin-top:1em;margin-bottom:0.15em;font-weight:bold;">Method Signature:</p>
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">userlib</span><span class="o">.</span><span class="n">KeystoreSet</span><span class="p">(</span><span class="n">name</span> <span class="kt">string</span><span class="p">,</span> <span class="n">value</span> <span class="n">PKEEncKey</span><span class="o">|</span><span class="n">DSVerifyKey</span><span class="p">)</span> <span class="p">(</span><span class="n">err</span> <span class="kt">error</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>Description:</strong> <br />
+Stores a <code class="language-plaintext highlighter-rouge">name</code> and <code class="language-plaintext highlighter-rouge">value</code> as a name-value pair into Keystore. The name can be any unique string, and the value must be a public key. You cannot store any data that is not a public key in Keystore.</p>
+
+<p><strong>Keystore is immutable:</strong> A name-value pair cannot be modified or deleted after being stored in Keystore. Any attempt to modify an existing name-value pair will return an error.</p>
+<h3 class="big-heading" id="userlibkeystoreget">
+  
+  
+    <a href="../library.html#userlibkeystoreget" class="anchor-heading" aria-labelledby="userlibkeystoreget"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> <code class="language-plaintext highlighter-rouge">userlib.KeystoreGet</code>
+  
+  
+</h3>
+    
+
+<p style="margin-top:1em;margin-bottom:0.15em;font-weight:bold;">Method Signature:</p>
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">userlib</span><span class="o">.</span><span class="n">KeystoreGet</span><span class="p">(</span><span class="n">name</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="n">value</span> <span class="n">PKEEncKey</span><span class="o">|</span><span class="n">DSVerifyKey</span><span class="p">,</span> <span class="n">ok</span> <span class="kt">bool</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>Description:</strong> <br />
+Looks up the provided <code class="language-plaintext highlighter-rouge">name</code> and returns the corresponding <code class="language-plaintext highlighter-rouge">value</code>.</p>
+
+<p>If a corresponding value exists, then <code class="language-plaintext highlighter-rouge">ok</code> will be true; otherwise, <code class="language-plaintext highlighter-rouge">ok</code> will be false.</p>
+<h2 id="datastore">
+  
+  
+    <a href="../library.html#datastore" class="anchor-heading" aria-labelledby="datastore"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Datastore
+  
+  
+</h2>
+    
+<h3 class="big-heading" id="userlibdatastoreset">
+  
+  
+    <a href="../library.html#userlibdatastoreset" class="anchor-heading" aria-labelledby="userlibdatastoreset"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> <code class="language-plaintext highlighter-rouge">userlib.DatastoreSet</code>
+  
+  
+</h3>
+    
+
+<p style="margin-top:1em;margin-bottom:0.15em;font-weight:bold;">Method Signature:</p>
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">userlib</span><span class="o">.</span><span class="n">DatastoreSet</span><span class="p">(</span><span class="n">name</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span><span class="p">,</span> <span class="n">value</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>Description:</strong> <br />
+Stores <code class="language-plaintext highlighter-rouge">name</code> and <code class="language-plaintext highlighter-rouge">value</code> as a name-value pair into Datastore.</p>
+
+<p>Datastore is mutable:  If <code class="language-plaintext highlighter-rouge">name</code> already maps to an existing name-value pair, then the existing value will be overwritten with the provided <code class="language-plaintext highlighter-rouge">value</code>.</p>
+<h3 class="big-heading" id="userlibdatastoreget">
+  
+  
+    <a href="../library.html#userlibdatastoreget" class="anchor-heading" aria-labelledby="userlibdatastoreget"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> <code class="language-plaintext highlighter-rouge">userlib.DatastoreGet</code>
+  
+  
+</h3>
+    
+
+<p style="margin-top:1em;margin-bottom:0.15em;font-weight:bold;">Method Signature:</p>
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">userlib</span><span class="o">.</span><span class="n">DatastoreGet</span><span class="p">(</span><span class="n">name</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span><span class="p">)</span> <span class="p">(</span><span class="n">value</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">,</span> <span class="n">ok</span> <span class="kt">bool</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>Description:</strong> <br />
+Looks up the provided <code class="language-plaintext highlighter-rouge">name</code> and returns the corresponding <code class="language-plaintext highlighter-rouge">value</code>.</p>
+
+<p>If a corresponding value exists, then <code class="language-plaintext highlighter-rouge">ok</code> will be true; otherwise, <code class="language-plaintext highlighter-rouge">ok</code> will be false.</p>
+<h3 class="big-heading" id="userlibdatastoredelete">
+  
+  
+    <a href="../library.html#userlibdatastoredelete" class="anchor-heading" aria-labelledby="userlibdatastoredelete"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> <code class="language-plaintext highlighter-rouge">userlib.DatastoreDelete</code>
+  
+  
+</h3>
+    
+
+<p style="margin-top:1em;margin-bottom:0.15em;font-weight:bold;">Method Signature:</p>
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">userlib</span><span class="o">.</span><span class="n">DatastoreDelete</span><span class="p">(</span><span class="n">key</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>Description:</strong> <br />
+Looks up the provided <code class="language-plaintext highlighter-rouge">name</code> and deletes the corresponding value, if it exists.</p>
+<h2 id="uuid">
+  
+  
+    <a href="../library.html#uuid" class="anchor-heading" aria-labelledby="uuid"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> UUID
+  
+  
+</h2>
+    
+
+<p>Recall that in the name-value pairs of Datastore, the name should be a UUID. UUID stands for Universal Unique Identifier, and is a unique 16-byte (128-bit) value.</p>
+
+<p>There are two ways to create UUIDs. You can randomly generate a new UUID from scratch. Alternatively, you can take an existing 16-byte string, and deterministically cast it into a UUID.</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">uuid</code> library also provides <code class="language-plaintext highlighter-rouge">uuid.Nil</code>, a UUID consisting of all zeros to represent a nil value.</p>
+<h3 class="big-heading" id="uuidnew">
+  
+  
+    <a href="../library.html#uuidnew" class="anchor-heading" aria-labelledby="uuidnew"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> <code class="language-plaintext highlighter-rouge">uuid.New</code>
+  
+  
+</h3>
+    
+
+<p style="margin-top:1em;margin-bottom:0.15em;font-weight:bold;">Method Signature:</p>
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">uuid</span><span class="o">.</span><span class="n">New</span><span class="p">()</span> <span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span><span class="p">)</span>
+</code></pre></div></div>
+<p><strong>Description:</strong> <br />
+Returns a randomly generated UUID.</p>
+
+<p class="NOTEY">If you’re concerned about two randomly-generated UUIDs being the same, think about the probability that two randomly-generated 128-bit values are identical. In this project, you don’t have to worry about events that are astronomically unlikely to occur.</p>
+<h3 class="big-heading" id="uuidfrombytes">
+  
+  
+    <a href="../library.html#uuidfrombytes" class="anchor-heading" aria-labelledby="uuidfrombytes"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> <code class="language-plaintext highlighter-rouge">uuid.FromBytes</code>
+  
+  
+</h3>
+    
+
+<p style="margin-top:1em;margin-bottom:0.15em;font-weight:bold;">Method Signature:</p>
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">uuid</span><span class="o">.</span><span class="n">FromBytes</span><span class="p">(</span><span class="n">b</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span> <span class="p">(</span><span class="n">uuid</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span><span class="p">,</span> <span class="n">err</span> <span class="kt">error</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>Description:</strong> <br />
+Creates a new UUID by copying the 16 bytes in <code class="language-plaintext highlighter-rouge">b</code> into a new UUID.</p>
+
+<p>Returns an error if the byte slice <code class="language-plaintext highlighter-rouge">b</code> does not have a length of 16.</p>
+
+<p class="NOTEY">This function does not apply any additional security to the inputted byte slice. You can think of this function as casting a 16-byte value into a UUID. Anybody who reads the UUID will be able to determine what 16-byte value you used to generate the UUID, so you should not pass sensitive information into this function.</p>
+<h2 id="json-marshal-and-unmarshal">
+  
+  
+    <a href="../library.html#json-marshal-and-unmarshal" class="anchor-heading" aria-labelledby="json-marshal-and-unmarshal"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> JSON Marshal and Unmarshal
+  
+  
+</h2>
+    
+
+<p>Recall that in the name-value pairs of Datastore, the value should be a byte array.</p>
+
+<p>If you want to store other types of data (e.g. structs) in Datastore, you will need to convert that data into a byte array before storing it. Then, you will need to convert the byte array back into the original data structure when retrieving the data.</p>
+
+<p>We’ve provided the <code class="language-plaintext highlighter-rouge">json.Marshal</code> serialization function, which takes any arbitrary data and converts it into a byte array.</p>
+
+<p>We’ve also provided the <code class="language-plaintext highlighter-rouge">json.Unmarshal</code> deserialization function, which takes a byte array outputted by <code class="language-plaintext highlighter-rouge">json.Marshal</code>, and converts it back into the original data.</p>
+<h3 class="big-heading" id="jsonmarshal">
+  
+  
+    <a href="../library.html#jsonmarshal" class="anchor-heading" aria-labelledby="jsonmarshal"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> <code class="language-plaintext highlighter-rouge">json.Marshal</code>
+  
+  
+</h3>
+    
+
+<p style="margin-top:1em;margin-bottom:0.15em;font-weight:bold;">Method Signature:</p>
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">json</span><span class="o">.</span><span class="n">Marshal</span><span class="p">(</span><span class="n">v</span> <span class="k">interface</span><span class="p">{})</span> <span class="p">(</span><span class="n">bytes</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">,</span> <span class="n">err</span> <span class="kt">error</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>Description:</strong> <br />
+Converts an arbitrary Go value, <code class="language-plaintext highlighter-rouge">v</code>, into a byte slice containing the JSON representation of the struct.</p>
+
+<p>If the value is a struct, <strong>only fields that start with a capital letter are converted. Fields starting with a lowercase letter are not marshaled into the output.</strong></p>
+
+<p>This function will automatically follow Go memory pointers (including nested Go memory pointers) when marshalling.</p>
+
+<blockquote class="EXAMPLE">
+  <div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">// Serialize a User struct into JSON.</span>
+<span class="k">type</span> <span class="n">User</span> <span class="k">struct</span> <span class="p">{</span>
+     <span class="n">Username</span> <span class="kt">string</span>
+     <span class="n">Password</span> <span class="kt">string</span>
+     <span class="n">lostdata</span> <span class="kt">int</span>
+<span class="p">}</span>
+
+<span class="n">alice</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="n">User</span><span class="p">{</span>
+ <span class="s">"alice"</span><span class="p">,</span>
+ <span class="s">"password"</span><span class="p">,</span>
+ <span class="m">42</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">aliceBytes</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">json</span><span class="o">.</span><span class="n">Marshal</span><span class="p">(</span><span class="n">alice</span><span class="p">)</span>
+<span class="n">userlib</span><span class="o">.</span><span class="n">DebugMsg</span><span class="p">(</span><span class="s">"%s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="kt">string</span><span class="p">(</span><span class="n">aliceBytes</span><span class="p">))</span>
+<span class="c">// {"Username":"alice","Password":"password"}</span>
+</code></pre></div>  </div>
+</blockquote>
+<h3 class="big-heading" id="jsonunmarshal">
+  
+  
+    <a href="../library.html#jsonunmarshal" class="anchor-heading" aria-labelledby="jsonunmarshal"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> <code class="language-plaintext highlighter-rouge">json.Unmarshal</code>
+  
+  
+</h3>
+    
+
+<p style="margin-top:1em;margin-bottom:0.15em;font-weight:bold;">Method Signature:</p>
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">json</span><span class="o">.</span><span class="n">Unmarshal</span><span class="p">(</span><span class="n">v</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">,</span> <span class="n">obj</span> <span class="k">interface</span><span class="p">{})</span> <span class="p">(</span><span class="n">err</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>Description:</strong> <br />
+Converts a byte slice <code class="language-plaintext highlighter-rouge">v</code>, generated by json.Marshal, back into a Go struct. Assigns <code class="language-plaintext highlighter-rouge">obj</code> to the converted Go struct.</p>
+
+<p>Only struct fields that start with a capital letter will have their values restored. Struct fields that start with a lowercase letter will be initialized to their default value.</p>
+
+<p>This function automatically generates nested Go memory pointers where needed to generate a valid struct.</p>
+
+<p>This function will return an error if there is a type mismatch between the JSON and the struct (e.g. storing a string into a number field in a struct).</p>
+
+<blockquote class="EXAMPLE">
+  <div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">// Serialize a User struct into JSON.</span>
+<span class="c">// The lostdata field will NOT be included in the byte array output.</span>
+<span class="k">type</span> <span class="n">User</span> <span class="k">struct</span> <span class="p">{</span>
+     <span class="n">Username</span> <span class="kt">string</span>
+     <span class="n">Password</span> <span class="kt">string</span>
+     <span class="n">lostdata</span> <span class="kt">int</span>
+<span class="p">}</span>
+
+<span class="n">aliceBytes</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">(</span><span class="s">"{</span><span class="se">\"</span><span class="s">Username</span><span class="se">\"</span><span class="s">:</span><span class="se">\"</span><span class="s">alice</span><span class="se">\"</span><span class="s">,</span><span class="se">\"</span><span class="s">Password</span><span class="se">\"</span><span class="s">:</span><span class="se">\"</span><span class="s">password</span><span class="se">\"</span><span class="s">}"</span><span class="p">)</span>
+ <span class="k">var</span> <span class="n">alice</span> <span class="n">User</span>
+ <span class="n">err</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">Unmarshal</span><span class="p">(</span><span class="n">aliceBytes</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">alice</span><span class="p">)</span>
+ <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span> <span class="k">return</span> <span class="p">}</span>
+
+<span class="n">userlib</span><span class="o">.</span><span class="n">DebugMsg</span><span class="p">(</span><span class="s">"%v</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">alice</span><span class="p">)</span>
+<span class="c">// {alice password 0}</span>
+</code></pre></div>  </div>
+</blockquote>
+<h2 id="random-byte-generator">
+  
+  
+    <a href="../library.html#random-byte-generator" class="anchor-heading" aria-labelledby="random-byte-generator"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Random Byte Generator
+  
+  
+</h2>
+    
+<h3 class="big-heading" id="userlibrandombyte">
+  
+  
+    <a href="../library.html#userlibrandombyte" class="anchor-heading" aria-labelledby="userlibrandombyte"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> <code class="language-plaintext highlighter-rouge">userlib.RandomByte</code>
+  
+  
+</h3>
+    
+
+<p style="margin-top:1em;margin-bottom:0.15em;font-weight:bold;">Method Signature:</p>
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">userlib</span><span class="o">.</span><span class="n">RandomBytes</span><span class="p">(</span><span class="n">bytes</span> <span class="kt">int</span><span class="p">)</span> <span class="p">(</span><span class="n">data</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>Description:</strong> <br />
+Given a length <code class="language-plaintext highlighter-rouge">bytes</code>, return that number of randomly generated bytes.</p>
+
+<p>The random bytes returned could be used as an IV, symmetric key, or anything else you’d like.</p>
+
+<p>You don’t need to worry about the underlying implementation (e.g. you don’t have to think about reseeding any PRNG). You can assume the returned bytes are indistinguishable from truly random bytes.</p>
+<h2 id="hash-functions">
+  
+  
+    <a href="../library.html#hash-functions" class="anchor-heading" aria-labelledby="hash-functions"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Hash Functions
+  
+  
+</h2>
+    
+<h3 class="big-heading" id="userlibhash">
+  
+  
+    <a href="../library.html#userlibhash" class="anchor-heading" aria-labelledby="userlibhash"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> <code class="language-plaintext highlighter-rouge">userlib.Hash</code>
+  
+  
+</h3>
+    
+
+<p style="margin-top:1em;margin-bottom:0.15em;font-weight:bold;">Method Signature:</p>
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">userlib</span><span class="o">.</span><span class="n">Hash</span><span class="p">(</span><span class="n">data</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span> <span class="p">(</span><span class="n">sum</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>Description:</strong> <br />
+Takes in arbitrary-length <code class="language-plaintext highlighter-rouge">data</code>, and outputs <code class="language-plaintext highlighter-rouge">sum</code>, a 64-byte SHA-512 hash of the data.</p>
+
+<p class="NOTEY">You should use <a href="../library.html#userlibhmacequal">HMACEqual</a> to determine hash equality. This function runs in constant time and avoids timing side-channel attacks.</p>
+<h3 class="big-heading" id="userlibhashkdf">
+  
+  
+    <a href="../library.html#userlibhashkdf" class="anchor-heading" aria-labelledby="userlibhashkdf"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> <code class="language-plaintext highlighter-rouge">userlib.HashKDF</code>
+  
+  
+</h3>
+    
+
+<p style="margin-top:1em;margin-bottom:0.15em;font-weight:bold;">Method Signature:</p>
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">userlib</span><span class="o">.</span><span class="n">HashKDF</span><span class="p">(</span><span class="n">sourceKey</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">,</span> <span class="n">purpose</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span> <span class="p">(</span><span class="n">derivedKey</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">,</span> <span class="n">err</span> <span class="kt">error</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>Description:</strong> <br />
+HashKDF stands for <strong>Hash-Based Key Derivation Function.</strong> It hashes together a 16-byte <code class="language-plaintext highlighter-rouge">sourceKey</code> and some arbitrary-length byte array <code class="language-plaintext highlighter-rouge">purpose</code> to deterministically derive a new 64-byte <code class="language-plaintext highlighter-rouge">derivedKey</code>.</p>
+
+<p>If you don’t need all 64 bytes of the output, you can slice to obtain a key of the desired length.</p>
+
+<p>You can use the HashKDF to deterministically derive multiple keys from a single root key. This can simplify your key management schemes.</p>
+
+<p>HashKDF is a fast hash function, similar to HMAC, that essentially hashes the source key and the purpose together. Changing either the source key, or the purpose, or both, will cause the output of HashKDF to be unpredictably different.</p>
+
+<p class="NOTEY">If the source key is insecure (e.g. an attacker knows its value), and the purpose is insecure (e.g. it’s a hard-coded string and the attacker has a copy of your code), then the derived keys outputted by HashKDF will also be insecure.</p>
+
+<blockquote class="EXAMPLE">
+  <p>One way you can use HashKDF is by calling it multiple times with the same source key but different, hard-coded purposes every time. This will generate multiple keys, one per call to HashKDF. Anybody who knows the source key and the purposes can re-generate the keys by calling HashKDF again (without needing to store the derived keys). Anybody who doesn’t know the source key will be unable to generate the keys.</p>
+
+  <p>Here’s a code snippet showing how you could use HashKDF to take one source key and derive two keys, one for encryption and one for MACing.</p>
+
+  <div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sourceKey</span> <span class="o">:=</span> <span class="n">userlib</span><span class="o">.</span><span class="n">RandomBytes</span><span class="p">(</span><span class="m">16</span><span class="p">)</span>
+
+<span class="n">encKey</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">userlib</span><span class="o">.</span><span class="n">HashKDF</span><span class="p">(</span><span class="n">sourceKey</span><span class="p">,</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">(</span><span class="s">"encryption"</span><span class="p">))</span>
+<span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span> <span class="k">return</span> <span class="p">}</span>
+
+<span class="n">macKey</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">userlib</span><span class="o">.</span><span class="n">HashKDF</span><span class="p">(</span><span class="n">sourceKey</span><span class="p">,</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">(</span><span class="s">"mac"</span><span class="p">))</span>
+<span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span> <span class="k">return</span> <span class="p">}</span>
+</code></pre></div>  </div>
+</blockquote>
+<h3 class="big-heading" id="userlibargon2key">
+  
+  
+    <a href="../library.html#userlibargon2key" class="anchor-heading" aria-labelledby="userlibargon2key"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> <code class="language-plaintext highlighter-rouge">userlib.Argon2Key</code>
+  
+  
+</h3>
+    
+
+<p style="margin-top:1em;margin-bottom:0.15em;font-weight:bold;">Method Signature:</p>
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">userlib</span><span class="o">.</span><span class="n">Argon2Key</span><span class="p">(</span><span class="n">password</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">,</span> <span class="n">salt</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">,</span> <span class="n">keyLen</span> <span class="kt">uint32</span><span class="p">)</span> <span class="p">(</span><span class="n">result</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>Description:</strong> <br />
+Argon2Key is a slow hash function, designed specifically for hashing passwords. It applies a slow hash to the given <code class="language-plaintext highlighter-rouge">password</code> and <code class="language-plaintext highlighter-rouge">salt</code>. The outputted hash is <code class="language-plaintext highlighter-rouge">keyLen</code> bytes long, and can be used as a symmetric key.</p>
+
+<p>Argon2Key is called a <strong>Password-Based Key Derivation Function (PBKDF)</strong> because the output (i.e. the hashed password) can be used as a symmetric key. An attacker cannot brute-force passwords to learn the key because the hash function is too slow. Also, the hash function makes the hashed password look unpredictably random, so it can be used as a symmetric key.</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">salt</code> argument is used to ensure that two users with the same password don’t have the same password hash. If you choose to use the hash as a key, then the salt also ensures that the two users don’t use the same key.</p>
+
+<p class="NOTEY">For this project, you may assume that the user’s chosen password has sufficient entropy for the PBKDF output to be used as a symmetric key.</p>
+<h2 id="symmetric-key-cryptography">
+  
+  
+    <a href="../library.html#symmetric-key-cryptography" class="anchor-heading" aria-labelledby="symmetric-key-cryptography"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Symmetric-Key Cryptography
+  
+  
+</h2>
+    
+<h3 class="big-heading" id="userlibsymenc">
+  
+  
+    <a href="../library.html#userlibsymenc" class="anchor-heading" aria-labelledby="userlibsymenc"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> <code class="language-plaintext highlighter-rouge">userlib.SymEnc</code>
+  
+  
+</h3>
+    
+
+<p style="margin-top:1em;margin-bottom:0.15em;font-weight:bold;">Method Signature:</p>
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">userlib</span><span class="o">.</span><span class="n">SymEnc</span><span class="p">(</span><span class="n">key</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">,</span> <span class="n">iv</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">,</span> <span class="n">plaintext</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span> <span class="p">(</span><span class="n">ciphertext</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>Description:</strong> <br />
+Encrypts the <code class="language-plaintext highlighter-rouge">plaintext</code> using AES-CTR mode with the provided 16-byte <code class="language-plaintext highlighter-rouge">key</code> and 16-byte <code class="language-plaintext highlighter-rouge">iv</code>.</p>
+
+<p>Returns the <code class="language-plaintext highlighter-rouge">ciphertext</code>, which will contain the IV (you do not need to store the IV separately).</p>
+
+<p>This function is capable of encrypting variable-length plaintext, regardless of size. You do not need to pad your plaintext to any specific block size.</p>
+<h3 class="big-heading" id="userlibsymdec">
+  
+  
+    <a href="../library.html#userlibsymdec" class="anchor-heading" aria-labelledby="userlibsymdec"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> <code class="language-plaintext highlighter-rouge">userlib.SymDec</code>
+  
+  
+</h3>
+    
+
+<p style="margin-top:1em;margin-bottom:0.15em;font-weight:bold;">Method Signature:</p>
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">userlib</span><span class="o">.</span><span class="n">SymDec</span><span class="p">(</span><span class="n">key</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">,</span> <span class="n">ciphertext</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span> <span class="p">(</span><span class="n">plaintext</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>Description:</strong> <br />
+Decrypts the <code class="language-plaintext highlighter-rouge">ciphertext</code> using the 16-byte <code class="language-plaintext highlighter-rouge">key</code>.</p>
+
+<p>The IV should be included in the ciphertext (see <code class="language-plaintext highlighter-rouge">SymEnc</code>).</p>
+
+<p>If the provided <code class="language-plaintext highlighter-rouge">ciphertext</code> is less than the length of one cipher block, then <code class="language-plaintext highlighter-rouge">SymDec</code> will panic (remember, your code should always return errors, and not panic).</p>
+
+<p>Notice that the SymDec method does not return an error. In other words, if some ciphertext has been mutated, SymDec will return non-useful plaintext (e.g. garbage), since AES-CTR mode does not provide integrity.</p>
+<h3 class="big-heading" id="userlibhmaceval">
+  
+  
+    <a href="../library.html#userlibhmaceval" class="anchor-heading" aria-labelledby="userlibhmaceval"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> <code class="language-plaintext highlighter-rouge">userlib.HMACEval</code>
+  
+  
+</h3>
+    
+
+<p style="margin-top:1em;margin-bottom:0.15em;font-weight:bold;">Method Signature:</p>
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">userlib</span><span class="o">.</span><span class="n">HMACEval</span><span class="p">(</span><span class="n">key</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">,</span> <span class="n">msg</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span> <span class="p">(</span><span class="n">sum</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">,</span> <span class="n">err</span> <span class="kt">error</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>Description:</strong> <br />
+Takes in an arbitrary-length <code class="language-plaintext highlighter-rouge">msg</code>, and a 16-byte key. Computes a 64-byte HMAC-SHA-512 on the message.</p>
+<h3 class="big-heading" id="userlibhmacequal">
+  
+  
+    <a href="../library.html#userlibhmacequal" class="anchor-heading" aria-labelledby="userlibhmacequal"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> <code class="language-plaintext highlighter-rouge">userlib.HMACEqual</code>
+  
+  
+</h3>
+    
+
+<p style="margin-top:1em;margin-bottom:0.15em;font-weight:bold;">Method Signature:</p>
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">userlib</span><span class="o">.</span><span class="n">HMACEqual</span><span class="p">(</span><span class="n">a</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">,</span> <span class="n">b</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span> <span class="p">(</span><span class="n">equal</span> <span class="kt">bool</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>Description:</strong> <br />
+Compare whether two HMACs (or hashes) <code class="language-plaintext highlighter-rouge">a</code> and <code class="language-plaintext highlighter-rouge">b</code> are the same, in constant time.</p>
+
+<p>If <code class="language-plaintext highlighter-rouge">a</code> and <code class="language-plaintext highlighter-rouge">b</code> are the same HMAC/hash, then <code class="language-plaintext highlighter-rouge">equals</code> will be true; otherwise, <code class="language-plaintext highlighter-rouge">equals</code> will be false.</p>
+<h2 id="public-key-cryptography">
+  
+  
+    <a href="../library.html#public-key-cryptography" class="anchor-heading" aria-labelledby="public-key-cryptography"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Public-Key Cryptography
+  
+  
+</h2>
+    
+<h3 class="big-heading" id="userlibpkekeygen">
+  
+  
+    <a href="../library.html#userlibpkekeygen" class="anchor-heading" aria-labelledby="userlibpkekeygen"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> <code class="language-plaintext highlighter-rouge">userlib.PKEKeyGen</code>
+  
+  
+</h3>
+    
+
+<p style="margin-top:1em;margin-bottom:0.15em;font-weight:bold;">Method Signature:</p>
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">PKEKeyGen</span><span class="p">()</span> <span class="p">(</span><span class="n">PKEEncKey</span><span class="p">,</span> <span class="n">PKEDecKey</span><span class="p">,</span> <span class="n">err</span> <span class="kt">error</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>Description:</strong> <br />
+Generates a 256-byte RSA key pair for public-key encryption.</p>
+<h3 class="big-heading" id="userlibpkeenc">
+  
+  
+    <a href="../library.html#userlibpkeenc" class="anchor-heading" aria-labelledby="userlibpkeenc"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> <code class="language-plaintext highlighter-rouge">userlib.PKEEnc</code>
+  
+  
+</h3>
+    
+
+<p style="margin-top:1em;margin-bottom:0.15em;font-weight:bold;">Method Signature:</p>
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">userlib</span><span class="o">.</span><span class="n">PKEEnc</span><span class="p">(</span><span class="n">ek</span> <span class="n">PKEEncKey</span><span class="p">,</span> <span class="n">plaintext</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span> <span class="p">(</span><span class="n">ciphertext</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">,</span> <span class="n">err</span> <span class="kt">error</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>Description:</strong> <br />
+Uses the RSA public key <code class="language-plaintext highlighter-rouge">ek</code> to encrypt the <code class="language-plaintext highlighter-rouge">plaintext</code>, using RSA-OAEP.</p>
+<h3 class="big-heading" id="userlibpkedec">
+  
+  
+    <a href="../library.html#userlibpkedec" class="anchor-heading" aria-labelledby="userlibpkedec"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> <code class="language-plaintext highlighter-rouge">userlib.PKEDec</code>
+  
+  
+</h3>
+    
+
+<p style="margin-top:1em;margin-bottom:0.15em;font-weight:bold;">Method Signature:</p>
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">PKEDec</span><span class="p">(</span><span class="n">dk</span> <span class="n">PKEDecKey</span><span class="p">,</span> <span class="n">ciphertext</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span> <span class="p">(</span><span class="n">plaintext</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">,</span> <span class="n">err</span> <span class="kt">error</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>Description:</strong> <br />
+Use the RSA private key <code class="language-plaintext highlighter-rouge">dk</code> to decrypt the <code class="language-plaintext highlighter-rouge">ciphertext</code>.</p>
+
+<blockquote class="NOTEY">
+  <p>RSA encryption does not support very long plaintext. If you need to use a public key to encrypt long plaintext, consider writing a helper function that implements hybrid encryption.</p>
+
+  <p><strong>Recall the hybrid encryption process:</strong></p>
+  <ol>
+    <li>Use the given public key to encrypt a random symmetric key.</li>
+    <li>Use the symmetric key to encrypt the actual data.</li>
+    <li>Return the symmetric key (encrypted with the public key) and the data (encrypted with the symmetric key).</li>
+  </ol>
+
+  <p><strong>Recall the decryption process for hybrid encryption schemes:</strong></p>
+  <ol>
+    <li>Use the given private key to decrypt the symmetric key.</li>
+    <li>Use the symmetric key to decrypt the data.</li>
+  </ol>
+</blockquote>
+<h3 class="big-heading" id="userlibdskeygen">
+  
+  
+    <a href="../library.html#userlibdskeygen" class="anchor-heading" aria-labelledby="userlibdskeygen"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> <code class="language-plaintext highlighter-rouge">userlib.DSKeyGen</code>
+  
+  
+</h3>
+    
+
+<p style="margin-top:1em;margin-bottom:0.15em;font-weight:bold;">Method Signature:</p>
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">userlib</span><span class="o">.</span><span class="n">DSKeyGen</span><span class="p">()</span> <span class="p">(</span><span class="n">DSSignKey</span><span class="p">,</span> <span class="n">DSVerifyKey</span><span class="p">,</span> <span class="n">err</span> <span class="kt">error</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>Description:</strong> <br />
+Generates an RSA key pair for digital signatures.</p>
+<h3 class="big-heading" id="userlibdssign">
+  
+  
+    <a href="../library.html#userlibdssign" class="anchor-heading" aria-labelledby="userlibdssign"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> <code class="language-plaintext highlighter-rouge">userlib.DSSign</code>
+  
+  
+</h3>
+    
+
+<p style="margin-top:1em;margin-bottom:0.15em;font-weight:bold;">Method Signature:</p>
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">userlib</span><span class="o">.</span><span class="n">DSSign</span><span class="p">(</span><span class="n">sk</span> <span class="n">DSSignKey</span><span class="p">,</span> <span class="n">msg</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span> <span class="p">(</span><span class="n">sig</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">,</span> <span class="n">err</span> <span class="kt">error</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>Description:</strong> <br />
+Given an RSA private (signing) key <code class="language-plaintext highlighter-rouge">sk</code> and a <code class="language-plaintext highlighter-rouge">msg</code>, outputs a 256-byte RSA signature <code class="language-plaintext highlighter-rouge">sig</code>.</p>
+<h3 class="big-heading" id="userlibdsverify">
+  
+  
+    <a href="../library.html#userlibdsverify" class="anchor-heading" aria-labelledby="userlibdsverify"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> <code class="language-plaintext highlighter-rouge">userlib.DSVerify</code>
+  
+  
+</h3>
+    
+
+<p style="margin-top:1em;margin-bottom:0.15em;font-weight:bold;">Method Signature:</p>
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">userlib</span><span class="o">.</span><span class="n">DSVerify</span><span class="p">(</span><span class="n">vk</span> <span class="n">DSVerifyKey</span><span class="p">,</span> <span class="n">msg</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">,</span> <span class="n">sig</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span> <span class="p">(</span><span class="n">err</span> <span class="kt">error</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>Description:</strong> <br />
+Uses the RSA public (verification) key <code class="language-plaintext highlighter-rouge">vk</code> to verify that the signature <code class="language-plaintext highlighter-rouge">sig</code> on the message <code class="language-plaintext highlighter-rouge">msg</code> is valid. If the signature is valid, <code class="language-plaintext highlighter-rouge">err</code> is <code class="language-plaintext highlighter-rouge">nil</code>; otherwise, <code class="language-plaintext highlighter-rouge">err</code> is not <code class="language-plaintext highlighter-rouge">nil</code>.</p>
+
+  </div>
+</div>
+
+          
+
+          
+            
+          
+        </main>
+        
+
+  <hr>
+  <footer>
+    
+
+    
+
+
+
+
+
+
+
+
+
+<script>
+  (function () {
+    var navList = document.querySelector('.aux-nav-list');
+    if (!navList || !navList.firstElementChild) return;
+    var darkToggle = navList.firstElementChild;
+    darkToggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      toggleDark();
+    });
+  })();
+</script>
+
+<script src="../../assets/js/tocbot.min.js"></script>
+<script>
+  // Tries to mirror the HTML TOC
+  tocbot.init({
+    tocSelector: '.js-toc',
+    contentSelector: '.content',
+    headingSelector: 'h2,h3,h4,h5,h6',
+    ignoreSelector: '.no_toc',
+    hasInnerContainers: true,
+    linkClass: 'nav-list-link',
+    activeLinkClass: 'active',
+    listClass: 'nav-list',
+    listItemClass: 'nav-list-item',
+    activeListItemClass: 'active',
+    collapseDepth: 3,
+    scrollSmooth: false,
+  });
+</script>
+
+
+    
+  </footer>
+
+
+      </div>
+    </div>
+    
+      
+
+<div class="search-overlay"></div>
+
+    
+  </div>
+
+  
+</body>
+</html>
+

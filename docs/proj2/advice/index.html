@@ -1,0 +1,677 @@
+
+
+<!DOCTYPE html>
+
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+
+  <link rel="stylesheet" href="../../assets/css/just-the-docs-default.css">
+
+  <link rel="stylesheet" href="../../assets/css/just-the-docs-head-nav.css" id="jtd-head-nav-stylesheet">
+
+  <style id="jtd-nav-activation">
+  
+
+    .site-nav > ul.nav-list:first-child > li > a,
+    
+    .site-nav > ul.nav-list:first-child > li > ul > li:not(:nth-child(10)) > a,
+    .site-nav > ul.nav-list:first-child > li > ul > li > ul > li a {
+      background-image: none;
+    }
+
+    .site-nav > ul.nav-list:not(:first-child) a,
+    .site-nav li.external a {
+      background-image: none;
+    }
+
+    .site-nav > ul.nav-list:first-child > li:nth-child(7) > ul > li:nth-child(10) > a {
+      font-weight: 600;
+      text-decoration: none;
+    }.site-nav > ul.nav-list:first-child > li:nth-child(7) > button svg,
+    .site-nav > ul.nav-list:first-child > li:nth-child(7) > ul > li:nth-child(10) > button svg {
+      transform: rotate(-90deg);
+    }.site-nav > ul.nav-list:first-child > li.nav-list-item:nth-child(7) > ul.nav-list,
+    .site-nav > ul.nav-list:first-child > li.nav-list-item:nth-child(7) > ul.nav-list > li.nav-list-item:nth-child(10) > ul.nav-list {
+      display: block;
+    }
+  </style>
+
+  
+
+  
+    <script src="../../assets/js/vendor/lunr.min.js"></script>
+  
+
+  <script src="../../assets/js/just-the-docs.js"></script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <link rel="icon" href="../../favicon.ico" type="image/x-icon">
+
+
+
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Advice and Tips | CS 161 Fall 2025</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="Advice and Tips" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Computer Security at UC Berkeley" />
+<meta property="og:description" content="Computer Security at UC Berkeley" />
+<link rel="canonical" href="index.html" />
+<meta property="og:url" content="https://fa25.cs161.org/proj2/advice/" />
+<meta property="og:site_name" content="CS 161 Fall 2025" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Advice and Tips" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"Computer Security at UC Berkeley","headline":"Advice and Tips","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://fa25.cs161.org/"}},"url":"https://fa25.cs161.org/proj2/advice/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  <link
+  rel="preload"
+  href="https://fa25.cs161.org/assets/css/just-the-docs-dark.css"
+  as="style"
+>
+
+<!-- Intentionally duplicates the default theme stylesheet so there's a fallback when changing themes -->
+<link
+  id="jtdThemeCSS"
+  rel="stylesheet"
+  href="../../assets/css/just-the-docs-default.css"
+>
+
+<script>
+  /* Script to enable persistent dark mode. */
+
+  jtd.getTheme = function () {
+    var cssFileHref = (
+      document.getElementById('jtdThemeCSS') || document.querySelector('[rel="stylesheet"]')
+    ).getAttribute('href');
+    return cssFileHref.substring(cssFileHref.lastIndexOf('-') + 1, cssFileHref.length - 4);
+  };
+
+  jtd.setTheme = function (theme) {
+    var cssFile = document.getElementById('jtdThemeCSS') || document.querySelector('[rel="stylesheet"]');
+    cssFile.setAttribute('href', cssFile.getAttribute('href').replace(jtd.getTheme(), theme));
+  };
+
+  let toggleDark = () => {
+    let setDark = jtd.getTheme() !== 'dark';
+    document.documentElement.setAttribute('data-theme', setDark ? 'dark' : 'default');
+    document.documentElement.setAttribute('data-theme', setDark ? 'dark' : 'default');
+    jtd.setTheme(setDark ? 'dark' : 'default');
+    localStorage.setItem('darkMode', String(setDark));
+
+    if (typeof calendar !== 'undefined') {
+      calendar.setColorScheme(setDark ? 'dark' : 'light');
+    }
+  };
+
+  if (localStorage.getItem('darkMode') === 'true') {
+    toggleDark();
+  }
+</script>
+
+<!-- Script for LaTeX rendering. -->
+<link
+  rel="stylesheet"
+  href="../../assets/katex/katex.min.css"
+>
+<script defer src="../../assets/katex/katex.min.js"></script>
+<script>
+  function renderKaTeX() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '$', right: '$', display: false },
+        { left: '\\(', right: '\\)', display: false },
+        { left: '\\[', right: '\\]', display: true },
+      ],
+    });
+  }
+</script>
+<script
+  defer
+  src="../../assets/katex/contrib/auto-render.min.js"
+  onload="renderKaTeX();"
+></script>
+
+
+</head>
+
+<body>
+  <a class="skip-to-main" href="index.html#main-content">Skip to main content</a>
+  <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+  <symbol id="svg-link" viewBox="0 0 24 24">
+  <title>Link</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-link">
+    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+  </svg>
+</symbol>
+
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+  <title>Menu</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu">
+    <line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line>
+  </svg>
+</symbol>
+
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+  <title>Expand</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+    <polyline points="9 18 15 12 9 6"></polyline>
+  </svg>
+</symbol>
+
+  <!-- Feather. MIT License: https://github.com/feathericons/feather/blob/master/LICENSE -->
+<symbol id="svg-external-link" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link">
+  <title id="svg-external-link-title">(external link)</title>
+  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line>
+</symbol>
+
+  
+    <symbol id="svg-doc" viewBox="0 0 24 24">
+  <title>Document</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file">
+    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline>
+  </svg>
+</symbol>
+
+    <symbol id="svg-search" viewBox="0 0 24 24">
+  <title>Search</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search">
+    <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+  </svg>
+</symbol>
+
+  
+  
+    <!-- Bootstrap Icons. MIT License: https://github.com/twbs/icons/blob/main/LICENSE.md -->
+<symbol id="svg-copy" viewBox="0 0 16 16">
+  <title>Copy</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard" viewBox="0 0 16 16">
+    <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+    <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+  </svg>
+</symbol>
+<symbol id="svg-copied" viewBox="0 0 16 16">
+  <title>Copied</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-check-fill" viewBox="0 0 16 16">
+    <path d="M6.5 0A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3Zm3 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3Z"/>
+    <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1A2.5 2.5 0 0 1 9.5 5h-3A2.5 2.5 0 0 1 4 2.5v-1Zm6.854 7.354-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L7.5 10.793l2.646-2.647a.5.5 0 0 1 .708.708Z"/>
+  </svg>
+</symbol>
+
+  
+</svg>
+
+  
+    <div class="side-bar">
+  <div class="site-header" role="banner">
+    <a href="https://fa25.cs161.org/" class="site-title lh-tight">
+
+
+  CS 161 Fall 2025
+
+</a>
+    <button id="menu-button" class="site-button btn-reset" aria-label="Toggle menu" aria-pressed="false">
+      <svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><use xlink:href="#svg-menu"></use></svg>
+    </button>
+  </div>
+
+  <nav aria-label="Main" id="site-nav" class="site-nav">
+  
+  
+    <ul class="nav-list"><li class="nav-list-item"><a href="https://fa25.cs161.org/exam/" class="nav-list-link">Exam Logistics</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/calendar/" class="nav-list-link">Calendar</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/policies/" class="nav-list-link">Policies</a></li><li class="nav-list-item"><button class="nav-list-expander btn-reset" aria-label="toggle items in Resources category" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use xlink:href="#svg-arrow-right"></use></svg>
+      </button><a href="https://fa25.cs161.org/resources/" class="nav-list-link">Resources</a><ul class="nav-list"><li class="nav-list-item"><a href="https://fa25.cs161.org/resources/faqs/" class="nav-list-link">Spring 2026 FAQs</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/resources/instructional-machine/" class="nav-list-link">Instructional Machine Setup</a></li></ul></li><li class="nav-list-item"><a href="https://fa25.cs161.org/staff/" class="nav-list-link">Staff</a></li><li class="nav-list-item"><button class="nav-list-expander btn-reset" aria-label="toggle items in Project 1 category" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use xlink:href="#svg-arrow-right"></use></svg>
+      </button><a href="https://fa25.cs161.org/proj1/" class="nav-list-link">Project 1</a><ul class="nav-list"><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/getting-started/" class="nav-list-link">Getting Started</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/customizing/" class="nav-list-link">Customizing</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q1/" class="nav-list-link">Question 1: Remus</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q2/" class="nav-list-link">Question 2: Spica</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q3/" class="nav-list-link">Question 3: Polaris</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q4/" class="nav-list-link">Question 4: Vega</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q5/" class="nav-list-link">Question 5: Deneb</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q6/" class="nav-list-link">Question 6: Antares</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q7/" class="nav-list-link">Question 7: Rigel</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/deliverables/" class="nav-list-link">Deliverables</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/vm-debugging/" class="nav-list-link">Troubleshooting</a></li></ul></li><li class="nav-list-item"><button class="nav-list-expander btn-reset" aria-label="toggle items in Project 2 category" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use xlink:href="#svg-arrow-right"></use></svg>
+      </button><a href="../index.html" class="nav-list-link">Project 2</a><ul class="nav-list"><li class="nav-list-item"><a href="../story/index.html" class="nav-list-link">Story</a></li><li class="nav-list-item"><a href="../policies.html" class="nav-list-link">Project 2 Policies and Deliverables</a></li><li class="nav-list-item"><a href="../getting-started.html" class="nav-list-link">Getting Started</a></li><li class="nav-list-item"><a href="../overview/index.html" class="nav-list-link">Design Overview</a></li><li class="nav-list-item"><a href="../library.html" class="nav-list-link">Library Functions</a></li><li class="nav-list-item"><a href="../userauth/index.html" class="nav-list-link">Users And User Authentication</a></li><li class="nav-list-item"><a href="../files/index.html" class="nav-list-link">File Operations</a></li><li class="nav-list-item"><a href="../sharing/index.html" class="nav-list-link">Sharing and Revocation</a></li><li class="nav-list-item"><a href="../troubleshooting.html" class="nav-list-link">Debugging and Errors</a></li><li class="nav-list-item"><a href="index.html" class="nav-list-link">Advice and Tips</a></li><li class="nav-list-item"><a href="../appendix/index.html" class="nav-list-link">Appendix</a></li></ul></li><li class="nav-list-item"><button class="nav-list-expander btn-reset" aria-label="toggle items in Project 3 category" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use xlink:href="#svg-arrow-right"></use></svg>
+      </button><a href="https://fa25.cs161.org/proj3/" class="nav-list-link">Project 3</a><ul class="nav-list"><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/story/" class="nav-list-link">Story</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/getting-started/" class="nav-list-link">Getting Started</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/tips/" class="nav-list-link">General Tips</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag1/" class="nav-list-link">Flag 1: dev</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag2/" class="nav-list-link">Flag 2: ip.txt</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag3/" class="nav-list-link">Flag 3: shomil</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag4/" class="nav-list-link">Flag 4: nicholas</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag5/" class="nav-list-link">Flag 5: cs161</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag6/" class="nav-list-link">Flag 6: delete</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag7/" class="nav-list-link">Flag 7: admin</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag8/" class="nav-list-link">Flag 8: config</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/deliverables/" class="nav-list-link">Deliverables</a></li></ul></li></ul>
+  
+</nav>
+
+
+
+
+  
+  
+    <div class="site-footer">
+	Report an <a href="https://dap.berkeley.edu/get-help/report-web-accessibility-issue">accessibility issue</a>.
+
+	<br><br>
+
+	This site uses <a href="https://github.com/just-the-docs/just-the-docs">Just the Docs</a>, a documentation theme for Jekyll.
+</div>
+  
+</div>
+
+  
+  <div class="main" id="top">
+    <div id="main-header" class="main-header">
+  
+    
+
+<div class="search" role="search">
+  <div class="search-input-wrap">
+    <input type="text" id="search-input" class="search-input" tabindex="0" placeholder="Search CS 161 Fall 2025" aria-label="Search CS 161 Fall 2025" autocomplete="off">
+    <label for="search-input" class="search-label"><svg viewBox="0 0 24 24" class="search-icon"><use xlink:href="#svg-search"></use></svg></label>
+  </div>
+  <div id="search-results" class="search-results"></div>
+</div>
+
+  
+  
+  
+    <nav aria-label="Auxiliary" class="aux-nav">
+  <ul class="aux-nav-list">
+    
+      <li class="aux-nav-list-item">
+        <a href="index.html#" class="site-button"
+          
+        >
+          Dark Mode
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://textbook.cs161.org" class="site-button"
+          
+        >
+          Textbook
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://edstem.org/us/courses/83260" class="site-button"
+          
+        >
+          Ed
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://oh.cs161.org" class="site-button"
+          
+        >
+          OH Queue
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://forms.gle/uaFdyWWqnPkW9Uhg6" class="site-button"
+          
+        >
+          Extensions
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://forms.gle/bW9nen9oHGNUzWo69" class="site-button"
+          
+        >
+          Anonymous Feedback
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://calendar.app.google/9quTrjViGAGPG47Z8" class="site-button"
+          
+        >
+          Student Support
+        </a>
+      </li>
+    
+  </ul>
+</nav>
+
+  
+</div>
+
+    <div class="main-content-wrap">
+      <nav aria-label="Breadcrumb" class="breadcrumb-nav">
+  <ol class="breadcrumb-nav-list">
+    <li class="breadcrumb-nav-list-item"><a href="../index.html">Project 2</a></li>
+    <li class="breadcrumb-nav-list-item"><span>Advice and Tips</span></li>
+  </ol>
+</nav>
+
+
+      <div id="main-content" class="main-content">
+        <main>
+          
+            <div class="content-container">
+    <nav class="content-nav nav-list js-toc" aria-label="In-page navigation">
+      <ul class="nav-list"><li class="nav-list-item"><a href="index.html#tips-on-database-architecture" class="nav-list-link">Tips on Database Architecture</a></li><li class="nav-list-item"><a href="index.html#minimizing-complexity" class="nav-list-link">Minimizing Complexity</a></li><li class="nav-list-item"><a href="index.html#authenticated-encryption" class="nav-list-link">Authenticated Encryption</a></li><li class="nav-list-item"><a href="index.html#checking-for-errors" class="nav-list-link">Checking for Errors</a></li><li class="nav-list-item"><a href="index.html#tips-for-writing-test-cases" class="nav-list-link">Tips For Writing Test Cases</a></li><li class="nav-list-item"><a href="index.html#coverage-flags-tips" class="nav-list-link">Coverage Flags Tips</a></li><li class="nav-list-item"><a href="index.html#writing-advanced-tests" class="nav-list-link">Writing Advanced Tests</a></li><li class="nav-list-item"><a href="index.html#writing-efficiency-tests" class="nav-list-link">Writing Efficiency Tests</a></li><li class="nav-list-item"><a href="index.html#expecterrtonotbenil" class="nav-list-link">Expect(err).ToNot(BeNil())</a></li><li class="nav-list-item"><a href="index.html#notes-on-key-reuse" class="nav-list-link">Notes on Key Reuse</a></li><li class="nav-list-item"><a href="index.html#notes-on-key-management" class="nav-list-link">Notes on Key Management</a></li><li class="nav-list-item"><a href="index.html#more-notes-on-key-reuse" class="nav-list-link">More Notes on Key Reuse</a></li><li class="nav-list-item"><a href="index.html#strings-and-byte-arrays" class="nav-list-link">Strings and Byte Arrays</a></li></ul>
+    </nav>
+  <div class="content">
+<h1 id="advice-and-tips">
+  
+  
+    <a href="index.html#advice-and-tips" class="anchor-heading" aria-labelledby="advice-and-tips"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Advice and Tips
+  
+  
+</h1>
+    
+<h2 id="tips-on-database-architecture">
+  
+  
+    <a href="index.html#tips-on-database-architecture" class="anchor-heading" aria-labelledby="tips-on-database-architecture"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Tips on Database Architecture
+  
+  
+</h2>
+    
+
+<p>Whenever you’re thinking about storing lists or maps of things in Datastore, it may help to think about how you can “flatten” your data structure - this might help with security, efficiency, and/or code complexity! As an example: let’s say we have a list of restaurants, where each restaurant has a list of menu items. Let’s say I want to figure out whether a particular restaurant has a specific menu item, and we’re using a datastore-like backend (a key-value store).</p>
+
+<p>Consider these two approaches to representing this information in some <strong>key-value store:</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">//</span> <span class="n">Approach</span> <span class="n">A</span>
+<span class="p">{</span>
+   <span class="sh">"</span><span class="s">movies</span><span class="sh">"</span><span class="p">:</span> <span class="p">{</span>
+      <span class="sh">"</span><span class="s">mcu</span><span class="sh">"</span><span class="p">:</span> <span class="p">[</span><span class="sh">"</span><span class="s">iron man</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">the incredible hulk</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">iron man 2</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">thor</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">captain america</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">the avengers</span><span class="sh">"</span><span class="p">],</span>
+      <span class="sh">"</span><span class="s">dceu</span><span class="sh">"</span><span class="p">:</span> <span class="p">[</span><span class="sh">"</span><span class="s">batman</span><span class="sh">"</span><span class="p">],</span>
+      <span class="sh">"</span><span class="s">pixar</span><span class="sh">"</span><span class="p">:</span> <span class="p">[</span><span class="sh">"</span><span class="s">turning red</span><span class="sh">"</span><span class="p">]</span>
+   <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="o">//</span> <span class="n">Approach</span> <span class="n">B</span>
+<span class="p">{</span>
+   <span class="sh">"</span><span class="s">movies/mcu</span><span class="sh">"</span><span class="p">:</span> <span class="p">[</span><span class="sh">"</span><span class="s">iron man</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">the incredible hulk</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">iron man 2</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">thor</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">captain america</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">the avengers</span><span class="sh">"</span><span class="p">],</span>
+   <span class="sh">"</span><span class="s">movies/dceu</span><span class="sh">"</span><span class="p">:</span> <span class="p">[</span><span class="sh">"</span><span class="s">batman</span><span class="sh">"</span><span class="p">],</span>
+   <span class="sh">"</span><span class="s">movies/pixar</span><span class="sh">"</span><span class="p">:</span> <span class="p">[</span><span class="sh">"</span><span class="s">turning red</span><span class="sh">"</span><span class="p">]</span>
+<span class="p">}</span> 
+</code></pre></div></div>
+
+<p>Both of these represent the same data, except instead of storing all of this information in one place, we’re flattening this data out across multiple entries in our key-value store. In approach B, all I need to do is to index into the datastore at the string value I construct (e.g. in this case, <code class="language-plaintext highlighter-rouge">"movies/pixar"</code>), and I can retrieve all of the movies that are affiliated with Pixar without having to retrieve a bunch of other data that was previously stored at the same location!</p>
+
+<p>If efficiency is measured in read/write bandwidth (like it is in this project), then it’s much more efficient to represent our data in this flattened structure.</p>
+<h2 id="minimizing-complexity">
+  
+  
+    <a href="index.html#minimizing-complexity" class="anchor-heading" aria-labelledby="minimizing-complexity"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Minimizing Complexity
+  
+  
+</h2>
+    
+
+<p>If you don’t need to store a certain piece of data, then <strong>don’t store it.</strong> Just recompute it (or re-fetch it, if it’s coming from datastore) “on-the-fly” when you need it. It’ll make your life easier!</p>
+<h2 id="authenticated-encryption">
+  
+  
+    <a href="index.html#authenticated-encryption" class="anchor-heading" aria-labelledby="authenticated-encryption"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Authenticated Encryption
+  
+  
+</h2>
+    
+
+<p>In order to build in support for authenticated encryption, you may find it helpful to create a struct with two properties: (a) some arbitrary ciphertext, and (b) some tag (e.g. MAC, signature) over the ciphertext. Then, you could marshal that struct into a sequence of bytes, and store that in datastore. When loading it from datastore, you could (a) unmarshal it and check the tag for authenticity/integrity, and then decrypt the ciphertext and pass the plaintext downstream.</p>
+<h2 id="checking-for-errors">
+  
+  
+    <a href="index.html#checking-for-errors" class="anchor-heading" aria-labelledby="checking-for-errors"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Checking for Errors
+  
+  
+</h2>
+    
+
+<p>Throughout each API method, you’ll probably have several dozen error checks. Take a look at the following code for an example of good and bad practice when it comes to handling errors.</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">// This is bad practice: the error is discarded!</span>
+<span class="n">value</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">SomeAPICall</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+
+<span class="c">// This is good practice: the error is checked!</span>
+<span class="n">value</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">SomeAPICall</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">err</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>When an error is detected (e.g. malicious tampering occurred), your client just needs to immediately return. We don’t care about what happens afterwards (e.g. program state could be messed up, could have file inconsistency, etc. - none of this matters). In other words, we don’t care about <strong>recovery</strong> – we solely care about <strong>detection</strong>.</p>
+
+<p>You should almost never discard the output of an error: always, always check to see if an error occurred!</p>
+<h2 id="tips-for-writing-test-cases">
+  
+  
+    <a href="index.html#tips-for-writing-test-cases" class="anchor-heading" aria-labelledby="tips-for-writing-test-cases"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Tips For Writing Test Cases
+  
+  
+</h2>
+    
+
+<p>Here are a few different ways to think about creative tests:</p>
+<ol>
+  <li>Functionality Tests
+    <ol>
+      <li>Consider basic functionality for single + multiple users</li>
+      <li>Consider different sequences of events of Client API methods</li>
+      <li>Consider interleaving file sharing/revocation/loading/storing actions</li>
+    </ol>
+  </li>
+  <li>Edge Case Tests
+    <ol>
+      <li>Consider edge cases outlined in the <a href="../overview/index.html">Design Overview</a> and other parts of this specification.</li>
+    </ol>
+  </li>
+  <li>Security Tests
+    <ol>
+      <li>Consider what happens when an attacker tampers with different pieces of data</li>
+    </ol>
+  </li>
+</ol>
+
+<p>In all cases, you should ensure that your Client API is following all requirements listed in the <a href="../overview/index.html">Design Overview</a>.</p>
+<h2 id="coverage-flags-tips">
+  
+  
+    <a href="index.html#coverage-flags-tips" class="anchor-heading" aria-labelledby="coverage-flags-tips"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Coverage Flags Tips
+  
+  
+</h2>
+    
+
+<p>It’s okay if your tests don’t get all 20 test coverage points! Some flags are very tricky to get, and we don’t expect everyone to get all the flags. If you’re missing a few flags, a few points won’t make or break your project. That said, higher test coverage does mean you’re testing more edge cases, which means you can also be more confident in your own implementation if it’s passing all your tests.</p>
+<h2 id="writing-advanced-tests">
+  
+  
+    <a href="index.html#writing-advanced-tests" class="anchor-heading" aria-labelledby="writing-advanced-tests"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Writing Advanced Tests
+  
+  
+</h2>
+    
+
+<ol>
+  <li>Some students have reported success with <a href="https://en.wikipedia.org/wiki/Fuzzing">fuzz testing</a>, which uses lots of different random tampering attacks. Sometimes this can help you catch an edge case you weren’t expecting.</li>
+  <li>Remember that your tests must work on any project implementation, not just your own implementation. This means you cannot assume anything about the design except the API calls that everyone implements (InitUser, GetUser, LoadFile, StoreFile, etc). For example, you cannot reference a field in a user struct in your tests, because other implementations might not have that field in their user struct.
+    <ol>
+      <li>The userlib has a nifty <a href="https://github.com/cs161-staff/project2-userlib/blob/d5c2a090deaca59388006eb66e63cca318b5bf40/userlib.go#L211">DatastoreGetMap function</a> which returns the underlying go map structure of the Datastore. This can be used to modify the Datastore directly to simulate attacker action.</li>
+      <li><code class="language-plaintext highlighter-rouge">DatastoreGetMap</code> can also be used to learn about how the Datastore is changed as a result of an API call. For example, you can scan the Datastore, perform an API call (e.g. StoreFile), then scan the Datastore again to see what has been updated. This can help you write more sophisticated tests that leverage information about what encrypted Datastore entries correspond to what data.</li>
+    </ol>
+  </li>
+</ol>
+<h2 id="writing-efficiency-tests">
+  
+  
+    <a href="index.html#writing-efficiency-tests" class="anchor-heading" aria-labelledby="writing-efficiency-tests"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Writing Efficiency Tests
+  
+  
+</h2>
+    
+
+<p>Here’s a helper function you can use to measure efficiency.</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">// Helper function to measure bandwidth of a particular operation</span>
+<span class="n">measureBandwidth</span> <span class="o">:=</span> <span class="k">func</span><span class="p">(</span><span class="n">probe</span> <span class="k">func</span><span class="p">())</span> <span class="p">(</span><span class="n">bandwidth</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+   <span class="n">before</span> <span class="o">:=</span> <span class="n">userlib</span><span class="o">.</span><span class="n">DatastoreGetBandwidth</span><span class="p">()</span>
+   <span class="n">probe</span><span class="p">()</span>
+   <span class="n">after</span> <span class="o">:=</span> <span class="n">userlib</span><span class="o">.</span><span class="n">DatastoreGetBandwidth</span><span class="p">()</span>
+   <span class="k">return</span> <span class="n">after</span> <span class="o">-</span> <span class="n">before</span>
+<span class="p">}</span>
+
+<span class="c">// Example usage</span>
+<span class="n">bw</span> <span class="o">=</span> <span class="n">measureBandwidth</span><span class="p">(</span><span class="k">func</span><span class="p">()</span> <span class="p">{</span>
+   <span class="n">alice</span><span class="o">.</span><span class="n">StoreFile</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="p">})</span>
+</code></pre></div></div>
+<h2 id="expecterrtonotbenil">
+  
+  
+    <a href="index.html#expecterrtonotbenil" class="anchor-heading" aria-labelledby="expecterrtonotbenil"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Expect(err).ToNot(BeNil())
+  
+  
+</h2>
+    
+
+<p>You should check for errors after every Client API call. This makes sure errors are caught as soon as they happen, instead of them propagating downstream. Don’t make any assumptions over which methods will throw and which errors won’t: use an <code class="language-plaintext highlighter-rouge">Expect</code> after each API method.</p>
+
+<p>Remember the core principle around testing: the more lines of the staff solution you hit, the more flags you’re likely to acquire! Think about all of the <code class="language-plaintext highlighter-rouge">if err != nil</code> cases that may be present in the staff code, and see if you’re able to write tests to enter those cases.</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">value</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">InitUser</span><span class="p">(</span><span class="o">...</span><span class="p">);</span>
+<span class="n">Expect</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="o">.</span><span class="n">ToNot</span><span class="p">(</span><span class="n">BeNil</span><span class="p">());</span>
+</code></pre></div></div>
+<h2 id="notes-on-key-reuse">
+  
+  
+    <a href="index.html#notes-on-key-reuse" class="anchor-heading" aria-labelledby="notes-on-key-reuse"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Notes on Key Reuse
+  
+  
+</h2>
+    
+
+<p>In general, avoid reusing a key for multiple purposes. Why? Here’s a snippet from a post that Professor David Wagner wrote:</p>
+
+<blockquote>
+  <p><em>Suppose I use a key <code class="language-plaintext highlighter-rouge">k</code> to encrypt and MAC a username (say), and elsewhere in the code I use the same key <code class="language-plaintext highlighter-rouge">k</code> to encrypt and MAC a filename. This might open up some attacks. For instance, an attacker might be able to take the encrypted username and copy-paste it over the encrypted filename. When the client decrypts the filename, everything decrypts fine, and the MAC is valid (so no error is detected), but now the filename has been replaced with a username.</em></p>
+
+  <p><em>I’ve seen many protocols that have had subtle flaws like this</em>.</p>
+
+  <p><em>There are two ways to protect yourself from this. One way is to think really, really hard about these kind of copy-paste attacks whenever you reuse a key for multiple purposes. The other way is to never reuse a key for multiple purposes. I don’t like to think hard. If I have to think hard, I often make mistakes. Or, as Brian Kernighan once wrote: “Everyone knows that debugging is twice as hard as writing a program in the first place. So if you’re as clever as you can be when you write it, how will you ever debug it?” So, I recommend way #2: never reuse a key for multiple purposes.</em></p>
+
+  <p><em>Hopefully this rationale will help you recognize the motivation behind that advice, which might help you recognize when the advice does or doesn’t apply.</em></p>
+</blockquote>
+<h2 id="notes-on-key-management">
+  
+  
+    <a href="index.html#notes-on-key-management" class="anchor-heading" aria-labelledby="notes-on-key-management"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Notes on Key Management
+  
+  
+</h2>
+    
+
+<p>In order to simplify your key management scheme, it may be useful to store a small number of root keys, and re-derive many keys for specific purposes “on-the-fly” (a.k.a. when you need them) using the HashKDF function.</p>
+<h2 id="more-notes-on-key-reuse">
+  
+  
+    <a href="index.html#more-notes-on-key-reuse" class="anchor-heading" aria-labelledby="more-notes-on-key-reuse"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> More Notes on Key Reuse
+  
+  
+</h2>
+    
+
+<p>The term “key reuse” can be ambiguous.</p>
+
+<p>As defined in our lecture, “key reuse” refers to the practice of using the same key in multiple algorithms. For example, if you use the same key to encrypt some data and HMAC that same data, this is a case of “key reuse” as defined in lecture. As discussed in lecture, you should always use one key per algorithm.</p>
+
+<p>Note that using the same key to encrypt different pieces of data, or using the same key to MAC/sign different pieces of data, is not considered key reuse (as defined in lecture). Recall that the whole point of discarding one-time pads and introducing block ciphers was to allow for using the same key to encrypt different pieces of data.</p>
+
+<p>Even though using one key per algorithm solves the “key reuse” problem from lecture, it doesn’t necessarily mean that other issues with key reuse don’t exist.</p>
+
+<p>As an example, suppose you use the same, hard-coded key to encrypt every single value in your design. You use a different key (also hard-coded) to MAC every single value in your design. This is not a case of “key reuse” from lecture, because you did use one key per algorithm. However, this is still an insecure design because an attacker could read the hard-coded keys in your code and decrypt and modify all your stored data.</p>
+
+<p>In summary: Reusing the same key in different algorithms is the “key reuse” problem from lecture, and you should always avoid this. Other cases of key reuse may exist in your design; it’s your job to figure out when these cases are problematic.</p>
+<h2 id="strings-and-byte-arrays">
+  
+  
+    <a href="index.html#strings-and-byte-arrays" class="anchor-heading" aria-labelledby="strings-and-byte-arrays"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Strings and Byte Arrays
+  
+  
+</h2>
+    
+
+<p>Be very careful about casting byte arrays to strings. Byte arrays can contain any byte between 0 and 255, including some bytes that correspond to unprintable characters. If you cast a byte array containing unprintable characters to a string, the resulting string could have unexpected behavior. A safer way to convert byte arrays to strings (and back) is to use the <code class="language-plaintext highlighter-rouge">encoding/hex</code> library, which we’ve imported for you.</p>
+
+<p>If you instead need to convert strings to byte arrays (and back), you can use <code class="language-plaintext highlighter-rouge">json.Marshal</code>. Recall that marshalling works on any data structure, including strings.</p>
+
+  </div>
+</div>
+
+          
+
+          
+            
+          
+        </main>
+        
+
+  <hr>
+  <footer>
+    
+
+    
+
+
+
+
+
+
+
+
+
+<script>
+  (function () {
+    var navList = document.querySelector('.aux-nav-list');
+    if (!navList || !navList.firstElementChild) return;
+    var darkToggle = navList.firstElementChild;
+    darkToggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      toggleDark();
+    });
+  })();
+</script>
+
+<script src="../../assets/js/tocbot.min.js"></script>
+<script>
+  // Tries to mirror the HTML TOC
+  tocbot.init({
+    tocSelector: '.js-toc',
+    contentSelector: '.content',
+    headingSelector: 'h2,h3,h4,h5,h6',
+    ignoreSelector: '.no_toc',
+    hasInnerContainers: true,
+    linkClass: 'nav-list-link',
+    activeLinkClass: 'active',
+    listClass: 'nav-list',
+    listItemClass: 'nav-list-item',
+    activeListItemClass: 'active',
+    collapseDepth: 3,
+    scrollSmooth: false,
+  });
+</script>
+
+
+    
+  </footer>
+
+
+      </div>
+    </div>
+    
+      
+
+<div class="search-overlay"></div>
+
+    
+  </div>
+
+  
+</body>
+</html>
+

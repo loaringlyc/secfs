@@ -1,0 +1,723 @@
+
+
+<!DOCTYPE html>
+
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+
+  <link rel="stylesheet" href="../../assets/css/just-the-docs-default.css">
+
+  <link rel="stylesheet" href="../../assets/css/just-the-docs-head-nav.css" id="jtd-head-nav-stylesheet">
+
+  <style id="jtd-nav-activation">
+  
+
+    .site-nav > ul.nav-list:first-child > li > a,
+    
+    .site-nav > ul.nav-list:first-child > li > ul > li:not(:nth-child(2)) > a,
+    .site-nav > ul.nav-list:first-child > li > ul > li > ul > li a {
+      background-image: none;
+    }
+
+    .site-nav > ul.nav-list:not(:first-child) a,
+    .site-nav li.external a {
+      background-image: none;
+    }
+
+    .site-nav > ul.nav-list:first-child > li:nth-child(7) > ul > li:nth-child(2) > a {
+      font-weight: 600;
+      text-decoration: none;
+    }.site-nav > ul.nav-list:first-child > li:nth-child(7) > button svg,
+    .site-nav > ul.nav-list:first-child > li:nth-child(7) > ul > li:nth-child(2) > button svg {
+      transform: rotate(-90deg);
+    }.site-nav > ul.nav-list:first-child > li.nav-list-item:nth-child(7) > ul.nav-list,
+    .site-nav > ul.nav-list:first-child > li.nav-list-item:nth-child(7) > ul.nav-list > li.nav-list-item:nth-child(2) > ul.nav-list {
+      display: block;
+    }
+  </style>
+
+  
+
+  
+    <script src="../../assets/js/vendor/lunr.min.js"></script>
+  
+
+  <script src="../../assets/js/just-the-docs.js"></script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <link rel="icon" href="../../favicon.ico" type="image/x-icon">
+
+
+
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Project 2 Policies and Deliverables | CS 161 Fall 2025</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="Project 2 Policies and Deliverables" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Computer Security at UC Berkeley" />
+<meta property="og:description" content="Computer Security at UC Berkeley" />
+<link rel="canonical" href="../policies.html" />
+<meta property="og:url" content="https://fa25.cs161.org/proj2/policies/" />
+<meta property="og:site_name" content="CS 161 Fall 2025" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Project 2 Policies and Deliverables" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"Computer Security at UC Berkeley","headline":"Project 2 Policies and Deliverables","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://fa25.cs161.org/"}},"url":"https://fa25.cs161.org/proj2/policies/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  <link
+  rel="preload"
+  href="https://fa25.cs161.org/assets/css/just-the-docs-dark.css"
+  as="style"
+>
+
+<!-- Intentionally duplicates the default theme stylesheet so there's a fallback when changing themes -->
+<link
+  id="jtdThemeCSS"
+  rel="stylesheet"
+  href="../../assets/css/just-the-docs-default.css"
+>
+
+<script>
+  /* Script to enable persistent dark mode. */
+
+  jtd.getTheme = function () {
+    var cssFileHref = (
+      document.getElementById('jtdThemeCSS') || document.querySelector('[rel="stylesheet"]')
+    ).getAttribute('href');
+    return cssFileHref.substring(cssFileHref.lastIndexOf('-') + 1, cssFileHref.length - 4);
+  };
+
+  jtd.setTheme = function (theme) {
+    var cssFile = document.getElementById('jtdThemeCSS') || document.querySelector('[rel="stylesheet"]');
+    cssFile.setAttribute('href', cssFile.getAttribute('href').replace(jtd.getTheme(), theme));
+  };
+
+  let toggleDark = () => {
+    let setDark = jtd.getTheme() !== 'dark';
+    document.documentElement.setAttribute('data-theme', setDark ? 'dark' : 'default');
+    document.documentElement.setAttribute('data-theme', setDark ? 'dark' : 'default');
+    jtd.setTheme(setDark ? 'dark' : 'default');
+    localStorage.setItem('darkMode', String(setDark));
+
+    if (typeof calendar !== 'undefined') {
+      calendar.setColorScheme(setDark ? 'dark' : 'light');
+    }
+  };
+
+  if (localStorage.getItem('darkMode') === 'true') {
+    toggleDark();
+  }
+</script>
+
+<!-- Script for LaTeX rendering. -->
+<link
+  rel="stylesheet"
+  href="../../assets/katex/katex.min.css"
+>
+<script defer src="../../assets/katex/katex.min.js"></script>
+<script>
+  function renderKaTeX() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '$', right: '$', display: false },
+        { left: '\\(', right: '\\)', display: false },
+        { left: '\\[', right: '\\]', display: true },
+      ],
+    });
+  }
+</script>
+<script
+  defer
+  src="../../assets/katex/contrib/auto-render.min.js"
+  onload="renderKaTeX();"
+></script>
+
+
+</head>
+
+<body>
+  <a class="skip-to-main" href="../policies.html#main-content">Skip to main content</a>
+  <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+  <symbol id="svg-link" viewBox="0 0 24 24">
+  <title>Link</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-link">
+    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+  </svg>
+</symbol>
+
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+  <title>Menu</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu">
+    <line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line>
+  </svg>
+</symbol>
+
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+  <title>Expand</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+    <polyline points="9 18 15 12 9 6"></polyline>
+  </svg>
+</symbol>
+
+  <!-- Feather. MIT License: https://github.com/feathericons/feather/blob/master/LICENSE -->
+<symbol id="svg-external-link" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link">
+  <title id="svg-external-link-title">(external link)</title>
+  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line>
+</symbol>
+
+  
+    <symbol id="svg-doc" viewBox="0 0 24 24">
+  <title>Document</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file">
+    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline>
+  </svg>
+</symbol>
+
+    <symbol id="svg-search" viewBox="0 0 24 24">
+  <title>Search</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search">
+    <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+  </svg>
+</symbol>
+
+  
+  
+    <!-- Bootstrap Icons. MIT License: https://github.com/twbs/icons/blob/main/LICENSE.md -->
+<symbol id="svg-copy" viewBox="0 0 16 16">
+  <title>Copy</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard" viewBox="0 0 16 16">
+    <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+    <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+  </svg>
+</symbol>
+<symbol id="svg-copied" viewBox="0 0 16 16">
+  <title>Copied</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-check-fill" viewBox="0 0 16 16">
+    <path d="M6.5 0A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3Zm3 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3Z"/>
+    <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1A2.5 2.5 0 0 1 9.5 5h-3A2.5 2.5 0 0 1 4 2.5v-1Zm6.854 7.354-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L7.5 10.793l2.646-2.647a.5.5 0 0 1 .708.708Z"/>
+  </svg>
+</symbol>
+
+  
+</svg>
+
+  
+    <div class="side-bar">
+  <div class="site-header" role="banner">
+    <a href="https://fa25.cs161.org/" class="site-title lh-tight">
+
+
+  CS 161 Fall 2025
+
+</a>
+    <button id="menu-button" class="site-button btn-reset" aria-label="Toggle menu" aria-pressed="false">
+      <svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><use xlink:href="#svg-menu"></use></svg>
+    </button>
+  </div>
+
+  <nav aria-label="Main" id="site-nav" class="site-nav">
+  
+  
+    <ul class="nav-list"><li class="nav-list-item"><a href="https://fa25.cs161.org/exam/" class="nav-list-link">Exam Logistics</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/calendar/" class="nav-list-link">Calendar</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/policies/" class="nav-list-link">Policies</a></li><li class="nav-list-item"><button class="nav-list-expander btn-reset" aria-label="toggle items in Resources category" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use xlink:href="#svg-arrow-right"></use></svg>
+      </button><a href="https://fa25.cs161.org/resources/" class="nav-list-link">Resources</a><ul class="nav-list"><li class="nav-list-item"><a href="https://fa25.cs161.org/resources/faqs/" class="nav-list-link">Spring 2026 FAQs</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/resources/instructional-machine/" class="nav-list-link">Instructional Machine Setup</a></li></ul></li><li class="nav-list-item"><a href="https://fa25.cs161.org/staff/" class="nav-list-link">Staff</a></li><li class="nav-list-item"><button class="nav-list-expander btn-reset" aria-label="toggle items in Project 1 category" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use xlink:href="#svg-arrow-right"></use></svg>
+      </button><a href="https://fa25.cs161.org/proj1/" class="nav-list-link">Project 1</a><ul class="nav-list"><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/getting-started/" class="nav-list-link">Getting Started</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/customizing/" class="nav-list-link">Customizing</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q1/" class="nav-list-link">Question 1: Remus</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q2/" class="nav-list-link">Question 2: Spica</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q3/" class="nav-list-link">Question 3: Polaris</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q4/" class="nav-list-link">Question 4: Vega</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q5/" class="nav-list-link">Question 5: Deneb</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q6/" class="nav-list-link">Question 6: Antares</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q7/" class="nav-list-link">Question 7: Rigel</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/deliverables/" class="nav-list-link">Deliverables</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/vm-debugging/" class="nav-list-link">Troubleshooting</a></li></ul></li><li class="nav-list-item"><button class="nav-list-expander btn-reset" aria-label="toggle items in Project 2 category" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use xlink:href="#svg-arrow-right"></use></svg>
+      </button><a href="../index.html" class="nav-list-link">Project 2</a><ul class="nav-list"><li class="nav-list-item"><a href="../story/index.html" class="nav-list-link">Story</a></li><li class="nav-list-item"><a href="../policies.html" class="nav-list-link">Project 2 Policies and Deliverables</a></li><li class="nav-list-item"><a href="../getting-started.html" class="nav-list-link">Getting Started</a></li><li class="nav-list-item"><a href="../overview/index.html" class="nav-list-link">Design Overview</a></li><li class="nav-list-item"><a href="../library.html" class="nav-list-link">Library Functions</a></li><li class="nav-list-item"><a href="../userauth/index.html" class="nav-list-link">Users And User Authentication</a></li><li class="nav-list-item"><a href="../files/index.html" class="nav-list-link">File Operations</a></li><li class="nav-list-item"><a href="../sharing/index.html" class="nav-list-link">Sharing and Revocation</a></li><li class="nav-list-item"><a href="../troubleshooting.html" class="nav-list-link">Debugging and Errors</a></li><li class="nav-list-item"><a href="../advice/index.html" class="nav-list-link">Advice and Tips</a></li><li class="nav-list-item"><a href="../appendix/index.html" class="nav-list-link">Appendix</a></li></ul></li><li class="nav-list-item"><button class="nav-list-expander btn-reset" aria-label="toggle items in Project 3 category" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use xlink:href="#svg-arrow-right"></use></svg>
+      </button><a href="https://fa25.cs161.org/proj3/" class="nav-list-link">Project 3</a><ul class="nav-list"><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/story/" class="nav-list-link">Story</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/getting-started/" class="nav-list-link">Getting Started</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/tips/" class="nav-list-link">General Tips</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag1/" class="nav-list-link">Flag 1: dev</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag2/" class="nav-list-link">Flag 2: ip.txt</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag3/" class="nav-list-link">Flag 3: shomil</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag4/" class="nav-list-link">Flag 4: nicholas</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag5/" class="nav-list-link">Flag 5: cs161</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag6/" class="nav-list-link">Flag 6: delete</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag7/" class="nav-list-link">Flag 7: admin</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag8/" class="nav-list-link">Flag 8: config</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/deliverables/" class="nav-list-link">Deliverables</a></li></ul></li></ul>
+  
+</nav>
+
+
+
+
+  
+  
+    <div class="site-footer">
+	Report an <a href="https://dap.berkeley.edu/get-help/report-web-accessibility-issue">accessibility issue</a>.
+
+	<br><br>
+
+	This site uses <a href="https://github.com/just-the-docs/just-the-docs">Just the Docs</a>, a documentation theme for Jekyll.
+</div>
+  
+</div>
+
+  
+  <div class="main" id="top">
+    <div id="main-header" class="main-header">
+  
+    
+
+<div class="search" role="search">
+  <div class="search-input-wrap">
+    <input type="text" id="search-input" class="search-input" tabindex="0" placeholder="Search CS 161 Fall 2025" aria-label="Search CS 161 Fall 2025" autocomplete="off">
+    <label for="search-input" class="search-label"><svg viewBox="0 0 24 24" class="search-icon"><use xlink:href="#svg-search"></use></svg></label>
+  </div>
+  <div id="search-results" class="search-results"></div>
+</div>
+
+  
+  
+  
+    <nav aria-label="Auxiliary" class="aux-nav">
+  <ul class="aux-nav-list">
+    
+      <li class="aux-nav-list-item">
+        <a href="../policies.html#" class="site-button"
+          
+        >
+          Dark Mode
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://textbook.cs161.org" class="site-button"
+          
+        >
+          Textbook
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://edstem.org/us/courses/83260" class="site-button"
+          
+        >
+          Ed
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://oh.cs161.org" class="site-button"
+          
+        >
+          OH Queue
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://forms.gle/uaFdyWWqnPkW9Uhg6" class="site-button"
+          
+        >
+          Extensions
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://forms.gle/bW9nen9oHGNUzWo69" class="site-button"
+          
+        >
+          Anonymous Feedback
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://calendar.app.google/9quTrjViGAGPG47Z8" class="site-button"
+          
+        >
+          Student Support
+        </a>
+      </li>
+    
+  </ul>
+</nav>
+
+  
+</div>
+
+    <div class="main-content-wrap">
+      <nav aria-label="Breadcrumb" class="breadcrumb-nav">
+  <ol class="breadcrumb-nav-list">
+    <li class="breadcrumb-nav-list-item"><a href="../index.html">Project 2</a></li>
+    <li class="breadcrumb-nav-list-item"><span>Project 2 Policies and Deliverables</span></li>
+  </ol>
+</nav>
+
+
+      <div id="main-content" class="main-content">
+        <main>
+          
+            <div class="content-container">
+    <nav class="content-nav nav-list js-toc" aria-label="In-page navigation">
+      <ul class="nav-list"><li class="nav-list-item"><a href="../policies.html#overview" class="nav-list-link">Overview</a></li><li class="nav-list-item"><a href="../policies.html#grading-breakdown-and-deadlines" class="nav-list-link">Grading Breakdown and Deadlines</a></li><li class="nav-list-item"><a href="../policies.html#checkpoint-spec-quiz" class="nav-list-link">Checkpoint: Spec Quiz</a></li><li class="nav-list-item"><a href="../policies.html#checkpoint-design-document" class="nav-list-link">Checkpoint: Design Document</a></li><li class="nav-list-item"><a href="../policies.html#checkpoint-design-review" class="nav-list-link">Checkpoint: Design Review</a></li><li class="nav-list-item"><a href="../policies.html#checkpoint-testing" class="nav-list-link">Checkpoint: Testing</a><ul class="nav-list"><li class="nav-list-item"><a href="../policies.html#finding-flags" class="nav-list-link">Finding Flags</a></li><li class="nav-list-item"><a href="../policies.html#test-writing" class="nav-list-link">Test Writing</a></li></ul></li><li class="nav-list-item"><a href="../policies.html#autograder-implementation" class="nav-list-link">Autograder: Implementation</a></li><li class="nav-list-item"><a href="../policies.html#autograder-test-coverage" class="nav-list-link">Autograder: Test Coverage</a></li><li class="nav-list-item"><a href="../policies.html#final-design-document" class="nav-list-link">Final Design Document</a></li><li class="nav-list-item"><a href="../policies.html#deliverables-for-groups" class="nav-list-link">Deliverables for Groups</a></li></ul>
+    </nav>
+  <div class="content">
+<h1 id="project-2-policies-and-deliverables">
+  
+  
+    <a href="../policies.html#project-2-policies-and-deliverables" class="anchor-heading" aria-labelledby="project-2-policies-and-deliverables"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Project 2 Policies and Deliverables
+  
+  
+</h1>
+    
+
+<p>This page outlines all the logistics of this project. All information about the project content is on the other page; this page does not contain any project content.</p>
+
+<blockquote class="WARNINGR">
+  <p>Project 2 is substantially longer and more involved than most projects you will encounter at Berkeley. We will do our best to help you through it, but it’s important that you read the spec thoroughly, understand all of the deliverables, start early, and ask questions in OH or on <a href="https://edstem.org/us/courses/83260">Edstem</a>.</p>
+</blockquote>
+<h2 id="overview">
+  
+  
+    <a href="../policies.html#overview" class="anchor-heading" aria-labelledby="overview"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Overview
+  
+  
+</h2>
+    
+
+<p>In this project, you will be provided with some cryptographic library functions. You will need to use those cryptographic library functions to design a secure file sharing system, which will allow users to log in, store files, and share files with other users, while in the presence of attackers. Then, you will implement your design by filling in 8 functions that users of your system can call to perform file operations.</p>
+
+<p>This project is heavily design-oriented. The starter code we give you is very limited (it’s not much more than 8 function signatures), so you will need to think of a design from scratch that satisfies the functionality and security requirements.</p>
+
+<p>For this project, you may either work alone, or in a team of two. <strong>We recommend working in teams of two, since it helps to talk through the challenging components of this project with a partner.</strong></p>
+<h2 id="grading-breakdown-and-deadlines">
+  
+  
+    <a href="../policies.html#grading-breakdown-and-deadlines" class="anchor-heading" aria-labelledby="grading-breakdown-and-deadlines"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Grading Breakdown and Deadlines
+  
+  
+</h2>
+    
+
+<p>Project 2 is worth a total of 150 points, broken down as follows:</p>
+
+<div class="table-wrapper"><table>
+  <thead>
+    <tr>
+      <th>Task</th>
+      <th>Due</th>
+      <th>Points</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Spec Quiz</td>
+      <td>Friday, September 26, 2025</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <td>Design Doc Checkpoint</td>
+      <td>Sunday, October 12, 2025</td>
+      <td>15</td>
+    </tr>
+    <tr>
+      <td>Testing Checkpoint</td>
+      <td>Friday, October 24, 2025</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <td>Final Design Doc</td>
+      <td>Friday, October 31, 2025</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <td>Final Test Case Coverage</td>
+      <td>Friday, October 31, 2025</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <td>Final Autograded Code</td>
+      <td>Friday, October 31, 2025</td>
+      <td>100</td>
+    </tr>
+  </tbody>
+</table></div>
+<h2 id="checkpoint-spec-quiz">
+  
+  
+    <a href="../policies.html#checkpoint-spec-quiz" class="anchor-heading" aria-labelledby="checkpoint-spec-quiz"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Checkpoint: Spec Quiz
+  
+  
+</h2>
+    
+
+<p><strong>Deliverable</strong>: To begin this assignment, please complete the <a href="https://www.gradescope.com/courses/1098878/assignments/6580623">Spec Quiz</a> assignment.</p>
+
+<p>The intent of the spec quiz is to help guide your understanding for the scope and requirements of this project. <strong>Understanding the spec is very important, as any mistakes in your understanding of what’s required will derail your design and make later fixes to your design/code extremely painful.</strong></p>
+<h2 id="checkpoint-design-document">
+  
+  
+    <a href="../policies.html#checkpoint-design-document" class="anchor-heading" aria-labelledby="checkpoint-design-document"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Checkpoint: Design Document
+  
+  
+</h2>
+    
+
+<p><strong>Deliverable</strong>: Please submit a design document to the <a href="https://www.gradescope.com/courses/1098878/assignments/6580619">Design Checkpoint</a> assignment containing:</p>
+
+<ul>
+  <li>At most 2 pages of text, describing your draft design (e.g. answering the “Design Questions” in green boxes throughout the spec)</li>
+  <li>A diagram showing how you’re organizing the data that you’re storing. (The diagram is not part of the 2-page limit.)</li>
+</ul>
+
+<p>Before writing any code, you will start by writing down the design that you intend to implement.</p>
+
+<p>Your design document can include any details that you think are important, including, but not limited to: What data structures (i.e. struct definitions) will you be using? How will you organize the data you need to store? When a user calls a function, what steps will you take? What cryptographic functions will you be using, and what inputs will you provide to those functions (e.g. what key will you use)?</p>
+
+<p>You can organize your document in any way that seems clear to you. If you’re having trouble organizing your design doc, note that we have several “Design Questions” in green boxes throughout the spec. One way to organize your design doc is by answering each of those design questions, one by one.</p>
+
+<p>For the checkpoint, you will need to submit a design document with your draft design so far. Your design does not need to be perfect, but should have significant thought put into it. The more you’ve thought about your design for the checkpoint, the more feedback we can offer you before you start coding. Having a stronger design for the checkpoint will also reduce the amount of re-coding and re-designing you need to do while coding.</p>
+
+<p>Your design document must be readable and typed. Please limit your design document to 2 pages of text with 11 pt font or greater. There is no minimum length, as long as you’ve given a complete overview of your design (e.g. answered all the design questions in the spec).</p>
+
+<p>It’s natural to feel that 2 pages is too short to describe your whole design. Our suggestion is to keep a detailed design document for yourself, which can be as long as you’d like. Then, once you’re satisfied with your design, summarize the key points of your design into a 2-page document that you submit for the checkpoint.</p>
+
+<p>Your design document must also include a diagram that visualizes how you’re organizing the data that you’re storing. The diagram can be on a third page (it doesn’t count against your 2-page limit). You can use any drawing tool (e.g. hand-drawn, Miro, Draw.io, Docs, Publisher, etc.) and the diagram can be in any format that seems clear to you. If you’re having trouble with your diagram, you could check out our suggested template (<a href="https://www.overleaf.com/read/sdsvjqwdkkbf">LaTeX</a>, <a href="https://drive.google.com/file/d/1YqVm3KL0iLdIFVFXbitlz6V0HBOVQuQ3/view?usp=sharing">PDF</a>, <a href="https://docs.google.com/document/d/1VMYk-mkjodEPNVw_OnBCx9To2PeN92bviWH2ASa35hA/edit#heading=h.ltxemz5n3xbn">Google Docs</a>).</p>
+<h2 id="checkpoint-design-review">
+  
+  
+    <a href="../policies.html#checkpoint-design-review" class="anchor-heading" aria-labelledby="checkpoint-design-review"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Checkpoint: Design Review
+  
+  
+</h2>
+    
+
+<p>After you’ve submitted your design document, your project group should sign up for one 20-minute design review with a staff member. During this design review, you will present your design and receive feedback for it. Your design will be graded for correctness.
+<!-- but you can regain lost points by collaborating with the staff member to find solutions for identified problems. --></p>
+
+<p>Design reviews tend to be more efficient in-person, but we’ll have some remote time slots if needed.</p>
+
+<p><strong>Deliverable</strong>: Sign up for a design review using the Signup Genius links on <a href="https://edstem.org/us/courses/83260">EdStem</a>.</p>
+
+<p>Policies for scheduling a time slot:</p>
+<ul>
+  <li>You need to have a design document submitted by the time of your design review.</li>
+  <li>Both partners must be present for design reviews. We reserve the right to take off points if both partners are not present for the design review.</li>
+  <li>Please only sign up for a design review if you are ready. A design review is most useful to you if you are ready to explain your design and discuss improvements with a TA.</li>
+  <li>Please check to make sure your time zone is correct when booking your design review.</li>
+  <li>Do not sign up for multiple design reviews. We don’t have staff-hours to hold multiple reviews for one group, and we reserve the right to take off points if you sign up for multiple slots.</li>
+  <li>Do not show up to a design review sick. Please cancel (see below for how to cancel) or email your TA to convert the design review to a remote one.
+    <ul>
+      <li>However, if you request a remote design review due  to sickness but your TA does not respond in time (and you do not receive a zoom link), you must cancel your slot (see below).</li>
+    </ul>
+  </li>
+  <li>You are allocated 20 minutes for your design review from when your appointment on Signup Genius starts. Unfortunately, if you show up late, we cannot grant any additional time.</li>
+  <li>If you sign up for a slot and don’t show up, we reserve the right to take off points, and we can’t promise that we’ll have time to schedule another time slot for you.</li>
+</ul>
+
+<p>Remote design reviews:</p>
+<ul>
+  <li>We are offering remote design reviews this semester. If you need a remote design review, sign up with the design reviews that have REMOTE for the location (listed as <code class="language-plaintext highlighter-rouge">TA Name(REMOTE)</code>). Design reviews without the remote tag must be held in person at the location specified in the calendar invite.</li>
+</ul>
+
+<p>Cancelling/rescheduling a design review:</p>
+<ul>
+  <li>To cancel an appointment slot, remove yourself from the Signup Genius slot. If you need to reschedule, please cancel at least 24 hours in advance. If you need to cancel within 24 hours, you should additionally make a private post on Ed, and email the staff member hosting your design review (copy <a href="mailto:cs161-staff@berkeley.edu">cs161-staff@berkeley.edu</a>) with subject “[CS161] Cancelling Design Review”, explaining why.</li>
+  <li>If you sign up for a slot and
+    <ul>
+      <li>cancel within 24 hours, or</li>
+      <li>don’t show up (including due to time zone mixups),
+we reserve the right to take off points, and we can’t promise that we’ll have time to schedule another time slot for you.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Grading:</p>
+<ul>
+  <li>Everybody starts out with a score of 15/15 points. We will remove points for inadequate designs. Designs missing parts of or entire sections will be docked points even if the rest of their design is adequate. Design reviews where the students are not familiar with their own design will be docked points even if the rest of their design on paper is adequate.</li>
+  <li>Please do not resubmit your design checkpoint after the start of your design review. You will risk getting a 0 if so (as design checkpoints are graded during design reviews).
+<!-- - Everybody starts out with a score of 18/15 points, with early design doc reviews starting at 20/15 points. We will subtract points for mistakes, missing sections, etc. Note that the extra 3/5 points are a buffer, so your design doesn't need to be perfect to get a full score. -->
+<!-- - If you sign up for a review in the first week, we'll give you 1 extra point (i.e. you start with 23/20 instead), to account for the fact that earlier designs might have more mistakes in them. -->
+<!-- - The maximum score is capped at 15 points (no extra credit). -->
+<!-- - Please do not resubmit your design checkpoint after the start of your design review. You will risk getting a 0 if so (as design checkpoints are graded during design reviews). -->
+<!-- - You can potentially regain lost points after the design review by collaborating with the staff member to find solutions to your mistakes. --></li>
+</ul>
+<h2 id="checkpoint-testing">
+  
+  
+    <a href="../policies.html#checkpoint-testing" class="anchor-heading" aria-labelledby="checkpoint-testing"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Checkpoint: Testing
+  
+  
+</h2>
+    
+
+<p><strong>Deliverable</strong>: Please submit your implementation, in the <code class="language-plaintext highlighter-rouge">client_test.go</code> file, to the <a href="https://www.gradescope.com/courses/1098878/assignments/6580625">Testing Checkpoint</a> assignment. We recommend submitting by linking your GitHub account to Gradescope and selecting the relevant repository.</p>
+
+<p>On submission to this assignment, the autograder will run the tests you wrote in <code class="language-plaintext highlighter-rouge">client_test.go</code> against the staff implemention of <code class="language-plaintext highlighter-rouge">client.go</code>. See more about the details of test coverage <a href="../policies.html#autograder-test-coverage">here</a>. In our staff implementation, we’ve labeled each flag as one that tests for integrity or not. As a caveat, in order receive <em>full</em> credit, you’ll need to hit at least one flag that tests for integrity. Your score for the testing checkpoint will be solely dictated by the tests you write and nothing more (hence, it is possible to get a full score on the testing checkpoint without any code in <code class="language-plaintext highlighter-rouge">client.go</code>).</p>
+
+<p>In order to receive credit on the testing checkpoint, you’ll need to write test cases that hit at least 5 flags. This means that hitting 4 non-integrity flags will garner you 4/5 on the testing checkpoint. Likewise for only hitting 5 non-integrity flags. Hitting 4 non-integrity flags and 1 integrity flag will get you full credit, and so will hitting 3 non-integrity flags and 2 integrity flags.</p>
+
+<p>Not all flags are included in the testing checkpoint by design (we want to encourage students to write interesting edge cases). This does mean it is possible for your testing coverage score to increase on submission to the final Autograder assignment without writing more tests (congratulations if so).</p>
+
+<p>The intent of the testing checkpoint is to ensure that you are on track for completion of the project. Many students find that writing tests prior to coding their <code class="language-plaintext highlighter-rouge">client.go</code> gives them a better understanding of the APIs. We do not recommend rushing into coding your <code class="language-plaintext highlighter-rouge">client.go</code> file until you have written a couple test cases at least and had your design review; remember that one of our security principles is to design security in from the start. Retrofitting a codebase that passes the basic tests to include security measures for your final autograder is not recommended–so please start this early!</p>
+<h3 id="finding-flags">
+  
+  
+    <a href="../policies.html#finding-flags" class="anchor-heading" aria-labelledby="finding-flags"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Finding Flags
+  
+  
+</h3>
+    
+
+<p>We know it is difficult writing a lot of test cases without knowing what the flags represent. However, in order to best simulate a real-world environment, course staff will not answer any questions about what the flag numbers on the autograder correspond to nor give hints as to what flags are. This is why we are encouraging you to start testing early via this checkpoint!</p>
+
+<p>To write more robust test cases, we recommend going through the Design Questions listed throughout the spec to think through what possible security testing you could perform. Furthermore, each API lists out times a function should succeed and fail–these are great tests to write.</p>
+<h3 id="test-writing">
+  
+  
+    <a href="../policies.html#test-writing" class="anchor-heading" aria-labelledby="test-writing"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Test Writing
+  
+  
+</h3>
+    
+
+<p>We recommend following our <a href="../getting-started.html#testing-with-ginkgo">testing workflow</a> when building out your tests.</p>
+<h2 id="autograder-implementation">
+  
+  
+    <a href="../policies.html#autograder-implementation" class="anchor-heading" aria-labelledby="autograder-implementation"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Autograder: Implementation
+  
+  
+</h2>
+    
+
+<p><strong>Deliverable</strong>: Please submit your implementation, in the <code class="language-plaintext highlighter-rouge">client.go</code> file, to the Autograder assignment, which will be released on Gradescope. We recommend submitting by linking your GitHub account to Gradescope and selecting the relevant repository.</p>
+
+<p>Before the deadline, the autograder will only check that your code compiles, and run the same basic tests that were provided in the starter code. You will not be able to see your actual score for the project before the deadline.</p>
+
+<p>After the deadline, we will run all the functionality and security tests on your design, and release your final autograder score. Almost all tests for this project are “hidden” and are not run until after the deadline. This is done to simulate a real-world security environment: attackers don’t tell you ahead of time what their attacks will be, so you have to think proactively to defend against potential attacks. We encourage you to write your own tests to check the functionality requirements and simulate the attacks that we’ll be running on your system.</p>
+
+<p>We have many years of accumulated knowledge about attacks, while you only have one semester to think about the project. Therefore, it’s expected that your design will not score full points on the autograder, and we’ll account for this when computing final grades.</p>
+
+<p>Below is an example of a Project 2 score distribution from a previous semester. It doesn’t look like our usual project distributions (where most people get full credit). Instead, the distribution looks more like a typical CS 161 exam curve. If you’d like, you can think of this assignment as a long take-home exam.</p>
+
+<p><img src="https://assets.cs161.org/proj2/proj2-spec-sp23-distribution.png" alt="CS 161 Project 2 Spring 2023 grade distribution." width="75%" /></p>
+
+<p>Each failed test (e.g. a functionality requirement that doesn’t work on your system, or an attack that your system doesn’t defend against), incurs a multiplicative penalty. For example, if every test has a 10% penalty, then each failed test multiples your total score by 0.9. In the example, failing one test results in a score of 90%, failing two tests results in a score of 81% (instead of 80% in the additive penalty model), failing three tests results in a score of 72.9% (instead of 70% in the additive penalty model), etc. We have lots of tests, and even a submission that scores relatively high will fail many of them. This grading system ensures that each subsequent failed test has less of an impact on your overall grade.</p>
+
+<p>Your code cannot use any external libraries beyond the ones we’ve imported. Don’t try any adversarial behavior on the autograder (e.g. don’t try to DoS autograder resources). Attempts to circumvent the autograder will be considered academic dishonesty.</p>
+<h2 id="autograder-test-coverage">
+  
+  
+    <a href="../policies.html#autograder-test-coverage" class="anchor-heading" aria-labelledby="autograder-test-coverage"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Autograder: Test Coverage
+  
+  
+</h2>
+    
+
+<p><strong>Deliverable</strong>: Please submit your implementation, in the <code class="language-plaintext highlighter-rouge">client_test.go</code> file, to the <a href="https://www.gradescope.com/courses/1098878/assignments/6580618">Autograder</a> assignment. We recommend submitting by linking your GitHub account to Gradescope and selecting the relevant repository.</p>
+
+<p>We’ve provided some basic tests in the starter code, but you will need to write the majority of tests yourself.</p>
+
+<p>To compute your test coverage score, we will run your tests on the staff reference implementation of <code class="language-plaintext highlighter-rouge">client.go</code>. The staff implementation contains 34 specially-flagged lines of code that correspond to interesting behavior (e.g. we might flag a line of code that returns an error if the HMAC is incorrect). We check how many flagged lines of code are executed as a result of running your tests.</p>
+
+<p>Each flagged line of code you get to run is worth 1 coverage flag point. To receive full credit for test case coverage, your tests need to cause 20 of the flagged lines of code to execute. We cannot answer any questions about what the flag numbers on the autograder correspond to. It’s okay if you don’t score all 20 points here; it’s more important to make sure that your own design is thoroughly tested.</p>
+
+<p>You may check your test case coverage by submitting to the autograder on Gradescope at any time before the project deadline. The coverage score you see on Gradescope is your final coverage score for the project (there are no hidden coverage flag points).</p>
+
+<p>Note that getting a full score on the coverage flags does not guarantee anything about your own implementation. It can be a good indicator that you’ve written thorough tests, but there is no guarantee that the tests you’ve written are the same as the hidden tests we’ll be running on your own implementation.</p>
+
+<p>We reserve the right to re-run the autograder on all submissions before releasing final scores. Therefore, if your code coverage score is non-deterministic, we cannot promise that the score will stay the same after re-running the autograder.</p>
+<h2 id="final-design-document">
+  
+  
+    <a href="../policies.html#final-design-document" class="anchor-heading" aria-labelledby="final-design-document"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Final Design Document
+  
+  
+</h2>
+    
+
+<p><strong>Deliverable</strong>: Please submit an updated version of your design document to the <a href="https://www.gradescope.com/courses/1098878/assignments/6580620">Final Design Doc</a> assignment.</p>
+
+<p>This document should reflect the final design you’ve implemented in code. If you made modifications after the checkpoint, you can modify your checkpoint design document. If you didn’t update your design, it’s also okay to re-submit the same document you did for the checkpoint.</p>
+
+<p>We’ll grade your final design document on completion and effort, not correctness. The correctness of your final design is checked by running the autograder on your code.</p>
+<h2 id="deliverables-for-groups">
+  
+  
+    <a href="../policies.html#deliverables-for-groups" class="anchor-heading" aria-labelledby="deliverables-for-groups"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Deliverables for Groups
+  
+  
+</h2>
+    
+
+<p>If you worked with a partner, only one partner should submit the code deliverables and design documents, and <a href="https://guides.gradescope.com/hc/en-us/articles/21863861823373-Adding-Group-Members-to-a-Submission">tag the other partner on Gradescope</a>. Remember to add your partner to all of your Gradescope submissions!</p>
+
+<p>However, both partners must be present for the design review.</p>
+
+  </div>
+</div>
+
+          
+
+          
+            
+          
+        </main>
+        
+
+  <hr>
+  <footer>
+    
+
+    
+
+
+
+
+
+
+
+
+
+<script>
+  (function () {
+    var navList = document.querySelector('.aux-nav-list');
+    if (!navList || !navList.firstElementChild) return;
+    var darkToggle = navList.firstElementChild;
+    darkToggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      toggleDark();
+    });
+  })();
+</script>
+
+<script src="../../assets/js/tocbot.min.js"></script>
+<script>
+  // Tries to mirror the HTML TOC
+  tocbot.init({
+    tocSelector: '.js-toc',
+    contentSelector: '.content',
+    headingSelector: 'h2,h3,h4,h5,h6',
+    ignoreSelector: '.no_toc',
+    hasInnerContainers: true,
+    linkClass: 'nav-list-link',
+    activeLinkClass: 'active',
+    listClass: 'nav-list',
+    listItemClass: 'nav-list-item',
+    activeListItemClass: 'active',
+    collapseDepth: 3,
+    scrollSmooth: false,
+  });
+</script>
+
+
+    
+  </footer>
+
+
+      </div>
+    </div>
+    
+      
+
+<div class="search-overlay"></div>
+
+    
+  </div>
+
+  
+</body>
+</html>
+

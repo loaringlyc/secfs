@@ -1,0 +1,517 @@
+
+
+<!DOCTYPE html>
+
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+
+  <link rel="stylesheet" href="../../assets/css/just-the-docs-default.css">
+
+  <link rel="stylesheet" href="../../assets/css/just-the-docs-head-nav.css" id="jtd-head-nav-stylesheet">
+
+  <style id="jtd-nav-activation">
+  
+
+    .site-nav > ul.nav-list:first-child > li > a,
+    
+    .site-nav > ul.nav-list:first-child > li > ul > li:not(:nth-child(9)) > a,
+    .site-nav > ul.nav-list:first-child > li > ul > li > ul > li a {
+      background-image: none;
+    }
+
+    .site-nav > ul.nav-list:not(:first-child) a,
+    .site-nav li.external a {
+      background-image: none;
+    }
+
+    .site-nav > ul.nav-list:first-child > li:nth-child(7) > ul > li:nth-child(9) > a {
+      font-weight: 600;
+      text-decoration: none;
+    }.site-nav > ul.nav-list:first-child > li:nth-child(7) > button svg,
+    .site-nav > ul.nav-list:first-child > li:nth-child(7) > ul > li:nth-child(9) > button svg {
+      transform: rotate(-90deg);
+    }.site-nav > ul.nav-list:first-child > li.nav-list-item:nth-child(7) > ul.nav-list,
+    .site-nav > ul.nav-list:first-child > li.nav-list-item:nth-child(7) > ul.nav-list > li.nav-list-item:nth-child(9) > ul.nav-list {
+      display: block;
+    }
+  </style>
+
+  
+
+  
+    <script src="../../assets/js/vendor/lunr.min.js"></script>
+  
+
+  <script src="../../assets/js/just-the-docs.js"></script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <link rel="icon" href="../../favicon.ico" type="image/x-icon">
+
+
+
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Debugging and Errors | CS 161 Fall 2025</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="Debugging and Errors" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Computer Security at UC Berkeley" />
+<meta property="og:description" content="Computer Security at UC Berkeley" />
+<link rel="canonical" href="../troubleshooting.html" />
+<meta property="og:url" content="https://fa25.cs161.org/proj2/troubleshooting/" />
+<meta property="og:site_name" content="CS 161 Fall 2025" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Debugging and Errors" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"Computer Security at UC Berkeley","headline":"Debugging and Errors","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://fa25.cs161.org/"}},"url":"https://fa25.cs161.org/proj2/troubleshooting/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  <link
+  rel="preload"
+  href="https://fa25.cs161.org/assets/css/just-the-docs-dark.css"
+  as="style"
+>
+
+<!-- Intentionally duplicates the default theme stylesheet so there's a fallback when changing themes -->
+<link
+  id="jtdThemeCSS"
+  rel="stylesheet"
+  href="../../assets/css/just-the-docs-default.css"
+>
+
+<script>
+  /* Script to enable persistent dark mode. */
+
+  jtd.getTheme = function () {
+    var cssFileHref = (
+      document.getElementById('jtdThemeCSS') || document.querySelector('[rel="stylesheet"]')
+    ).getAttribute('href');
+    return cssFileHref.substring(cssFileHref.lastIndexOf('-') + 1, cssFileHref.length - 4);
+  };
+
+  jtd.setTheme = function (theme) {
+    var cssFile = document.getElementById('jtdThemeCSS') || document.querySelector('[rel="stylesheet"]');
+    cssFile.setAttribute('href', cssFile.getAttribute('href').replace(jtd.getTheme(), theme));
+  };
+
+  let toggleDark = () => {
+    let setDark = jtd.getTheme() !== 'dark';
+    document.documentElement.setAttribute('data-theme', setDark ? 'dark' : 'default');
+    document.documentElement.setAttribute('data-theme', setDark ? 'dark' : 'default');
+    jtd.setTheme(setDark ? 'dark' : 'default');
+    localStorage.setItem('darkMode', String(setDark));
+
+    if (typeof calendar !== 'undefined') {
+      calendar.setColorScheme(setDark ? 'dark' : 'light');
+    }
+  };
+
+  if (localStorage.getItem('darkMode') === 'true') {
+    toggleDark();
+  }
+</script>
+
+<!-- Script for LaTeX rendering. -->
+<link
+  rel="stylesheet"
+  href="../../assets/katex/katex.min.css"
+>
+<script defer src="../../assets/katex/katex.min.js"></script>
+<script>
+  function renderKaTeX() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '$', right: '$', display: false },
+        { left: '\\(', right: '\\)', display: false },
+        { left: '\\[', right: '\\]', display: true },
+      ],
+    });
+  }
+</script>
+<script
+  defer
+  src="../../assets/katex/contrib/auto-render.min.js"
+  onload="renderKaTeX();"
+></script>
+
+
+</head>
+
+<body>
+  <a class="skip-to-main" href="../troubleshooting.html#main-content">Skip to main content</a>
+  <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+  <symbol id="svg-link" viewBox="0 0 24 24">
+  <title>Link</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-link">
+    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+  </svg>
+</symbol>
+
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+  <title>Menu</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu">
+    <line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line>
+  </svg>
+</symbol>
+
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+  <title>Expand</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+    <polyline points="9 18 15 12 9 6"></polyline>
+  </svg>
+</symbol>
+
+  <!-- Feather. MIT License: https://github.com/feathericons/feather/blob/master/LICENSE -->
+<symbol id="svg-external-link" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link">
+  <title id="svg-external-link-title">(external link)</title>
+  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line>
+</symbol>
+
+  
+    <symbol id="svg-doc" viewBox="0 0 24 24">
+  <title>Document</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file">
+    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline>
+  </svg>
+</symbol>
+
+    <symbol id="svg-search" viewBox="0 0 24 24">
+  <title>Search</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search">
+    <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+  </svg>
+</symbol>
+
+  
+  
+    <!-- Bootstrap Icons. MIT License: https://github.com/twbs/icons/blob/main/LICENSE.md -->
+<symbol id="svg-copy" viewBox="0 0 16 16">
+  <title>Copy</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard" viewBox="0 0 16 16">
+    <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+    <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+  </svg>
+</symbol>
+<symbol id="svg-copied" viewBox="0 0 16 16">
+  <title>Copied</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-check-fill" viewBox="0 0 16 16">
+    <path d="M6.5 0A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3Zm3 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3Z"/>
+    <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1A2.5 2.5 0 0 1 9.5 5h-3A2.5 2.5 0 0 1 4 2.5v-1Zm6.854 7.354-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L7.5 10.793l2.646-2.647a.5.5 0 0 1 .708.708Z"/>
+  </svg>
+</symbol>
+
+  
+</svg>
+
+  
+    <div class="side-bar">
+  <div class="site-header" role="banner">
+    <a href="https://fa25.cs161.org/" class="site-title lh-tight">
+
+
+  CS 161 Fall 2025
+
+</a>
+    <button id="menu-button" class="site-button btn-reset" aria-label="Toggle menu" aria-pressed="false">
+      <svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><use xlink:href="#svg-menu"></use></svg>
+    </button>
+  </div>
+
+  <nav aria-label="Main" id="site-nav" class="site-nav">
+  
+  
+    <ul class="nav-list"><li class="nav-list-item"><a href="https://fa25.cs161.org/exam/" class="nav-list-link">Exam Logistics</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/calendar/" class="nav-list-link">Calendar</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/policies/" class="nav-list-link">Policies</a></li><li class="nav-list-item"><button class="nav-list-expander btn-reset" aria-label="toggle items in Resources category" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use xlink:href="#svg-arrow-right"></use></svg>
+      </button><a href="https://fa25.cs161.org/resources/" class="nav-list-link">Resources</a><ul class="nav-list"><li class="nav-list-item"><a href="https://fa25.cs161.org/resources/faqs/" class="nav-list-link">Spring 2026 FAQs</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/resources/instructional-machine/" class="nav-list-link">Instructional Machine Setup</a></li></ul></li><li class="nav-list-item"><a href="https://fa25.cs161.org/staff/" class="nav-list-link">Staff</a></li><li class="nav-list-item"><button class="nav-list-expander btn-reset" aria-label="toggle items in Project 1 category" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use xlink:href="#svg-arrow-right"></use></svg>
+      </button><a href="https://fa25.cs161.org/proj1/" class="nav-list-link">Project 1</a><ul class="nav-list"><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/getting-started/" class="nav-list-link">Getting Started</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/customizing/" class="nav-list-link">Customizing</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q1/" class="nav-list-link">Question 1: Remus</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q2/" class="nav-list-link">Question 2: Spica</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q3/" class="nav-list-link">Question 3: Polaris</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q4/" class="nav-list-link">Question 4: Vega</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q5/" class="nav-list-link">Question 5: Deneb</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q6/" class="nav-list-link">Question 6: Antares</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/q7/" class="nav-list-link">Question 7: Rigel</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/deliverables/" class="nav-list-link">Deliverables</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj1/vm-debugging/" class="nav-list-link">Troubleshooting</a></li></ul></li><li class="nav-list-item"><button class="nav-list-expander btn-reset" aria-label="toggle items in Project 2 category" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use xlink:href="#svg-arrow-right"></use></svg>
+      </button><a href="../index.html" class="nav-list-link">Project 2</a><ul class="nav-list"><li class="nav-list-item"><a href="../story/index.html" class="nav-list-link">Story</a></li><li class="nav-list-item"><a href="../policies.html" class="nav-list-link">Project 2 Policies and Deliverables</a></li><li class="nav-list-item"><a href="../getting-started.html" class="nav-list-link">Getting Started</a></li><li class="nav-list-item"><a href="../overview/index.html" class="nav-list-link">Design Overview</a></li><li class="nav-list-item"><a href="../library.html" class="nav-list-link">Library Functions</a></li><li class="nav-list-item"><a href="../userauth/index.html" class="nav-list-link">Users And User Authentication</a></li><li class="nav-list-item"><a href="../files/index.html" class="nav-list-link">File Operations</a></li><li class="nav-list-item"><a href="../sharing/index.html" class="nav-list-link">Sharing and Revocation</a></li><li class="nav-list-item"><a href="../troubleshooting.html" class="nav-list-link">Debugging and Errors</a></li><li class="nav-list-item"><a href="../advice/index.html" class="nav-list-link">Advice and Tips</a></li><li class="nav-list-item"><a href="../appendix/index.html" class="nav-list-link">Appendix</a></li></ul></li><li class="nav-list-item"><button class="nav-list-expander btn-reset" aria-label="toggle items in Project 3 category" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use xlink:href="#svg-arrow-right"></use></svg>
+      </button><a href="https://fa25.cs161.org/proj3/" class="nav-list-link">Project 3</a><ul class="nav-list"><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/story/" class="nav-list-link">Story</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/getting-started/" class="nav-list-link">Getting Started</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/tips/" class="nav-list-link">General Tips</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag1/" class="nav-list-link">Flag 1: dev</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag2/" class="nav-list-link">Flag 2: ip.txt</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag3/" class="nav-list-link">Flag 3: shomil</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag4/" class="nav-list-link">Flag 4: nicholas</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag5/" class="nav-list-link">Flag 5: cs161</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag6/" class="nav-list-link">Flag 6: delete</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag7/" class="nav-list-link">Flag 7: admin</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/flag8/" class="nav-list-link">Flag 8: config</a></li><li class="nav-list-item"><a href="https://fa25.cs161.org/proj3/deliverables/" class="nav-list-link">Deliverables</a></li></ul></li></ul>
+  
+</nav>
+
+
+
+
+  
+  
+    <div class="site-footer">
+	Report an <a href="https://dap.berkeley.edu/get-help/report-web-accessibility-issue">accessibility issue</a>.
+
+	<br><br>
+
+	This site uses <a href="https://github.com/just-the-docs/just-the-docs">Just the Docs</a>, a documentation theme for Jekyll.
+</div>
+  
+</div>
+
+  
+  <div class="main" id="top">
+    <div id="main-header" class="main-header">
+  
+    
+
+<div class="search" role="search">
+  <div class="search-input-wrap">
+    <input type="text" id="search-input" class="search-input" tabindex="0" placeholder="Search CS 161 Fall 2025" aria-label="Search CS 161 Fall 2025" autocomplete="off">
+    <label for="search-input" class="search-label"><svg viewBox="0 0 24 24" class="search-icon"><use xlink:href="#svg-search"></use></svg></label>
+  </div>
+  <div id="search-results" class="search-results"></div>
+</div>
+
+  
+  
+  
+    <nav aria-label="Auxiliary" class="aux-nav">
+  <ul class="aux-nav-list">
+    
+      <li class="aux-nav-list-item">
+        <a href="../troubleshooting.html#" class="site-button"
+          
+        >
+          Dark Mode
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://textbook.cs161.org" class="site-button"
+          
+        >
+          Textbook
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://edstem.org/us/courses/83260" class="site-button"
+          
+        >
+          Ed
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://oh.cs161.org" class="site-button"
+          
+        >
+          OH Queue
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://forms.gle/uaFdyWWqnPkW9Uhg6" class="site-button"
+          
+        >
+          Extensions
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://forms.gle/bW9nen9oHGNUzWo69" class="site-button"
+          
+        >
+          Anonymous Feedback
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://calendar.app.google/9quTrjViGAGPG47Z8" class="site-button"
+          
+        >
+          Student Support
+        </a>
+      </li>
+    
+  </ul>
+</nav>
+
+  
+</div>
+
+    <div class="main-content-wrap">
+      <nav aria-label="Breadcrumb" class="breadcrumb-nav">
+  <ol class="breadcrumb-nav-list">
+    <li class="breadcrumb-nav-list-item"><a href="../index.html">Project 2</a></li>
+    <li class="breadcrumb-nav-list-item"><span>Debugging and Errors</span></li>
+  </ol>
+</nav>
+
+
+      <div id="main-content" class="main-content">
+        <main>
+          
+            <div class="content-container">
+    <nav class="content-nav nav-list js-toc" aria-label="In-page navigation">
+      <ul class="nav-list"><li class="nav-list-item"><a href="../troubleshooting.html#debugging-in-vscode" class="nav-list-link">Debugging in VSCode</a><ul class="nav-list"><li class="nav-list-item"><a href="../troubleshooting.html#debugging-a-single-test-case" class="nav-list-link">Debugging a Single Test Case</a></li><li class="nav-list-item"><a href="../troubleshooting.html#errors-while-debugging" class="nav-list-link">Errors While Debugging</a></li></ul></li><li class="nav-list-item"><a href="../troubleshooting.html#common-gradescope-errors" class="nav-list-link">Common Gradescope Errors</a></li></ul>
+    </nav>
+  <div class="content">
+<h1 id="debugging-and-errors">
+  
+  
+    <a href="../troubleshooting.html#debugging-and-errors" class="anchor-heading" aria-labelledby="debugging-and-errors"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Debugging and Errors
+  
+  
+</h1>
+    
+
+<p>This section does not contain any design requirements (i.e. you could complete the whole project without reading this section). However, we’ve compiled our general guidelines for design, development, and testing.</p>
+<h2 id="debugging-in-vscode">
+  
+  
+    <a href="../troubleshooting.html#debugging-in-vscode" class="anchor-heading" aria-labelledby="debugging-in-vscode"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Debugging in VSCode
+  
+  
+</h2>
+    
+
+<p>Once the extensions are installed we can now follow the debugging flow:</p>
+
+<ul>
+  <li>
+    <p><strong>Set breakpoints.</strong> To set a breakpoint in your code, Navigate to the line where you want your breakpoint to be, and click on the left side of the line number. You should see a red dot appearing next to the line number, which indicates that a breakpoint has been set.
+<img src="../../assets/projects/proj2/breakpoint.png" alt="Setting a breakpoint." /></p>
+  </li>
+  <li>
+    <p><strong>Run a test.</strong> To debug a test case and peek around the breakpoint, navigate to the <code class="language-plaintext highlighter-rouge">client_test/client_test.go</code> file, and click on the <code class="language-plaintext highlighter-rouge">debug test</code> button above the test case that you want to run. Immediately after, the debugger will start. If your debugger doesn’t pause at breakpoints you’ve set, this means that your code flow never went through any lines of code that you’ve set a breakpoint on.
+<img src="../../assets/projects/proj2/debug_test.png" alt="Debug test." /></p>
+  </li>
+  <li>
+    <p><strong>Navigate the debugger.</strong> The golang debugger has a really convenient and powerful interface. There are a couple sections you should especially be aware of:</p>
+    <ul>
+      <li>You can step through your code using the menu bar at the center top of the screen just above the code editor (outlined in <span class="blue">blue</span> in the image below). Hover your mouse over each function to see the keyboard shortcut for each of these. This is a very important feature, so get familiar with <a href="https://code.visualstudio.com/docs/editor/debugging#_debug-actions">each and every button</a>.</li>
+      <li>You can use the <code class="language-plaintext highlighter-rouge">local variables</code> at the top left quadrant of your screen (dash outlined in <span class="red">red</span> in the image below), which displays the variable name and their values. For nested structures, you can click the expand button to view variables inside the struct.</li>
+      <li>You can use the <code class="language-plaintext highlighter-rouge">watch</code> section at the middle left quandrant of your screen (circled in <span class="green">green</span> in the image below) to constantly evaluate golang expressions. Some of the thing you can use it for is to constant check the length of an array, which you can do with <code class="language-plaintext highlighter-rouge">call len([variable])</code>. To constantly evaluate functions, you need to append the function call with <code class="language-plaintext highlighter-rouge">call</code> for watchpoints.</li>
+      <li>You can check the call stack in the <code class="language-plaintext highlighter-rouge">call stack</code> section, and edit breakpoints in the <code class="language-plaintext highlighter-rouge">breakpoints</code> section.
+ <img src="../../assets/projects/proj2/debugging_screenshot.png" alt="Using the debugger." /></li>
+    </ul>
+  </li>
+</ul>
+<h3 id="debugging-a-single-test-case">
+  
+  
+    <a href="../troubleshooting.html#debugging-a-single-test-case" class="anchor-heading" aria-labelledby="debugging-a-single-test-case"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Debugging a Single Test Case
+  
+  
+</h3>
+    
+<p>To learn how to debug a single test case, refer to our section on how to <a href="../getting-started.html#running-a-single-test-case">run a single test case</a>.</p>
+<h3 id="errors-while-debugging">
+  
+  
+    <a href="../troubleshooting.html#errors-while-debugging" class="anchor-heading" aria-labelledby="errors-while-debugging"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Errors While Debugging
+  
+  
+</h3>
+    
+<p>Here are solutions for a couple errors that you may run into while running the debugger.</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">Couldn't find dlv at the Go tools path</code> or <code class="language-plaintext highlighter-rouge">couldn't start dlv dap: Error cannot find delve debbuger</code> pops up when you click the <code class="language-plaintext highlighter-rouge">Debug test</code> button, but running <code class="language-plaintext highlighter-rouge">go test -v</code> works fine. This seems to be a problem due to recent updates to the Go extension on VSCode (and its compatability with delve). There are a couple possible solutions:
+    <ul>
+      <li>To solve the problem solely in VSCode, run <code class="language-plaintext highlighter-rouge">Go: Install/Update Tools</code> from the Command Palette. You can access the Command Palette by running <code class="language-plaintext highlighter-rouge">Cmd + Shift + P</code> in Mac or <code class="language-plaintext highlighter-rouge">Ctrl + Shift + P</code> in Linux/Windows. Then mark <code class="language-plaintext highlighter-rouge">dlv</code> and <code class="language-plaintext highlighter-rouge">dlv-dap</code> from the menu, and hit okay. This should start the update. You may need to restart VSCode after doing this.</li>
+      <li>For macOS users, you can also just run <code class="language-plaintext highlighter-rouge">brew install delve</code>.</li>
+    </ul>
+  </li>
+  <li>A general solution for other problems is making sure that you’re running Go &gt;=v1.20. This is the suggested version of Go (you can check your version of Go by running <code class="language-plaintext highlighter-rouge">go version</code> in your terminal). For some people, you’ll need to download the most <a href="https://go.dev/dl/">up-to-date Go version</a>.</li>
+</ul>
+<h2 id="common-gradescope-errors">
+  
+  
+    <a href="../troubleshooting.html#common-gradescope-errors" class="anchor-heading" aria-labelledby="common-gradescope-errors"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Common Gradescope Errors
+  
+  
+</h2>
+    
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">Tests failed to compile! Grading cannot continue.</code> but everything works when you run <code class="language-plaintext highlighter-rouge">go test</code> locally: This means that tests in your <code class="language-plaintext highlighter-rouge">client_test.go</code> file utilize struct attributes or helper functions (not the core API functionality). However, since these tests are run against the staff implementation, you cannot use struct attributes in your <code class="language-plaintext highlighter-rouge">client_test.go</code> (otherwise, you’d be assuming what structs in the staff implementation look like).
+    <ul>
+      <li>Fix: If you want tests that check against struct attributes or helper function functionality, put these in the unit test file! he separation between unit and client tests is that unit tests test for your implementation correctness and can be implementation-specific (so you can access any extra client helper functions or struct attributes) while client/integration tests are implementation-blind, just checking that the overall functionality is correct.</li>
+      <li>The distinction between the <code class="language-plaintext highlighter-rouge">client_test.go</code> integration tests and any tests you write in <code class="language-plaintext highlighter-rouge">client_unittest.go</code> as unit tests is that integration tests should pass on anyone’s implementation whereas unit tests may be specific to your design. For integration tests, we want you to write tests to ensure the correct functionality of the client API that would hold under your implementation, the staff implementation, Evanbot’s implementation, etc. These are functionality and security tests (so you can write tampering tests too!), and shouldn’t be dependent on what structs the staff solution has.</li>
+    </ul>
+  </li>
+</ul>
+
+<p><strong>Warning: Please remove all <code>FSpecify</code> statements when you submit to the autograder (otherwise, the autograder will only run tests labelled <code>FSpecify</code>) or potentially break the autograder. We cannot promise we will re-run the autograder for you if you forgot to remove them.</strong></p>
+
+  </div>
+</div>
+
+          
+
+          
+            
+          
+        </main>
+        
+
+  <hr>
+  <footer>
+    
+
+    
+
+
+
+
+
+
+
+
+
+<script>
+  (function () {
+    var navList = document.querySelector('.aux-nav-list');
+    if (!navList || !navList.firstElementChild) return;
+    var darkToggle = navList.firstElementChild;
+    darkToggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      toggleDark();
+    });
+  })();
+</script>
+
+<script src="../../assets/js/tocbot.min.js"></script>
+<script>
+  // Tries to mirror the HTML TOC
+  tocbot.init({
+    tocSelector: '.js-toc',
+    contentSelector: '.content',
+    headingSelector: 'h2,h3,h4,h5,h6',
+    ignoreSelector: '.no_toc',
+    hasInnerContainers: true,
+    linkClass: 'nav-list-link',
+    activeLinkClass: 'active',
+    listClass: 'nav-list',
+    listItemClass: 'nav-list-item',
+    activeListItemClass: 'active',
+    collapseDepth: 3,
+    scrollSmooth: false,
+  });
+</script>
+
+
+    
+  </footer>
+
+
+      </div>
+    </div>
+    
+      
+
+<div class="search-overlay"></div>
+
+    
+  </div>
+
+  
+</body>
+</html>
+
