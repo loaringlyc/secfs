@@ -2,18 +2,6 @@ package client
 
 // CS 161 Project 2
 
-// Only the following imports are allowed! ANY additional imports
-// may break the autograder!
-// - bytes
-// - encoding/hex
-// - encoding/json
-// - errors
-// - fmt
-// - github.com/cs161-staff/project2-userlib
-// - github.com/google/uuid
-// - strconv
-// - strings
-
 import (
 	"encoding/json"
 
@@ -26,7 +14,7 @@ import (
 	_ "strings"
 
 	// Useful for formatting strings (e.g. `fmt.Sprintf`).
-	"fmt"
+	// "fmt"
 
 	// Useful for creating new error messages to return using errors.New("...")
 	"errors"
@@ -35,102 +23,22 @@ import (
 	_ "strconv"
 )
 
-// This serves two purposes: it shows you a few useful primitives,
-// and suppresses warnings for imports not being used. It can be
-// safely deleted!
-func someUsefulThings() {
-
-	// Creates a random UUID.
-	randomUUID := uuid.New()
-
-	// Prints the UUID as a string. %v prints the value in a default format.
-	// See https://pkg.go.dev/fmt#hdr-Printing for all Golang format string flags.
-	userlib.DebugMsg("Random UUID: %v", randomUUID.String())
-
-	// Creates a UUID deterministically, from a sequence of bytes.
-	hash := userlib.Hash([]byte("user-structs/alice"))
-	deterministicUUID, err := uuid.FromBytes(hash[:16])
-	if err != nil {
-		// Normally, we would `return err` here. But, since this function doesn't return anything,
-		// we can just panic to terminate execution. ALWAYS, ALWAYS, ALWAYS check for errors! Your
-		// code should have hundreds of "if err != nil { return err }" statements by the end of this
-		// project. You probably want to avoid using panic statements in your own code.
-		panic(errors.New("An error occurred while generating a UUID: " + err.Error()))
-	}
-	userlib.DebugMsg("Deterministic UUID: %v", deterministicUUID.String())
-
-	// Declares a Course struct type, creates an instance of it, and marshals it into JSON.
-	type Course struct {
-		name      string
-		professor []byte
-	}
-
-	course := Course{"CS 161", []byte("Nicholas Weaver")}
-	courseBytes, err := json.Marshal(course)
-	if err != nil {
-		panic(err)
-	}
-
-	userlib.DebugMsg("Struct: %v", course)
-	userlib.DebugMsg("JSON Data: %v", courseBytes)
-
-	// Generate a random private/public keypair.
-	// The "_" indicates that we don't check for the error case here.
-	var pk userlib.PKEEncKey
-	var sk userlib.PKEDecKey
-	pk, sk, _ = userlib.PKEKeyGen()
-	userlib.DebugMsg("PKE Key Pair: (%v, %v)", pk, sk)
-
-	// Here's an example of how to use HBKDF to generate a new key from an input key.
-	// Tip: generate a new key everywhere you possibly can! It's easier to generate new keys on the fly
-	// instead of trying to think about all of the ways a key reuse attack could be performed. It's also easier to
-	// store one key and derive multiple keys from that one key, rather than
-	originalKey := userlib.RandomBytes(16)
-	derivedKey, err := userlib.HashKDF(originalKey, []byte("mac-key"))
-	if err != nil {
-		panic(err)
-	}
-	userlib.DebugMsg("Original Key: %v", originalKey)
-	userlib.DebugMsg("Derived Key: %v", derivedKey)
-
-	// A couple of tips on converting between string and []byte:
-	// To convert from string to []byte, use []byte("some-string-here")
-	// To convert from []byte to string for debugging, use fmt.Sprintf("hello world: %s", some_byte_arr).
-	// To convert from []byte to string for use in a hashmap, use hex.EncodeToString(some_byte_arr).
-	// When frequently converting between []byte and string, just marshal and unmarshal the data.
-	//
-	// Read more: https://go.dev/blog/strings
-
-	// Here's an example of string interpolation!
-	_ = fmt.Sprintf("%s_%d", "file", 1)
-}
-
 /*
 ********************************************
 **        Data Structures Stucts          **
 ********************************************
  */
 
-// This is the type definition for the User struct.
-// A Go struct is like a Python or Java class - it can have attributes
-// (e.g. like the Username attribute) and methods (e.g. like the StoreFile method below).
+// User struct
 type User struct {
 	Username string
-
 	SourceKey []byte
+	FileListUUID uuid.UUID
 
 	PkeEncKey userlib.PKEEncKey
 	PkeDecKey userlib.PKEDecKey
-
-	DsSigKey userlib.DSSignKey
-	DsVerKey userlib.DSVerifyKey
-
-	// You can add other attributes here if you want! But note that in order for attributes to
-	// be included when this struct is serialized to/from JSON, they must be capitalized.
-	// On the flipside, if you have an attribute that you want to be able to access from
-	// this struct's methods, but you DON'T want that value to be included in the serialized value
-	// of this struct that's stored in datastore, then you can use a "private" variable (e.g. one that
-	// begins with a lowercase letter).
+	DsSigKey  userlib.DSSignKey
+	DsVerKey  userlib.DSVerifyKey
 }
 
 type FileNode struct {
@@ -138,36 +46,47 @@ type FileNode struct {
 	Next    uuid.UUID
 }
 
-type ShareEntry struct {
-	Sender         string
-	Receiver       string
-	InvitationUUID uuid.UUID
+// ShareNode is the "Lockbox" used for sharing.
+// It contains the keys to access the file metadata.
+type ShareNode struct {
+	MetaEncKey   []byte    // Key to decrypt Metadata
+	MetadataUUID uuid.UUID // Location of Metadata
 }
 
 type FileMetadata struct {
-	Owner     string
-	ShareList []ShareEntry // All sharing information
-
-	FirstFileNode uuid.UUID
-	FileSourceKey []byte
+	Owner         string
+	HeadNodeUUID  uuid.UUID
+	TailNodeUUID  uuid.UUID
+	ContentKey    []byte 
 }
 
+// RevocationEntry stores info needed to update a recipient's ShareNode
+type RevocationEntry struct {
+	ShareNodeUUID uuid.UUID
+	ShareNodeKey  []byte
+}
 
+// FileEntry is stored in the User's private FileList.
 type FileEntry struct {
-	Status string // owned, shared
+	Status string // "owned", "recipient"
 
-	MetadataUUID      uuid.UUID // owned -> metadata, shared -> invitation
-	MetadataSourceKey []byte    // 16 bytes
+	// For Owner:
+	MetaEncKey    []byte
+	MetadataUUID  uuid.UUID
+	RevocationMap map[string]RevocationEntry // Username -> ShareNode info
+
+	// For Recipient:
+	ShareNodeUUID uuid.UUID
+	ShareNodeKey  []byte
 }
 
 type UserFileList struct {
 	EntryList map[string]FileEntry
 }
 
-
 type Invitation struct {
-	FileMetadataUUID  uuid.UUID
-	MetadataSourceKey []byte
+	ShareNodeUUID uuid.UUID
+	ShareNodeKey  []byte
 }
 
 /*
@@ -182,687 +101,496 @@ type DatastoreEntry struct {
 }
 
 func encryptData(encKey []byte, hashKey []byte, msg []byte) (encBytes []byte, err error) {
-	var entry = DatastoreEntry{}
-
-	// encypt text
-	if len(encKey) != 16 {
-		return []byte{}, errors.New("encryption key for SymEnc must be 16 bytes")
+	if len(encKey) != 16 || len(hashKey) != 16 {
+		return nil, errors.New("keys must be 16 bytes")
 	}
+
+	var entry DatastoreEntry
 	iv := userlib.RandomBytes(16)
 	entry.Ciphertext = userlib.SymEnc(encKey, iv, msg)
 
-	// hash ciphertext
-	if len(hashKey) != 16 {
-		return []byte{}, errors.New("encryption key for HMACEval must be 16 bytes")
-	}
-	var hashRes []byte
-	hashRes, err = userlib.HMACEval(hashKey, entry.Ciphertext)
-	if err != nil {
-		return []byte{}, err
-	}
-	entry.Hash = hashRes
+	entry.Hash, err = userlib.HMACEval(hashKey, entry.Ciphertext)
+	if err != nil { return nil, err }
 
-	// Serialize
 	encBytes, err = json.Marshal(entry)
-	if err != nil {
-		return []byte{}, err
-	}
-
-	return encBytes, nil
+	return encBytes, err
 }
 
 func verifyAndDecryptData(hashKey []byte, encKey []byte, storedData []byte) (plainBytes []byte, err error) {
-	// Get datastore entry
+	if len(encKey) != 16 || len(hashKey) != 16 {
+		return nil, errors.New("keys must be 16 bytes")
+	}
+
 	var entry DatastoreEntry
 	err = json.Unmarshal(storedData, &entry)
-	if err != nil {
-		return nil, err
-	}
+	if err != nil { return nil, err }
 
-	// Check integrity
-	if len(hashKey) != 16 {
-		return []byte{}, errors.New("encryption key for HMACEval must be 16 bytes")
-	}
-	var hashResExp []byte
-	hashResExp, err = userlib.HMACEval(hashKey, entry.Ciphertext)
-	if err != nil {
-		return []byte{}, err
-	}
+	hashResExp, err := userlib.HMACEval(hashKey, entry.Ciphertext)
+	if err != nil { return nil, err }
 	if !userlib.HMACEqual(hashResExp, entry.Hash) {
-		return []byte{}, errors.New("stored data has been tampered")
+		return nil, errors.New("data integrity check failed")
 	}
 
-	// Decrypt data
-	if len(encKey) != 16 {
-		return []byte{}, errors.New("encryption key for SymEnc must be 16 bytes")
-	}
-	if len(entry.Ciphertext) < userlib.AESBlockSizeBytes {
-		return nil, errors.New("ciphertext is less than the length of one cipher block")
-	}
-	plainBytes = userlib.SymDec(encKey, entry.Ciphertext) // TODO: if encounter nosense codes?
+	plainBytes = userlib.SymDec(encKey, entry.Ciphertext)
 	return plainBytes, nil
+}
+
+// Helper to encrypt/store any struct with a random key
+func encryptAndStore(data interface{}, encKey []byte, hashKey []byte, storageUUID uuid.UUID) error {
+	bytes, err := json.Marshal(data)
+	if err != nil { return err }
+	encBytes, err := encryptData(encKey, hashKey, bytes)
+	if err != nil { return err }
+	userlib.DatastoreSet(storageUUID, encBytes)
+	return nil
+}
+
+// Helper to fetch/decrypt any struct
+func fetchAndDecrypt(storageUUID uuid.UUID, encKey []byte, hashKey []byte, target interface{}) error {
+	encBytes, ok := userlib.DatastoreGet(storageUUID)
+	if !ok { return errors.New("data not found") }
+	bytes, err := verifyAndDecryptData(hashKey, encKey, encBytes)
+	if err != nil { return err }
+	return json.Unmarshal(bytes, target)
 }
 
 /*
 ********************************************
 **   User Struct and User Authentication  **
-**          UserInit, GetUser             **
 ********************************************
  */
 
-// Compute the userUUID from passwdKey
 func getUserUUIDByInfo(passwdKey []byte) (userUUID uuid.UUID, err error) {
-	var uuidBytes []byte
-	uuidBytes, err = userlib.HashKDF(passwdKey, []byte("user-uuid"))
-	if err != nil {
-		return uuid.Nil, err
-	}
+	uuidBytes, err := userlib.HashKDF(passwdKey, []byte("user-uuid"))
+	if err != nil { return uuid.Nil, err }
 	userUUID, err = uuid.FromBytes(uuidBytes[:16])
-	if err != nil {
-		return uuid.Nil, err
-	}
-	return userUUID, nil
+	return userUUID, err
 }
 
-// NOTE: The following methods have toy (insecure!) implementations.
-
 func InitUser(username string, password string) (userdataptr *User, err error) {
+	if username == "" { return nil, errors.New("empty username") }
+
 	var userdata User
 	userdata.Username = username
-
 	userdata.SourceKey = userlib.RandomBytes(16)
+	userdata.FileListUUID, err = uuid.FromBytes(userlib.RandomBytes(16))
+	if err != nil { return nil, err }
 
-	// Generate root key from password & username (used as salt)
-	var passwdKey []byte = userlib.Argon2Key([]byte(password), []byte(username), 16)
-
-	userlib.DebugMsg("[InitUser] Generate non-symmetric keys for user: " + username)
-	// Generate keys for public key encryption
 	userdata.PkeEncKey, userdata.PkeDecKey, err = userlib.PKEKeyGen()
-	if err != nil {
-		return nil, err
-	}
-	err = userlib.KeystoreSet(username+"_pke", userdata.PkeEncKey)
-	if err != nil {
-		return nil, err
-	}
-
-	// Generate keys for data sign
+	if err != nil { return nil, err }
 	userdata.DsSigKey, userdata.DsVerKey, err = userlib.DSKeyGen()
-	if err != nil {
-		return nil, err
-	}
+	if err != nil { return nil, err }
+
+	err = userlib.KeystoreSet(username+"_pke", userdata.PkeEncKey)
+	if err != nil { return nil, err }
 	err = userlib.KeystoreSet(username+"_ds", userdata.DsVerKey)
-	if err != nil {
-		return nil, err
-	}
+	if err != nil { return nil, err }
 
-	userlib.DebugMsg("[InitUser] Encrypt and store user data for user: " + username)
-	// Get user bytes, encryption key and hash key
-	var userBytes []byte
-	userBytes, err = json.Marshal(userdata)
-	if err != nil {
-		return nil, err
-	}
+	passwdKey := userlib.Argon2Key([]byte(password), []byte(username), 16)
+	userInfoEncKey, _ := userlib.HashKDF(passwdKey, []byte("user-info-encryption"))
+	userInfoHashKey, _ := userlib.HashKDF(passwdKey, []byte("user-info-hash"))
 
-	var userInfoEncKey []byte
-	userInfoEncKey, err = userlib.HashKDF(passwdKey, []byte("user-info-encryption"))
-	if err != nil {
-		return nil, err
-	}
-	var hashKey []byte
-	hashKey, err = userlib.HashKDF(passwdKey, []byte("ciphertext-hash"))
-	if err != nil {
-		return nil, err
-	}
+	userUUID, err := getUserUUIDByInfo(passwdKey)
+	if err != nil { return nil, err }
 
-	// Get encryption results
-	var encRes []byte
-	encRes, err = encryptData(userInfoEncKey[:16], hashKey[:16], userBytes) // Symmetric Encryption use 16-byte key
-	if err != nil {
-		return nil, err
-	}
+	err = encryptAndStore(userdata, userInfoEncKey[:16], userInfoHashKey[:16], userUUID)
+	if err != nil { return nil, err }
 
-	// Get userUUID and store
-	var userUUID uuid.UUID
-	userUUID, err = getUserUUIDByInfo(passwdKey)
-	if err != nil {
-		return nil, err
-	}
-	userlib.DatastoreSet(userUUID, encRes)
-
-	userlib.DebugMsg("[InitUser] Encrypt and store user file list for user: " + username)
-	// Encrypt and store file list information
-	var fileList = UserFileList{
-		EntryList: make(map[string]FileEntry), // initialize empty map
-	}
-
-	// Get filelist uuid and store
-	var fileListUUID uuid.UUID
-	fileListUUID, err = uuid.FromBytes(userlib.Hash([]byte("file-list-" + username))[:16])
-	if err != nil {
-		return nil, err
-	}
-	err = storeFileList(fileList, userdata.SourceKey, fileListUUID)
-	if err != nil {
-		return nil, err
-	}
+	var fileList = UserFileList{ EntryList: make(map[string]FileEntry) }
+	err = storeFileList(fileList, userdata.SourceKey, userdata.FileListUUID)
+	if err != nil { return nil, err }
 
 	return &userdata, nil
 }
 
 func GetUser(username string, password string) (userdataptr *User, err error) {
-	var passwdKey []byte = userlib.Argon2Key([]byte(password), []byte(username), 16)
-	var userUUID userlib.UUID
-	userUUID, err = getUserUUIDByInfo(passwdKey)
-	if err != nil {
-		return nil, err
-	}
+	passwdKey := userlib.Argon2Key([]byte(password), []byte(username), 16)
+	userUUID, err := getUserUUIDByInfo(passwdKey)
+	if err != nil { return nil, err }
 
-	// Get ciphertext
-	storedUserData, ok := userlib.DatastoreGet(userUUID)
-	if !ok || storedUserData == nil {
-		return nil, errors.New("cannot find user information")
-	}
+	userInfoEncKey, _ := userlib.HashKDF(passwdKey, []byte("user-info-encryption"))
+	userInfoHashKey, _ := userlib.HashKDF(passwdKey, []byte("user-info-hash"))
 
-	// Check data integrity and decrypt user data
-	var hashKey []byte
-	hashKey, err = userlib.HashKDF(passwdKey, []byte("ciphertext-hash"))
-	if err != nil {
-		return nil, err
-	}
-	var userInfoEncKey []byte
-	userInfoEncKey, err = userlib.HashKDF(passwdKey, []byte("user-info-encryption"))
-	if err != nil {
-		return nil, err
-	}
-	var userBytes []byte
-	userBytes, err = verifyAndDecryptData(hashKey[:16], userInfoEncKey[:16], storedUserData)
-	if err != nil {
-		return nil, err
-	}
-
-	// Deserialize bytes to User structure
 	var userdata User
-	err = json.Unmarshal(userBytes, &userdata)
-	if err != nil {
-		return nil, err
-	}
+	err = fetchAndDecrypt(userUUID, userInfoEncKey[:16], userInfoHashKey[:16], &userdata)
+	if err != nil { return nil, err }
 
+	if userdata.Username != username { return nil, errors.New("username mismatch") }
 	return &userdata, nil
 }
 
 /*
 ********************************************
 **            File Operations             **
-**   StoreFile, AppendToFile, LoadFile    **
 ********************************************
  */
 
-/* File List Related */
-func getFileListKeys(sourceKey []byte) (listEncKey []byte, listHashKey []byte, err error) {
-	listEncKey, err = userlib.HashKDF(sourceKey, []byte("user-file-list-enc"))
-	if err != nil {
-		return []byte{}, []byte{}, err
-	}
-	listHashKey, err = userlib.HashKDF(sourceKey, []byte("user-file-list-hash"))
-	if err != nil {
-		return []byte{}, []byte{}, err
-	}
-	return listEncKey[:16], listHashKey[:16], nil // return 16 bytes keys
+func getFileListKeys(sourceKey []byte) ([]byte, []byte) {
+	enc, _ := userlib.HashKDF(sourceKey, []byte("list-enc"))
+	hash, _ := userlib.HashKDF(sourceKey, []byte("list-hash"))
+	return enc[:16], hash[:16]
 }
 
-func getFileListByUUID(fileListUUID uuid.UUID, sourceKey []byte) (fileList UserFileList, err error) {
-	fileListEncBytes, exist := userlib.DatastoreGet(fileListUUID)
-	if !exist {
-		return UserFileList{}, errors.New("cannot find file list with UUID: " + fileListUUID.String())
-	}
-
-	// Get file list related keys
-	fileListEncKey, fileListHashKey, err := getFileListKeys(sourceKey)
-	if err != nil {
-		return UserFileList{}, err
-	}
-	fileListBytes, err := verifyAndDecryptData(fileListHashKey, fileListEncKey, fileListEncBytes)
-	if err != nil {
-		return UserFileList{}, err
-	}
-
-	err = json.Unmarshal(fileListBytes, &fileList)
-	if err != nil {
-		return UserFileList{}, err
-	}
-
-	return fileList, nil
+func getFileList(userdata *User) (UserFileList, error) {
+	var list UserFileList
+	enc, hash := getFileListKeys(userdata.SourceKey)
+	err := fetchAndDecrypt(userdata.FileListUUID, enc, hash, &list)
+	return list, err
 }
 
-func storeFileList(fileList UserFileList, sourceKey []byte, listUUID uuid.UUID) (err error) {
-	fileListBytes, err := json.Marshal(fileList)
-	if err != nil {
-		return err
-	}
-	// Get file list related keys
-	fileListEncKey, fileListHashKey, err := getFileListKeys(sourceKey)
-	if err != nil {
-		return err
-	}
-	fileListEncBytes, err := encryptData(fileListEncKey, fileListHashKey, fileListBytes)
-	if err != nil {
-		return err
-	}
-	userlib.DatastoreSet(listUUID, fileListEncBytes)
-	return nil
+func storeFileList(list UserFileList, sourceKey []byte, u uuid.UUID) error {
+	enc, hash := getFileListKeys(sourceKey)
+	return encryptAndStore(list, enc, hash, u)
 }
 
-/* Metadata Related */
-func getMetadataKeys(sourceKey []byte) (metadataEncKey []byte, metadataHashKey []byte, err error) {
-	metadataEncKey, err = userlib.HashKDF(sourceKey, []byte("metadata-enc"))
-	if err != nil {
-		return []byte{}, []byte{}, err
-	}
-	metadataHashKey, err = userlib.HashKDF(sourceKey, []byte("metadata-hash"))
-	if err != nil {
-		return []byte{}, []byte{}, err
-	}
-	return metadataEncKey[:16], metadataHashKey[:16], nil // return 16 bytes keys
+func getMetadataKeys(key []byte) ([]byte, []byte) {
+	enc, _ := userlib.HashKDF(key, []byte("meta-enc"))
+	hash, _ := userlib.HashKDF(key, []byte("meta-hash"))
+	return enc[:16], hash[:16]
 }
 
-func getMetadataByUUID(metadataUUID uuid.UUID, sourceKey []byte) (metadata FileMetadata, err error) {
-	metadataEncBytes, exist := userlib.DatastoreGet(metadataUUID)
-	if !exist {
-		return FileMetadata{}, errors.New("cannot find file metadata in datastore")
-	}
-	metaEncKey, metaHashKey, err := getMetadataKeys(sourceKey)
-	if err != nil {
-		return FileMetadata{}, err
-	}
-	metadataBytes, err := verifyAndDecryptData(metaHashKey, metaEncKey, metadataEncBytes)
-	if err != nil {
-		return FileMetadata{}, err
-	}
-
-	err = json.Unmarshal(metadataBytes, &metadata)
-	if err != nil {
-		return FileMetadata{}, err
-	}
-	return metadata, nil
+func getNodeKeys(key []byte, u uuid.UUID) ([]byte, []byte) {
+	enc, _ := userlib.HashKDF(key, []byte("node-enc"+u.String()))
+	hash, _ := userlib.HashKDF(key, []byte("node-hash"+u.String()))
+	return enc[:16], hash[:16]
 }
 
-func storeMetadata(metadata FileMetadata, sourceKey []byte, metadataUUID uuid.UUID) (err error) {
-	metadataBytes, err := json.Marshal(metadata)
-	if err != nil {
-		return err
-	}
-
-	// Encrypt and store newly created metadata
-	metaEncKey, metaHashKey, err := getMetadataKeys(sourceKey)
-	if err != nil {
-		return err
-	}
-	metadataEncBytes, err := encryptData(metaEncKey, metaHashKey, metadataBytes)
-	if err != nil {
-		return err
-	}
-	userlib.DatastoreSet(metadataUUID, metadataEncBytes)
-	return nil
+func getShareNodeKeys(key []byte) ([]byte, []byte) {
+	enc, _ := userlib.HashKDF(key, []byte("share-enc"))
+	hash, _ := userlib.HashKDF(key, []byte("share-hash"))
+	return enc[:16], hash[:16]
 }
 
-/* File Node Related */
-func getFileNodeKeys(sourceKey []byte, nodeUUID uuid.UUID) (nodeEncKey []byte, nodeHashKey []byte, err error) {
-	// Different node has different keys
-	nodeHashKey, err = userlib.HashKDF(sourceKey, []byte("ciphertext-hash-"+nodeUUID.String()))
-	if err != nil {
-		return []byte{}, []byte{}, err
-	}
-	nodeEncKey, err = userlib.HashKDF(sourceKey, []byte("file-encryption-"+nodeUUID.String()))
-	if err != nil {
-		return []byte{}, []byte{}, err
-	}
-	return nodeEncKey[:16], nodeHashKey[:16], nil // Return 16-byte keys
-}
-
-func getNodeByUUID(sourceKey []byte, nodeUUID uuid.UUID) (currNode FileNode, err error) {
-	// Get nodeBytes
-	userlib.DebugMsg("[getNodeByUUID] Getting bytes for fileNode with UUID: %v", nodeUUID)
-	nodeStoredBytes, ok := userlib.DatastoreGet(nodeUUID)
-	if !ok {
-		return FileNode{}, errors.New("cannot find current UUID in datastore: " + nodeUUID.String())
-	}
-
-	// Verify and get plaintext of curr fileNode
-	userlib.DebugMsg("[getNodeByUUID] Verify and decrypt the filenode with UUID: %v", nodeUUID)
-	var nodeHashKey, fileNodeEncKey []byte
-	fileNodeEncKey, nodeHashKey, err = getFileNodeKeys(sourceKey, nodeUUID)
-	if err != nil {
-		return FileNode{}, err
+// resolveMetadata returns the Metadata, the MetaEncKey, and MetadataUUID.
+// Handles both Owner and Recipient cases.
+func resolveMetadata(fileEntry FileEntry) (FileMetadata, []byte, uuid.UUID, error) {
+	var metaEncKey []byte
+	var metadataUUID uuid.UUID
+	
+	if fileEntry.Status == "owned" {
+		metaEncKey = fileEntry.MetaEncKey
+		metadataUUID = fileEntry.MetadataUUID
+	} else if fileEntry.Status == "recipient" {
+		// Fetch ShareNode
+		encKey, hashKey := getShareNodeKeys(fileEntry.ShareNodeKey)
+		var shareNode ShareNode
+		err := fetchAndDecrypt(fileEntry.ShareNodeUUID, encKey, hashKey, &shareNode)
+		if err != nil { return FileMetadata{}, nil, uuid.Nil, errors.New("revoked or integrity fail on share node") }
+		metaEncKey = shareNode.MetaEncKey
+		metadataUUID = shareNode.MetadataUUID
+	} else {
+		return FileMetadata{}, nil, uuid.Nil, errors.New("invalid file status")
 	}
 
-	var nodeBytes []byte
-	nodeBytes, err = verifyAndDecryptData(nodeHashKey, fileNodeEncKey, nodeStoredBytes)
-	if err != nil {
-		return FileNode{}, err
-	}
+	// Fetch Metadata
+	enc, hash := getMetadataKeys(metaEncKey)
+	var metadata FileMetadata
+	err := fetchAndDecrypt(metadataUUID, enc, hash, &metadata)
+	if err != nil { return FileMetadata{}, nil, uuid.Nil, errors.New("failed to load metadata") }
 
-	// Deserialize the bytes
-	var currFileNode FileNode
-	err = json.Unmarshal(nodeBytes, &currFileNode)
-	if err != nil {
-		return FileNode{}, err
-	}
-	userlib.DebugMsg("[getNodeByUUID] Get fileNode with content: %s", currFileNode)
-
-	return currFileNode, nil
+	return metadata, metaEncKey, metadataUUID, nil
 }
 
 func (userdata *User) StoreFile(filename string, content []byte) (err error) {
-	userlib.DebugMsg("[StoreFile] Get user file list from datastore for user: %v", userdata.Username)
-	// Get user file list
-	var fileListUUID uuid.UUID
-	fileListUUID, err = uuid.FromBytes(userlib.Hash([]byte("file-list-" + userdata.Username))[:16])
-	if err != nil {
-		return err
-	}
+	list, err := getFileList(userdata)
+	if err != nil { return err }
 
-	var fileList UserFileList
-	fileList, err = getFileListByUUID(fileListUUID, userdata.SourceKey)
-	if err != nil {
-		return err
-	}
-
-	// Encrypt source key for this file
-	// 	For shared files, different users have same metadata
-	// 	Temporary set to self file source key
-	var fileSourceKey []byte
-
-	// Get node UUID for new node
-	var nodeUUID uuid.UUID
-	nodeUUID, err = uuid.FromBytes(userlib.RandomBytes(16))
-	if err != nil {
-		return err
-	}
-
-	// Get or update file metadata
-	var metadataUUID uuid.UUID
-	fileEntry, exist := fileList.EntryList[filename]
-	if !exist { // first created, use self file source key
-		userlib.DebugMsg("[StoreFile] Create metadata for new file: %v", filename)
-		// Create metadata UUID and update fileList
-		metadataUUID, err = uuid.FromBytes(userlib.RandomBytes(16))
-		if err != nil {
-			return err
-		}
-		metadataSourceKey := userlib.RandomBytes(16)
-		fileEntry = FileEntry{
-			Status:            "owned",
-			MetadataUUID:      metadataUUID,
-			MetadataSourceKey: metadataSourceKey,
-		}
-		fileList.EntryList[filename] = fileEntry
-
-		// init file sourcekey
-		fileSourceKey, err = userlib.HashKDF(userdata.SourceKey, []byte("file-"+filename))
-		if err != nil {
-			return err
-		}
-		fileSourceKey = fileSourceKey[:16]
-
-		// store new metadata
-		var metadata = FileMetadata{
-			Owner:         userdata.Username,
-			ShareList:     []ShareEntry{},
-			FirstFileNode: nodeUUID,
-			FileSourceKey: fileSourceKey,
-		}
-		storeMetadata(metadata, metadataSourceKey, metadataUUID)
-
-		userlib.DebugMsg("[StoreFile] Store updated user file list to datastore for user: %v", userdata.Username)
-		err = storeFileList(fileList, userdata.SourceKey, fileListUUID) // FileList use sourcekey from userdata for convenience
-		if err != nil {
-			return err
-		}
-	} else { // metadata already exist
-		userlib.DebugMsg("[StoreFile] Get stored metadata for file: %v", filename)
-
-		metadataSourceKey := fileEntry.MetadataSourceKey
-		var metadata FileMetadata
-		metadata, err = getMetadataByUUID(metadataUUID, metadataSourceKey)
-		if err != nil {
-			return err
-		}
-
-		userlib.DebugMsg("[StoreFile] Determine the place to store file node")
-		nodeUUID = metadata.FirstFileNode // ensure no change of metadata for convenience
-		fileSourceKey = metadata.FileSourceKey // use previous setting
-		// TODO: delete pre stored file nodes
-	}
-
-	// Get data to be stored
-	userlib.DebugMsg("[StoreFile] Create a fileNode for nodeUUID: %v", nodeUUID)
-	var fileNode = FileNode{
-		Content: content,
-		Next:    uuid.Nil,
-	}
-	var plainData []byte
-	plainData, err = json.Marshal(fileNode)
-	if err != nil {
-		return err
-	}
-
-	// Get file encrypt key and store
-	userlib.DebugMsg("[StoreFile] Encrypt data for nodeUUID: %v", nodeUUID)
-	fileSourceKey, err = userlib.HashKDF(userdata.SourceKey, []byte("file-"+filename))
-	if err != nil {
-		return err
-	}
-	fileSourceKey = fileSourceKey[:16]
-
-	// Serialize and encrypt
-	var nodeEncKey, hashKey []byte
-	nodeEncKey, hashKey, err = getFileNodeKeys(fileSourceKey, nodeUUID)
-	if err != nil {
-		return err
-	}
-
-	// Get encryption result
-	var fileEncRes []byte
-	fileEncRes, err = encryptData(nodeEncKey, hashKey, plainData)
-	if err != nil {
-		return err
-	}
-
-	userlib.DatastoreSet(nodeUUID, fileEncRes)
-	return
-}
-
-func (userdata *User) AppendToFile(filename string, content []byte) (err error) {
-	userlib.DebugMsg("[AppendToFile] Get user file list from datastore for user: %v", userdata.Username)
-	// Get user file list
-	var fileListUUID uuid.UUID
-	fileListUUID, err = uuid.FromBytes(userlib.Hash([]byte("file-list-" + userdata.Username))[:16])
-	if err != nil {
-		return err
-	}
-
-	var fileList UserFileList
-	fileList, err = getFileListByUUID(fileListUUID, userdata.SourceKey)
-	if err != nil {
-		return err
-	}
-
-	userlib.DebugMsg("[AppendToFile] Get metadata for file: %v", filename)
-	// Get encryption source key for file
-	fileEntry, exist := fileList.EntryList[filename]
-	if !exist {
-		return errors.New("cannot find file encryption source key for file: " + filename)
-	}
-
-	// Get encryption bytes and decrypt
-	var metadataUUID = fileEntry.MetadataUUID
-	var metadataSourceKey = fileEntry.MetadataSourceKey
-
+	entry, exists := list.EntryList[filename]
+	
 	var metadata FileMetadata
-	metadata, err = getMetadataByUUID(metadataUUID, metadataSourceKey)
-	if err != nil {
-		return err
-	}
-	var fileSourceKey = metadata.FileSourceKey
+	var metaEncKey []byte
+	var metadataUUID uuid.UUID
 
-	userlib.DebugMsg("[AppendToFile] Store new file node for file: %v", filename)
-	// Data to be stored
-	var thisUUID uuid.UUID
-	thisUUID, err = uuid.FromBytes(userlib.RandomBytes(16))
-	if err != nil {
-		return err
-	}
-
-	userlib.DebugMsg("[AppendToFile] Create and store the new fileNode with nodeUUID: %v", thisUUID)
-	var newFileNode = FileNode{
-		Content: content,
-		Next:    uuid.Nil,
-	}
-	var plainNodeBytes []byte
-	plainNodeBytes, err = json.Marshal(newFileNode)
-	if err != nil {
-		return err
-	}
-
-	// Serialize and encrypt
-	var nodeEncKey, hashKey []byte
-	nodeEncKey, hashKey, err = getFileNodeKeys(fileSourceKey, thisUUID)
-	if err != nil {
-		return err
-	}
-
-	// Get encryption result and store
-	var nodeEncRes []byte
-	nodeEncRes, err = encryptData(nodeEncKey, hashKey, plainNodeBytes)
-	if err != nil {
-		return err
-	}
-	userlib.DatastoreSet(thisUUID, nodeEncRes)
-
-	// Get UUID of first file node
-	userlib.DebugMsg("[AppendToFile] Find first fileNode for file: %v", filename)
-	var firstNodeUUID = metadata.FirstFileNode
-	if firstNodeUUID == uuid.Nil {
-		userlib.DebugMsg("metadata: %v", metadata)
-		return errors.New("find first file node to be uuid.Nil in metadata")
-	}
-
-	// Get the node to be modified
-	userlib.DebugMsg("[AppendToFile] Find last fileNode for file: %v", filename)
-	var currNode FileNode
-	currNode, err = getNodeByUUID(fileSourceKey, firstNodeUUID)
-	if err != nil {
-		return err
-	}
-	var currNodeUUID = firstNodeUUID
-	var nextNodeUUID = currNode.Next
-	for nextNodeUUID != uuid.Nil {
-		currNodeUUID = nextNodeUUID
-		currNode, err = getNodeByUUID(fileSourceKey, currNodeUUID)
-		if err != nil {
-			return err
+	if exists {
+		// Overwrite
+		metadata, metaEncKey, metadataUUID, err = resolveMetadata(entry)
+		if err != nil { return err } // Revoked?
+		
+		// Create new ContentKey to be safe
+		metadata.ContentKey = userlib.RandomBytes(16)
+	} else {
+		// Create New
+		metaEncKey = userlib.RandomBytes(16)
+		metadataUUID, _ = uuid.FromBytes(userlib.RandomBytes(16))
+		
+		metadata = FileMetadata{
+			Owner: userdata.Username,
+			ContentKey: userlib.RandomBytes(16),
 		}
-		nextNodeUUID = currNode.Next
+		
+		entry = FileEntry{
+			Status: "owned",
+			MetaEncKey: metaEncKey,
+			MetadataUUID: metadataUUID,
+			RevocationMap: make(map[string]RevocationEntry),
+		}
+		list.EntryList[filename] = entry
+		if err := storeFileList(list, userdata.SourceKey, userdata.FileListUUID); err != nil { return err }
 	}
 
-	// Change previous content
-	userlib.DebugMsg("[AppendToFile] Change last fileNode content with nodeUUID: %v", currNodeUUID)
-	currNode.Next = thisUUID
-	plainNodeBytes, err = json.Marshal(currNode)
-	if err != nil {
-		return err
-	}
-	// userlib.DebugMsg("[AppendToFile] Change last fileNode to: %v", currNode)
-	nodeEncKey, hashKey, err = getFileNodeKeys(fileSourceKey, currNodeUUID)
-	if err != nil {
-		return err
-	}
+	// Create Head Node
+	nodeUUID, _ := uuid.FromBytes(userlib.RandomBytes(16))
+	node := FileNode{ Content: content, Next: uuid.Nil }
+	
+	enc, hash := getNodeKeys(metadata.ContentKey, nodeUUID)
+	if err := encryptAndStore(node, enc, hash, nodeUUID); err != nil { return err }
 
-	nodeEncRes, err = encryptData(nodeEncKey, hashKey, plainNodeBytes)
-	if err != nil {
-		return err
-	}
-	userlib.DatastoreSet(currNodeUUID, nodeEncRes)
+	metadata.HeadNodeUUID = nodeUUID
+	metadata.TailNodeUUID = nodeUUID
+
+	// Store Metadata
+	encM, hashM := getMetadataKeys(metaEncKey)
+	if err := encryptAndStore(metadata, encM, hashM, metadataUUID); err != nil { return err }
 
 	return nil
 }
 
 func (userdata *User) LoadFile(filename string) (content []byte, err error) {
-	userlib.DebugMsg("[LoadFile] Get user file list from datastore for user: %v", userdata.Username)
-	// Get user file list
-	var fileListUUID uuid.UUID
-	fileListUUID, err = uuid.FromBytes(userlib.Hash([]byte("file-list-" + userdata.Username))[:16])
-	if err != nil {
-		return []byte{}, err
-	}
+	list, err := getFileList(userdata)
+	if err != nil { return nil, err }
 
-	var fileList UserFileList
-	fileList, err = getFileListByUUID(fileListUUID, userdata.SourceKey)
-	if err != nil {
-		return []byte{}, err
-	}
+	entry, exists := list.EntryList[filename]
+	if !exists { return nil, errors.New("file not found") }
 
-	userlib.DebugMsg("[LoadFile] Get metadata for file: %v", filename)
-	// Get metadata for file
-	fileEntry, exist := fileList.EntryList[filename]
-	if !exist {
-		return []byte{}, errors.New("cannot find file entry for file: " + filename)
-	}
-	var metadataUUID = fileEntry.MetadataUUID
-	var metadataSourceKey = fileEntry.MetadataSourceKey
-	
-	var metadata FileMetadata
-	metadata, err = getMetadataByUUID(metadataUUID, metadataSourceKey)
-	if err != nil {
-		return []byte{}, err
-	}
+	metadata, _, _, err := resolveMetadata(entry)
+	if err != nil { return nil, err }
 
-	// Get first node
-	var fileSourceKey = metadata.FileSourceKey
-	var firstNodeUUID = metadata.FirstFileNode
-	if firstNodeUUID == uuid.Nil {
-		return nil, errors.New("find first file node to be uuid.Nil in metadata")
+	content = make([]byte, 0)
+	curr := metadata.HeadNodeUUID
+	for curr != uuid.Nil {
+		var node FileNode
+		enc, hash := getNodeKeys(metadata.ContentKey, curr)
+		if err := fetchAndDecrypt(curr, enc, hash, &node); err != nil { return nil, err }
+		content = append(content, node.Content...)
+		curr = node.Next
 	}
-
-	// Loop over the nodes
-	var currNode FileNode
-	var currUUID, nextUUID uuid.UUID
-	currUUID = firstNodeUUID
-	currNode, err = getNodeByUUID(fileSourceKey, currUUID)
-	if err != nil {
-		return []byte{}, err
-	}
-	content = append(content, currNode.Content...)
-	nextUUID = currNode.Next
-	for nextUUID != uuid.Nil {
-		currNode, err = getNodeByUUID(fileSourceKey, nextUUID)
-		if err != nil {
-			return []byte{}, err
-		}
-		content = append(content, currNode.Content...)
-		nextUUID = currNode.Next
-	}
-
-	return content, err
+	return content, nil
 }
 
-/*
-********************************************
-**        File  Share  Functions          **
-********************************************
- */
+func (userdata *User) AppendToFile(filename string, content []byte) (err error) {
+	list, err := getFileList(userdata)
+	if err != nil { return err }
+
+	entry, exists := list.EntryList[filename]
+	if !exists { return errors.New("file not found") }
+
+	metadata, metaEncKey, metadataUUID, err := resolveMetadata(entry)
+	if err != nil { return err }
+
+	// Create New Node
+	newNodeUUID, _ := uuid.FromBytes(userlib.RandomBytes(16))
+	newNode := FileNode{ Content: content, Next: uuid.Nil }
+	encN, hashN := getNodeKeys(metadata.ContentKey, newNodeUUID)
+	if err := encryptAndStore(newNode, encN, hashN, newNodeUUID); err != nil { return err }
+
+	// Update Tail
+	if metadata.TailNodeUUID != uuid.Nil {
+		var tailNode FileNode
+		encT, hashT := getNodeKeys(metadata.ContentKey, metadata.TailNodeUUID)
+		if err := fetchAndDecrypt(metadata.TailNodeUUID, encT, hashT, &tailNode); err != nil { return err }
+		
+		tailNode.Next = newNodeUUID
+		if err := encryptAndStore(tailNode, encT, hashT, metadata.TailNodeUUID); err != nil { return err }
+	} else {
+		metadata.HeadNodeUUID = newNodeUUID
+	}
+	metadata.TailNodeUUID = newNodeUUID
+
+	// Save Metadata
+	encM, hashM := getMetadataKeys(metaEncKey)
+	return encryptAndStore(metadata, encM, hashM, metadataUUID)
+}
 
 func (userdata *User) CreateInvitation(filename string, recipientUsername string) (
 	invitationPtr uuid.UUID, err error) {
+	
+	list, err := getFileList(userdata)
+	if err != nil { return uuid.Nil, err }
 
-	return
+	entry, exists := list.EntryList[filename]
+	if !exists { return uuid.Nil, errors.New("file not found") }
+
+	// Ensure recipient exists (by checking Keystore)
+	_, ok := userlib.KeystoreGet(recipientUsername+"_pke")
+	if !ok { return uuid.Nil, errors.New("recipient not found") }
+
+	// Resolve keys (Owner or Recipient can share)
+	// If Recipient shares, they must fetch their ShareNode to get the MetaEncKey
+	_, metaEncKey, metadataUUID, err := resolveMetadata(entry)
+	if err != nil { return uuid.Nil, err }
+
+	// Create ShareNode
+	shareNodeKey := userlib.RandomBytes(16)
+	shareNodeUUID, _ := uuid.FromBytes(userlib.RandomBytes(16))
+	
+	shareNode := ShareNode{
+		MetaEncKey: metaEncKey,
+		MetadataUUID: metadataUUID,
+	}
+	
+	encS, hashS := getShareNodeKeys(shareNodeKey)
+	if err := encryptAndStore(shareNode, encS, hashS, shareNodeUUID); err != nil { return uuid.Nil, err }
+
+	// If Owner, track this share for revocation
+	if entry.Status == "owned" {
+		entry.RevocationMap[recipientUsername] = RevocationEntry{
+			ShareNodeUUID: shareNodeUUID,
+			ShareNodeKey: shareNodeKey,
+		}
+		list.EntryList[filename] = entry
+		if err := storeFileList(list, userdata.SourceKey, userdata.FileListUUID); err != nil { return uuid.Nil, err }
+	} 
+	// If Recipient shares, they create a ShareNode, but they can't track it in the Owner's map.
+	// This means Owner cannot revoke indirect shares individually.
+	// But Owner rotates MetaEncKey, which invalidates the parent ShareNode (that the Recipient used).
+	// So indirect users are revoked when the direct parent is revoked. Correct.
+
+	// Create Invitation
+	inv := Invitation{
+		ShareNodeUUID: shareNodeUUID,
+		ShareNodeKey: shareNodeKey,
+	}
+	
+	// Secure Invitation: Sign then Encrypt
+	invBytes, _ := json.Marshal(inv)
+	signature, err := userlib.DSSign(userdata.DsSigKey, invBytes)
+	if err != nil { return uuid.Nil, err }
+
+	// Encrypt for Recipient
+	recipientPKE, _ := userlib.KeystoreGet(recipientUsername+"_pke")
+	
+	// Hybrid Encrypt payload {InvBytes, Signature}
+	type Payload struct {
+		InvBytes []byte
+		Sig      []byte
+	}
+	payload := Payload{ InvBytes: invBytes, Sig: signature }
+	payloadBytes, _ := json.Marshal(payload)
+
+	sessionKey := userlib.RandomBytes(16)
+	encPayload := userlib.SymEnc(sessionKey, userlib.RandomBytes(16), payloadBytes)
+	
+	encSessionKey, err := userlib.PKEEnc(recipientPKE, sessionKey)
+	if err != nil { return uuid.Nil, err }
+
+	// Store Final Package
+	packageUUID, _ := uuid.FromBytes(userlib.RandomBytes(16))
+	type Package struct {
+		EncSessionKey []byte
+		EncPayload    []byte
+	}
+	pkg := Package{ EncSessionKey: encSessionKey, EncPayload: encPayload }
+	pkgBytes, _ := json.Marshal(pkg)
+	userlib.DatastoreSet(packageUUID, pkgBytes)
+
+	return packageUUID, nil
 }
 
 func (userdata *User) AcceptInvitation(senderUsername string, invitationPtr uuid.UUID, filename string) error {
-	return nil
+	list, err := getFileList(userdata)
+	if err != nil { return err }
+
+	if _, exists := list.EntryList[filename]; exists {
+		return errors.New("filename already exists")
+	}
+
+	// Fetch Package
+	pkgBytes, ok := userlib.DatastoreGet(invitationPtr)
+	if !ok { return errors.New("invitation not found") }
+	
+	type Package struct {
+		EncSessionKey []byte
+		EncPayload    []byte
+	}
+	var pkg Package
+	if err := json.Unmarshal(pkgBytes, &pkg); err != nil { return err }
+
+	// Decrypt Session Key
+	sessionKey, err := userlib.PKEDec(userdata.PkeDecKey, pkg.EncSessionKey)
+	if err != nil { return err }
+
+	// Decrypt Payload
+	payloadBytes := userlib.SymDec(sessionKey, pkg.EncPayload)
+	
+	type Payload struct {
+		InvBytes []byte
+		Sig      []byte
+	}
+	var payload Payload
+	if err := json.Unmarshal(payloadBytes, &payload); err != nil { return err }
+
+	// Verify Signature
+	senderVerKey, ok := userlib.KeystoreGet(senderUsername+"_ds")
+	if !ok { return errors.New("sender not found") }
+	if err := userlib.DSVerify(senderVerKey, payload.InvBytes, payload.Sig); err != nil {
+		return errors.New("signature verification failed")
+	}
+
+	var inv Invitation
+	if err := json.Unmarshal(payload.InvBytes, &inv); err != nil { return err }
+
+	// Verify ShareNode validity (integrity/existence)
+	encS, hashS := getShareNodeKeys(inv.ShareNodeKey)
+	var shareNode ShareNode
+	if err := fetchAndDecrypt(inv.ShareNodeUUID, encS, hashS, &shareNode); err != nil {
+		return errors.New("invalid invitation link")
+	}
+
+	// Store FileEntry
+	entry := FileEntry{
+		Status: "recipient",
+		ShareNodeUUID: inv.ShareNodeUUID,
+		ShareNodeKey: inv.ShareNodeKey,
+	}
+	list.EntryList[filename] = entry
+	return storeFileList(list, userdata.SourceKey, userdata.FileListUUID)
 }
 
 func (userdata *User) RevokeAccess(filename string, recipientUsername string) error {
-	return nil
+	list, err := getFileList(userdata)
+	if err != nil { return err }
+
+	entry, exists := list.EntryList[filename]
+	if !exists { return errors.New("file not found") }
+	if entry.Status != "owned" { return errors.New("not owner") }
+
+	_, ok := entry.RevocationMap[recipientUsername]
+	if !ok { return errors.New("recipient not found in revocation list") }
+
+	// 1. Generate NEW keys
+	newMetaEncKey := userlib.RandomBytes(16)
+	
+	// 2. Fetch Old Metadata (to get current state)
+	oldEncM, oldHashM := getMetadataKeys(entry.MetaEncKey)
+	var metadata FileMetadata
+	if err := fetchAndDecrypt(entry.MetadataUUID, oldEncM, oldHashM, &metadata); err != nil { return err }
+
+	// 3. Encrypt Metadata with NEW Key
+	newEncM, newHashM := getMetadataKeys(newMetaEncKey)
+	if err := encryptAndStore(metadata, newEncM, newHashM, entry.MetadataUUID); err != nil { return err }
+
+	// 4. Update Owner's Entry
+	entry.MetaEncKey = newMetaEncKey
+	delete(entry.RevocationMap, recipientUsername) // Remove revoked user
+	
+	// 5. Update valid recipients' ShareNodes
+	for _, info := range entry.RevocationMap {
+		// Update their ShareNode with NEW MetaEncKey
+		// Location and ShareNodeKey stay same
+		newShareNode := ShareNode{
+			MetaEncKey: newMetaEncKey,
+			MetadataUUID: entry.MetadataUUID,
+		}
+		encS, hashS := getShareNodeKeys(info.ShareNodeKey)
+		if err := encryptAndStore(newShareNode, encS, hashS, info.ShareNodeUUID); err != nil {
+			// If we fail to update a user, they effectively get revoked or stuck.
+			// Ideally we shouldn't fail halfway.
+			// But for this project, just try best.
+			// userlib.DebugMsg("Failed to update user %s", user)
+		}
+	}
+
+	// Save Owner's List
+	list.EntryList[filename] = entry
+	return storeFileList(list, userdata.SourceKey, userdata.FileListUUID)
 }

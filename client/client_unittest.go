@@ -1,38 +1,10 @@
 package client
 
-///////////////////////////////////////////////////
-//                                               //
-// Everything in this file will NOT be graded!!! //
-//                                               //
-///////////////////////////////////////////////////
-
-// In this unit tests file, you can write white-box unit tests on your implementation.
-// These are different from the black-box integration tests in client_test.go,
-// because in this unit tests file, you can use details specific to your implementation.
-
-// For example, in this unit tests file, you can access struct fields and helper methods
-// that you defined, but in the integration tests (client_test.go), you can only access
-// the 8 functions (StoreFile, LoadFile, etc.) that are common to all implementations.
-
-// In this unit tests file, you can write InitUser where you would write client.InitUser in the
-// integration tests (client_test.go). In other words, the "client." in front is no longer needed.
-
 import (
 	"testing"
-
 	userlib "github.com/cs161-staff/project2-userlib"
-
-	_ "encoding/hex"
-
-	_ "errors"
-
 	. "github.com/onsi/ginkgo/v2"
-
 	. "github.com/onsi/gomega"
-
-	_ "strconv"
-
-	_ "strings"
 )
 
 func TestSetupAndExecution(t *testing.T) {
@@ -47,22 +19,82 @@ var _ = Describe("Client Unit Tests", func() {
 		userlib.KeystoreClear()
 	})
 
-	Describe("Unit Tests", func() {
-		// Specify("Simple Test: somefunction", func() {
-		// 	someUsefulThings()
-		// })
-
-		Specify("Basic Test: Check that the Username field is set for a new user", func() {
+	Describe("Phase 1 & 2: Auth and Basic Files", func() {
+		Specify("Should allow store and load", func() {
 			userlib.DebugMsg("Initializing user Alice.")
-			// Note: In the integration tests (client_test.go) this would need to
-			// be client.InitUser, but here (client_unittests.go) you can write InitUser.
 			alice, err := InitUser("alice", "password")
 			Expect(err).To(BeNil())
 
-			// Note: You can access the Username field of the User struct here.
-			// But in the integration tests (client_test.go), you cannot access
-			// struct fields because not all implementations will have a username field.
-			Expect(alice.Username).To(Equal("alice"))
+			content := []byte("hello world")
+			err = alice.StoreFile("file1", content)
+			Expect(err).To(BeNil())
+
+			loadedContent, err := alice.LoadFile("file1")
+			Expect(err).To(BeNil())
+			Expect(loadedContent).To(Equal(content))
+		})
+
+		Specify("Should allow overwrite", func() {
+			alice, err := InitUser("alice", "password")
+			Expect(err).To(BeNil())
+
+			err = alice.StoreFile("file1", []byte("version 1"))
+			Expect(err).To(BeNil())
+
+			err = alice.StoreFile("file1", []byte("version 2"))
+			Expect(err).To(BeNil())
+
+			loadedContent, err := alice.LoadFile("file1")
+			Expect(err).To(BeNil())
+			Expect(loadedContent).To(Equal([]byte("version 2")))
+		})
+
+		Specify("Should allow append", func() {
+			alice, err := InitUser("alice", "password")
+			Expect(err).To(BeNil())
+
+			err = alice.StoreFile("file1", []byte("part 1"))
+			Expect(err).To(BeNil())
+
+			err = alice.AppendToFile("file1", []byte(" part 2"))
+			Expect(err).To(BeNil())
+
+			loadedContent, err := alice.LoadFile("file1")
+			Expect(err).To(BeNil())
+			Expect(loadedContent).To(Equal([]byte("part 1 part 2")))
+		})
+
+		Specify("Should handle multiple files", func() {
+			alice, err := InitUser("alice", "password")
+			Expect(err).To(BeNil())
+
+			err = alice.StoreFile("fileA", []byte("A"))
+			Expect(err).To(BeNil())
+			err = alice.StoreFile("fileB", []byte("B"))
+			Expect(err).To(BeNil())
+
+			valA, err := alice.LoadFile("fileA")
+			Expect(err).To(BeNil())
+			Expect(valA).To(Equal([]byte("A")))
+
+			valB, err := alice.LoadFile("fileB")
+			Expect(err).To(BeNil())
+			Expect(valB).To(Equal([]byte("B")))
+		})
+
+		Specify("Should persist across logins", func() {
+			alice, err := InitUser("alice", "password")
+			Expect(err).To(BeNil())
+			err = alice.StoreFile("file1", []byte("secret"))
+			Expect(err).To(BeNil())
+
+			// Simulate logout/login
+			alice2, err := GetUser("alice", "password")
+			Expect(err).To(BeNil())
+
+			val, err := alice2.LoadFile("file1")
+			Expect(err).To(BeNil())
+			Expect(val).To(Equal([]byte("secret")))
 		})
 	})
 })
