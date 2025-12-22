@@ -143,6 +143,7 @@ type ShareEntry struct {
 	Sender         string
 	Receiver       string
 	InvitationUUID uuid.UUID
+	AccessNodeUUID uuid.UUID
 }
 
 type FileMetadata struct {
@@ -574,7 +575,7 @@ func getAccessNodeKeys(sourceKey []byte) (accessEncKey []byte, accessHashKey []b
 func getAccessNodeByUUID(accessNodeUUID uuid.UUID, sourceKey []byte) (accessNode AccessNode, err error) {
 	accessNodeEncBytes, exist := userlib.DatastoreGet(accessNodeUUID)
 	if !exist {
-		return AccessNode{}, errors.New("cannot find file metadata in datastore")
+		return AccessNode{}, errors.New("cannot find access node in datastore")
 	}
 	accessEncKey, accessHashKey, err := getAccessNodeKeys(sourceKey)
 	if err != nil {
@@ -929,6 +930,7 @@ func (userdata *User) LoadFile(filename string) (content []byte, err error) {
 		return []byte{}, err
 	}
 
+	userlib.DebugMsg("[LoadFile] Get file nodes for file: %v", filename)
 	// Get first node
 	var fileSourceKey = metadata.FileSourceKey
 	var firstNodeUUID = metadata.FirstFileNode
@@ -1033,13 +1035,17 @@ func (userdata *User) CreateInvitation(filename string, recipientUsername string
 		SourceKey:  fileEntry.MetadataSourceKey,
 	}
 	accessNodeUUID := uuid.New()
-	accessNodeSourceKey := userlib.RandomBytes(16)
+	accessNodeSourceKey, err := userlib.HashKDF(userdata.SourceKey, []byte("user-direct-access-node-access"))
+	if err != nil {
+		return uuid.Nil, err
+	}
+	accessNodeSourceKey = accessNodeSourceKey[:16]
 	storeAccessNode(accessNode, accessNodeSourceKey, accessNodeUUID)
 
 	userlib.DebugMsg("[CreateInvitation] create invitation for user: %v", recipientUsername)
 	// create and serialize invitation
 	var invitation = Invitation{
-		AccessNodeUUID: accessNodeUUID,
+		AccessNodeUUID:      accessNodeUUID,
 		AccessNodeSourceKey: accessNodeSourceKey,
 	}
 	invitationBytes, err := json.Marshal(invitation)
@@ -1096,6 +1102,7 @@ func (userdata *User) CreateInvitation(filename string, recipientUsername string
 		Sender:         userdata.Username,
 		Receiver:       recipientUsername,
 		InvitationUUID: invitationUUID,
+		AccessNodeUUID: accessNodeUUID,
 	}
 
 	metadata.ShareList = append(metadata.ShareList, shareEntry)
@@ -1252,7 +1259,7 @@ func (userdata *User) RevokeAccess(filename string, recipientUsername string) (e
 		return nil
 	}
 
-	// case 3: find one or more share entry, but accepted
+	// case 3: find one or more share entry, and accepted
 	userlib.DebugMsg("[RevokeAccess] delete revoke user related share entries from metadata")
 	// get revoke related entry idx list
 	var revokeUserSet = map[string]struct{}{recipientUsername: {}}
@@ -1330,12 +1337,39 @@ func (userdata *User) RevokeAccess(filename string, recipientUsername string) (e
 	metadata.FirstFileNode = newFirstNodeUUID
 
 	// update invitation for users with accessibility
-	// for i, shareEntry := range metadata.ShareList {
-	// 	var invitationUUID = shareEntry.InvitationUUID
-	// 	var receiver = shareEntry.Receiver
-	// 	// aha moment: owner could modify invitation even if he/she did not send invitation directly?
+	accessNodeSourceKey, err := userlib.HashKDF(userdata.SourceKey, []byte("user-direct-access-node-access"))
+	if err != nil {
+		return err
+	}
+	accessNodeSourceKey = accessNodeSourceKey[:16]
 
-	// }
+	for _, shareEntry := range metadata.ShareList {
+		// aha moment: owner should know the source key of the direct access node, which makes good sense
+		if shareEntry.Sender == userdata.Username {
+			// create new access node
+			var accessNode = AccessNode{
+				IsMetadata: true,
+				NodeUUID:   newMetadataUUID,
+				SourceKey:  newFileSourceKey,
+			}
+			var accessNodeUUID = shareEntry.AccessNodeUUID
+			err = storeAccessNode(accessNode, accessNodeSourceKey, accessNodeUUID)
+			if err != nil {
+				return err
+			}
+			// for unaccepted request, no need to update invitation, because 2 fields haven't changed
+			// if !shareEntry.Accepted {
+			// 	var invitation = Invitation {
+			// 		AccessNodeUUID: accessNodeUUID,
+			// 		AccessNodeSourceKey: ,
+			// 	}
+			// }
+		}
+	}
+
+	// finally save metadata
+	userlib.DatastoreDelete(metadataUUID)
+	storeMetadata(metadata, newMetadataSourceKey, newMetadataUUID)
 
 	return nil
 }
