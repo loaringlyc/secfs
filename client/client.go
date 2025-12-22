@@ -156,17 +156,23 @@ type FileMetadata struct {
 type FileEntry struct {
 	Status string // owned, shared
 
-	MetadataUUID      uuid.UUID // owned -> metadata, shared -> invitation
-	MetadataSourceKey []byte    // owned -> metadataKey, shared -> keystore key (16 bytes)
+	MetadataUUID      uuid.UUID // owned -> metadata, shared -> access node
+	MetadataSourceKey []byte    // owned -> metadataKey, shared -> access node source key (16 bytes)
 }
 
 type UserFileList struct {
 	EntryList map[string]FileEntry
 }
 
+type AccessNode struct {
+	IsMetadata bool
+	NodeUUID   uuid.UUID // isMetadata -> metadata UUID, !isMetadata -> prev node UUID
+	SourceKey  []byte    // isMetadata -> metadata source key, !isMetadata -> prev node source key
+}
+
 type Invitation struct {
-	MetadataUUID      uuid.UUID
-	MetadataSourceKey []byte
+	AccessNodeUUID      uuid.UUID
+	AccessNodeSourceKey []byte
 }
 
 /*
@@ -552,24 +558,88 @@ func getNodeByUUID(sourceKey []byte, nodeUUID uuid.UUID) (currNode FileNode, err
 	return currFileNode, nil
 }
 
-func getMetadataInfo(fileEntry FileEntry, pkeDecKey userlib.PKEDecKey) (
+/* Access Node Related */
+func getAccessNodeKeys(sourceKey []byte) (accessEncKey []byte, accessHashKey []byte, err error) {
+	accessEncKey, err = userlib.HashKDF(sourceKey, []byte("access-node-enc"))
+	if err != nil {
+		return []byte{}, []byte{}, err
+	}
+	accessHashKey, err = userlib.HashKDF(sourceKey, []byte("access-node-hash"))
+	if err != nil {
+		return []byte{}, []byte{}, err
+	}
+	return accessEncKey[:16], accessHashKey[:16], nil // return 16 bytes keys
+}
+
+func getAccessNodeByUUID(accessNodeUUID uuid.UUID, sourceKey []byte) (accessNode AccessNode, err error) {
+	accessNodeEncBytes, exist := userlib.DatastoreGet(accessNodeUUID)
+	if !exist {
+		return AccessNode{}, errors.New("cannot find file metadata in datastore")
+	}
+	accessEncKey, accessHashKey, err := getAccessNodeKeys(sourceKey)
+	if err != nil {
+		return AccessNode{}, err
+	}
+	accessNodeBytes, err := verifyAndDecryptData(accessHashKey, accessEncKey, accessNodeEncBytes)
+	if err != nil {
+		return AccessNode{}, err
+	}
+
+	err = json.Unmarshal(accessNodeBytes, &accessNode)
+	if err != nil {
+		return AccessNode{}, err
+	}
+	return accessNode, nil
+}
+
+func storeAccessNode(accessNode AccessNode, sourceKey []byte, accessNodeUUID uuid.UUID) (err error) {
+	accessNodeBytes, err := json.Marshal(accessNode)
+	if err != nil {
+		return err
+	}
+
+	// Encrypt and store newly created metadata
+	accessEncKey, accessHashKey, err := getAccessNodeKeys(sourceKey)
+	if err != nil {
+		return err
+	}
+	metadataEncBytes, err := encryptData(accessEncKey, accessHashKey, accessNodeBytes)
+	if err != nil {
+		return err
+	}
+	userlib.DatastoreSet(accessNodeUUID, metadataEncBytes)
+	return nil
+}
+
+func getMetadataInfo(fileEntry FileEntry) (
 	metadataUUID uuid.UUID, metadataSourceKey []byte, err error) {
 	switch fileEntry.Status {
 	case "owned":
 		metadataUUID = fileEntry.MetadataUUID
 		metadataSourceKey = fileEntry.MetadataSourceKey
 	case "shared":
-		invitationUUID := fileEntry.MetadataUUID
-		senderDs, ok := userlib.KeystoreGet(string(fileEntry.MetadataSourceKey))
-		if !ok {
-			return uuid.Nil, []byte{}, errors.New("cannot find sender DSVerKey")
-		}
-		invitation, err := getInvitationByUUID(invitationUUID, pkeDecKey, senderDs)
+		accessNodeUUID := fileEntry.MetadataUUID
+		accessSourceKey := fileEntry.MetadataSourceKey
+
+		accessNode, err := getAccessNodeByUUID(accessNodeUUID, accessSourceKey)
 		if err != nil {
 			return uuid.Nil, []byte{}, err
 		}
-		metadataUUID = invitation.MetadataUUID
-		metadataSourceKey = invitation.MetadataSourceKey
+
+		// find metadata recursively
+		for !accessNode.IsMetadata {
+			accessNodeUUID = accessNode.NodeUUID
+			accessSourceKey = accessNode.SourceKey
+			accessNode, err = getAccessNodeByUUID(accessNodeUUID, accessSourceKey)
+			if err != nil {
+				return uuid.Nil, []byte{}, err
+			}
+		}
+
+		metadataUUID = accessNode.NodeUUID
+		metadataSourceKey = accessNode.SourceKey
+	default:
+		return uuid.Nil, []byte{}, errors.New("undefined file entry status")
 	}
 	return metadataUUID, metadataSourceKey, nil
 }
@@ -620,11 +690,12 @@ func (userdata *User) StoreFile(filename string, content []byte) (err error) {
 		fileList.EntryList[filename] = fileEntry
 
 		// init file sourcekey
-		fileSourceKey, err = userlib.HashKDF(userdata.SourceKey, []byte("file-"+filename))
-		if err != nil {
-			return err
-		}
-		fileSourceKey = fileSourceKey[:16]
+		// fileSourceKey, err = userlib.HashKDF(userdata.SourceKey, []byte("file-"+filename))
+		// if err != nil {
+		// 	return err
+		// }
+		// fileSourceKey = fileSourceKey[:16]
+		fileSourceKey = userlib.RandomBytes(16)
 
 		// store new metadata
 		var metadata = FileMetadata{
@@ -635,7 +706,7 @@ func (userdata *User) StoreFile(filename string, content []byte) (err error) {
 		}
 		storeMetadata(metadata, metadataSourceKey, metadataUUID)
 
-		userlib.DebugMsg("[StoreFile] Store updated user file list to datastore for user: %v", userdata.Username)
+		// store new file list
 		err = storeFileList(fileList, userdata.SourceKey, fileListUUID) // FileList use sourcekey from userdata for convenience
 		if err != nil {
 			return err
@@ -646,7 +717,7 @@ func (userdata *User) StoreFile(filename string, content []byte) (err error) {
 		// TODO: shared file status
 		var metadataUUID uuid.UUID
 		var metadataSourceKey []byte
-		metadataUUID, metadataSourceKey, err = getMetadataInfo(fileEntry, userdata.PkeDecKey)
+		metadataUUID, metadataSourceKey, err = getMetadataInfo(fileEntry)
 		if err != nil {
 			return err
 		}
@@ -677,11 +748,12 @@ func (userdata *User) StoreFile(filename string, content []byte) (err error) {
 
 	// Get file encrypt key and store
 	userlib.DebugMsg("[StoreFile] Encrypt data for nodeUUID: %v", nodeUUID)
-	fileSourceKey, err = userlib.HashKDF(userdata.SourceKey, []byte("file-"+filename))
-	if err != nil {
-		return err
-	}
-	fileSourceKey = fileSourceKey[:16]
+	// fileSourceKey, err = userlib.HashKDF(userdata.SourceKey, []byte("file-"+filename))
+	// if err != nil {
+	// 	return err
+	// }
+	// fileSourceKey = fileSourceKey[:16]
+	// fileSourceKey = userlib.RandomBytes(16)
 
 	// Serialize and encrypt
 	var nodeEncKey, hashKey []byte
@@ -728,7 +800,7 @@ func (userdata *User) AppendToFile(filename string, content []byte) (err error) 
 
 	var metadataUUID uuid.UUID
 	var metadataSourceKey []byte
-	metadataUUID, metadataSourceKey, err = getMetadataInfo(fileEntry, userdata.PkeDecKey)
+	metadataUUID, metadataSourceKey, err = getMetadataInfo(fileEntry)
 	if err != nil {
 		return err
 	}
@@ -845,7 +917,7 @@ func (userdata *User) LoadFile(filename string) (content []byte, err error) {
 	}
 	var metadataUUID uuid.UUID
 	var metadataSourceKey []byte
-	metadataUUID, metadataSourceKey, err = getMetadataInfo(fileEntry, userdata.PkeDecKey)
+	metadataUUID, metadataSourceKey, err = getMetadataInfo(fileEntry)
 	if err != nil {
 		return []byte{}, err
 	}
@@ -892,113 +964,6 @@ func (userdata *User) LoadFile(filename string) (content []byte, err error) {
 ********************************************
  */
 
-func (userdata *User) CreateInvitation(filename string, recipientUsername string) (
-	invitationPtr uuid.UUID, err error) {
-	userlib.DebugMsg("[CreateInvitation] Get user file list from datastore for user: %v", userdata.Username)
-	var fileListUUID uuid.UUID
-	fileListUUID, err = uuid.FromBytes(userlib.Hash([]byte("file-list-" + userdata.Username))[:16])
-	if err != nil {
-		return uuid.Nil, err
-	}
-
-	var fileList UserFileList
-	fileList, err = getFileListByUUID(fileListUUID, userdata.SourceKey)
-	if err != nil {
-		return uuid.Nil, err
-	}
-
-	userlib.DebugMsg("[CreateInvitation] Get file metadata for file: %v", filename)
-	fileEntry, exist := fileList.EntryList[filename]
-	if !exist {
-		return uuid.Nil, errors.New("cannot find file " + filename)
-	}
-
-	var metadataUUID uuid.UUID
-	var metadataSourceKey []byte
-	switch fileEntry.Status {
-	case "owned":
-		metadataUUID = fileEntry.MetadataUUID
-		metadataSourceKey = fileEntry.MetadataSourceKey
-	case "shared":
-		// get info from metadata
-		invitationUUID := fileEntry.MetadataUUID
-		senderDs, ok := userlib.KeystoreGet(string(fileEntry.MetadataSourceKey))
-		if !ok {
-			return uuid.Nil, errors.New("cannot find sender with key " + string(fileEntry.MetadataSourceKey))
-		}
-		var invitation Invitation
-		invitation, err = getInvitationByUUID(invitationUUID, userdata.PkeDecKey, senderDs)
-		if err != nil {
-			return uuid.Nil, err
-		}
-		metadataUUID = invitation.MetadataUUID
-		metadataSourceKey = invitation.MetadataSourceKey
-	default:
-		return uuid.Nil, errors.New("undefined file entry status")
-	}
-
-	var metadata FileMetadata
-	metadata, err = getMetadataByUUID(metadataUUID, metadataSourceKey)
-	if err != nil {
-		return uuid.Nil, err
-	}
-
-	userlib.DebugMsg("[CreateInvitation] create invitation for user: %v", recipientUsername)
-	// create and serialize invitation
-	var invitation = Invitation{
-		MetadataUUID:      metadataUUID,
-		MetadataSourceKey: metadataSourceKey,
-	}
-	invitationBytes, err := json.Marshal(invitation)
-	if err != nil {
-		return uuid.Nil, err
-	}
-
-	// get recepient key and encrypt
-	receiverPke, ok := userlib.KeystoreGet(recipientUsername + "_pke")
-	if !ok {
-		return uuid.Nil, errors.New("recipient public key not found")
-	}
-	invEncBytes, err := userlib.PKEEnc(receiverPke, invitationBytes)
-	if err != nil {
-		return uuid.Nil, err
-	}
-
-	// sign the env bytes
-	signature, err := userlib.DSSign(userdata.DsSigKey, invitationBytes)
-	if err != nil {
-		return uuid.Nil, err
-	}
-
-	// Store the entry
-	invitationEntry := DatastoreEntry{
-		Ciphertext: invEncBytes,
-		Hash:       signature, // reuse previous structure
-	}
-	invitationEntryBytes, err := json.Marshal(invitationEntry)
-	if err != nil {
-		return uuid.Nil, err
-	}
-	invitationUUID, err := uuid.FromBytes(userlib.RandomBytes(16))
-	if err != nil {
-		return uuid.Nil, err
-	}
-	userlib.DatastoreSet(invitationUUID, invitationEntryBytes)
-
-	// modify and store the metadata
-	shareEntry := ShareEntry{
-		Accepted:       false,
-		Sender:         userdata.Username,
-		Receiver:       recipientUsername,
-		InvitationUUID: invitationUUID,
-	}
-
-	metadata.ShareList = append(metadata.ShareList, shareEntry)
-	storeMetadata(metadata, metadataSourceKey, metadataUUID)
-
-	return invitationUUID, nil
-}
-
 func getInvitationByUUID(invitationUUID uuid.UUID, pkeDecKey userlib.PKEDecKey, dsVerKey userlib.DSVerifyKey) (
 	invitation Invitation, err error) {
 	// get datastore entry bytes
@@ -1030,6 +995,115 @@ func getInvitationByUUID(invitationUUID uuid.UUID, pkeDecKey userlib.PKEDecKey, 
 	return invitation, err
 }
 
+// will not create invitation for user who has accepted invitation
+func (userdata *User) CreateInvitation(filename string, recipientUsername string) (
+	invitationPtr uuid.UUID, err error) {
+	userlib.DebugMsg("[CreateInvitation] Get user file list from datastore for user: %v", userdata.Username)
+	var fileListUUID uuid.UUID
+	fileListUUID, err = uuid.FromBytes(userlib.Hash([]byte("file-list-" + userdata.Username))[:16])
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	var fileList UserFileList
+	fileList, err = getFileListByUUID(fileListUUID, userdata.SourceKey)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	userlib.DebugMsg("[CreateInvitation] create access node for user: %v", recipientUsername)
+	// get file entry
+	fileEntry, exist := fileList.EntryList[filename]
+	if !exist {
+		return uuid.Nil, errors.New("cannot find file " + filename)
+	}
+
+	var isMetadata bool
+	switch fileEntry.Status {
+	case "owned": // self-owned
+		isMetadata = true
+	case "shared":
+		isMetadata = false
+	default:
+		return uuid.Nil, errors.New("invalid file entry status")
+	}
+	var accessNode = AccessNode{
+		IsMetadata: isMetadata,
+		NodeUUID:   fileEntry.MetadataUUID,
+		SourceKey:  fileEntry.MetadataSourceKey,
+	}
+	accessNodeUUID := uuid.New()
+	accessNodeSourceKey := userlib.RandomBytes(16)
+	storeAccessNode(accessNode, accessNodeSourceKey, accessNodeUUID)
+
+	userlib.DebugMsg("[CreateInvitation] create invitation for user: %v", recipientUsername)
+	// create and serialize invitation
+	var invitation = Invitation{
+		AccessNodeUUID: accessNodeUUID,
+		AccessNodeSourceKey: accessNodeSourceKey,
+	}
+	invitationBytes, err := json.Marshal(invitation)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	// get recepient key and encrypt
+	receiverPke, ok := userlib.KeystoreGet(recipientUsername + "_pke")
+	if !ok {
+		return uuid.Nil, errors.New("recipient public key not found")
+	}
+	invEncBytes, err := userlib.PKEEnc(receiverPke, invitationBytes)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	// sign the env bytes
+	signature, err := userlib.DSSign(userdata.DsSigKey, invitationBytes)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	// Store the entry
+	invitationEntry := DatastoreEntry{
+		Ciphertext: invEncBytes,
+		Hash:       signature, // reuse previous structure
+	}
+	invitationEntryBytes, err := json.Marshal(invitationEntry)
+	if err != nil {
+		return uuid.Nil, err
+	}
+	invitationUUID := uuid.New()
+	userlib.DatastoreSet(invitationUUID, invitationEntryBytes)
+
+	userlib.DebugMsg("[CreateInvitation] Get and modify file metadata for file: %v", filename)
+	// get metadata
+	var metadataUUID uuid.UUID
+	var metadataSourceKey []byte
+	metadataUUID, metadataSourceKey, err = getMetadataInfo(fileEntry)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	var metadata FileMetadata
+	metadata, err = getMetadataByUUID(metadataUUID, metadataSourceKey)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	// modify and store the metadata
+	shareEntry := ShareEntry{
+		Accepted:       false,
+		Sender:         userdata.Username,
+		Receiver:       recipientUsername,
+		InvitationUUID: invitationUUID,
+	}
+
+	metadata.ShareList = append(metadata.ShareList, shareEntry)
+	storeMetadata(metadata, metadataSourceKey, metadataUUID)
+
+	return invitationUUID, nil
+}
+
 func (userdata *User) AcceptInvitation(senderUsername string, invitationPtr uuid.UUID, filename string) (err error) {
 	userlib.DebugMsg("[AcceptInvitation] get invitation from user: %v", senderUsername)
 	// get invitation
@@ -1055,8 +1129,8 @@ func (userdata *User) AcceptInvitation(senderUsername string, invitationPtr uuid
 	// Add new file entry
 	var fileEntry = FileEntry{
 		Status:            "shared",
-		MetadataUUID:      invitationPtr,
-		MetadataSourceKey: []byte(senderUsername + "_ds"),
+		MetadataUUID:      invitation.AccessNodeUUID,
+		MetadataSourceKey: invitation.AccessNodeSourceKey,
 	}
 	_, exist := fileList.EntryList[filename]
 	if exist {
@@ -1071,9 +1145,14 @@ func (userdata *User) AcceptInvitation(senderUsername string, invitationPtr uuid
 	}
 
 	userlib.DebugMsg("[AcceptInvitation] modify metadata share list with invitationPtr: %v", invitationPtr)
+	// get metadata info
+	metadataUUID, metadataSourceKey, err := getMetadataInfo(fileEntry)
+	if err != nil {
+		return err
+	}
 	// get metadata and mofify
 	var metadata FileMetadata
-	metadata, err = getMetadataByUUID(invitation.MetadataUUID, invitation.MetadataSourceKey)
+	metadata, err = getMetadataByUUID(metadataUUID, metadataSourceKey)
 	if err != nil {
 		return err
 	}
@@ -1084,7 +1163,7 @@ func (userdata *User) AcceptInvitation(senderUsername string, invitationPtr uuid
 		}
 	}
 	// store metadata
-	err = storeMetadata(metadata, invitation.MetadataSourceKey, invitation.MetadataUUID)
+	err = storeMetadata(metadata, metadataSourceKey, metadataUUID)
 	if err != nil {
 		return err
 	}
@@ -1092,6 +1171,171 @@ func (userdata *User) AcceptInvitation(senderUsername string, invitationPtr uuid
 	return nil
 }
 
+// Only owner of the file could revoke
 func (userdata *User) RevokeAccess(filename string, recipientUsername string) (err error) {
+	userlib.DebugMsg("[RevokeAccess] Get user file list from datastore for user: %v", userdata.Username)
+	var fileListUUID uuid.UUID
+	fileListUUID, err = uuid.FromBytes(userlib.Hash([]byte("file-list-" + userdata.Username))[:16])
+	if err != nil {
+		return err
+	}
+
+	var fileList UserFileList
+	fileList, err = getFileListByUUID(fileListUUID, userdata.SourceKey)
+	if err != nil {
+		return err
+	}
+
+	userlib.DebugMsg("[RevokeAccess] Get file metadata for file: %v", filename)
+	fileEntry, exist := fileList.EntryList[filename]
+	if !exist {
+		return errors.New("cannot find file " + filename + " for user " + userdata.Username)
+	}
+
+	var metadataUUID uuid.UUID
+	var metadataSourceKey []byte
+	metadataUUID, metadataSourceKey, err = getMetadataInfo(fileEntry)
+	if err != nil {
+		return err
+	}
+
+	var metadata FileMetadata
+	metadata, err = getMetadataByUUID(metadataUUID, metadataSourceKey)
+	if err != nil {
+		return err
+	}
+
+	userlib.DebugMsg("[RevokeAccess] analyze the metadata for file: %v", filename)
+	if metadata.Owner != userdata.Username { // not the owner
+		return errors.New("only owner of the file could revoke access")
+	}
+	var find = false
+	var accepted = false
+	var relatedIdxList = []int{}
+	for i, shareEntry := range metadata.ShareList {
+		if shareEntry.Sender == userdata.Username && shareEntry.Receiver == recipientUsername {
+			find = true
+			relatedIdxList = append(relatedIdxList, i)
+			if shareEntry.Accepted {
+				accepted = true
+			}
+			// no break, because may have another invitation accepted
+		}
+	}
+
+	userlib.DebugMsg("[RevokeAccess] deal revoke logits in 3 different cases")
+	// case 1: no share entry from user to reciver
+	if !find {
+		return errors.New("cannot find share entry from " + userdata.Username + " to " + recipientUsername)
+	}
+
+	// delete not accepted entry from metadata
+	for i := len(relatedIdxList) - 1; i >= 0; i-- {
+		idx := relatedIdxList[i] // related share entry idx
+
+		// delete invitation from datastore
+		var invitationUUID uuid.UUID
+		invitationUUID = metadata.ShareList[idx].InvitationUUID
+		userlib.DatastoreDelete(invitationUUID)
+
+		// delete entry from entry list
+		metadata.ShareList = append(metadata.ShareList[:idx], metadata.ShareList[idx+1:]...)
+	}
+
+	// case 2: no accepted entry
+	if !accepted { // has not been accepted, so no indirect receiver
+		// store metadata
+		err = storeMetadata(metadata, metadataSourceKey, metadataUUID)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	// case 3: find one or more share entry, but accepted
+	userlib.DebugMsg("[RevokeAccess] delete revoke user related share entries from metadata")
+	// get revoke related entry idx list
+	var revokeUserSet = map[string]struct{}{recipientUsername: {}}
+	var revokeIdxList = []int{}
+	for i, shareEntry := range metadata.ShareList {
+		_, revokeRelated := revokeUserSet[shareEntry.Sender]
+		if revokeRelated {
+			revokeIdxList = append(revokeIdxList, i)
+			revokeUserSet[shareEntry.Receiver] = struct{}{} // whether accepted does not matter
+		}
+	}
+
+	// delete revoke related entry
+	for i := len(relatedIdxList) - 1; i >= 0; i-- {
+		revokeIdx := relatedIdxList[i]
+
+		// delete invitation
+		var invitationUUID uuid.UUID
+		invitationUUID = metadata.ShareList[revokeIdx].InvitationUUID
+		userlib.DatastoreDelete(invitationUUID)
+
+		// delete entry from entry list
+		metadata.ShareList = append(metadata.ShareList[:revokeIdx], metadata.ShareList[revokeIdx+1:]...)
+	}
+
+	userlib.DebugMsg("[RevokeAccess] get file content with previous file list")
+	// update metadata first node uuid
+	fileContent, err := userdata.LoadFile(filename)
+	if err != nil {
+		return err
+	}
+
+	userlib.DebugMsg("[RevokeAccess] update metadata position and source key, and update file list")
+	// generate new information
+	newMetadataUUID := uuid.New()
+	newMetadataSourceKey := userlib.RandomBytes(16)
+
+	// update and store user file list
+	fileEntry.MetadataUUID = newMetadataUUID
+	fileEntry.MetadataSourceKey = newMetadataSourceKey
+	fileList.EntryList[filename] = fileEntry
+	err = storeFileList(fileList, userdata.SourceKey, fileListUUID)
+	if err != nil {
+		return err
+	}
+
+	userlib.DebugMsg("[RevokeAccess] update first node")
+	newFileSourceKey := userlib.RandomBytes(16)
+	newFirstNodeUUID := uuid.New()
+	nodeEncKey, nodeHashKey, err := getFileNodeKeys(newFileSourceKey, newFirstNodeUUID)
+	if err != nil {
+		return err
+	}
+
+	var newFileNode = FileNode{
+		Content: fileContent,
+		Next:    uuid.Nil,
+	}
+	var newNodeBytes []byte
+	newNodeBytes, err = json.Marshal(newFileNode)
+	if err != nil {
+		return err
+	}
+
+	// Get encryption result and store
+	var nodeEncBytes []byte
+	nodeEncBytes, err = encryptData(nodeEncKey, nodeHashKey, newNodeBytes)
+	if err != nil {
+		return err
+	}
+	userlib.DatastoreSet(newFirstNodeUUID, nodeEncBytes)
+
+	userlib.DebugMsg("[RevokeAccess] update metadata content")
+	metadata.FileSourceKey = newFileSourceKey
+	metadata.FirstFileNode = newFirstNodeUUID
+
+	// update invitation for users with accessibility
+	// for i, shareEntry := range metadata.ShareList {
+	// 	var invitationUUID = shareEntry.InvitationUUID
+	// 	var receiver = shareEntry.Receiver
+	// 	// aha moment: owner could modify invitation even if he/she did not send invitation directly?
+
+	// }
+
 	return nil
 }
