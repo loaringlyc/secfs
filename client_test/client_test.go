@@ -12,7 +12,7 @@ import (
 	_ "strings"
 	"testing"
 
-	_ "github.com/google/uuid"
+	"github.com/google/uuid"
 
 	// A "dot" import is used here so that the functions in the ginko and gomega
 	// modules can be used without an identifier. For example, Describe() and
@@ -248,6 +248,101 @@ var _ = Describe("Client Tests", func() {
 
 			err = charles.AppendToFile(charlesFile, []byte(contentTwo))
 			Expect(err).ToNot(BeNil())
+		})
+
+		Describe("Adversary Tests", func() {
+			Specify("Datastore Adversary: Corrupt User Data", func() {
+				userlib.DebugMsg("Initializing user Alice.")
+				alice, err = client.InitUser("alice", defaultPassword)
+				Expect(err).To(BeNil())
+
+				// Replicate logic to find Alice's UUID
+				username := "alice"
+				password := defaultPassword
+				passwdKey := userlib.Argon2Key([]byte(password), []byte(username), 16)
+				uuidBytes, _ := userlib.HashKDF(passwdKey, []byte("user-uuid"))
+				userUUID, _ := uuid.FromBytes(uuidBytes[:16])
+
+				// Corrupt the data
+				userlib.DebugMsg("Corrupting Alice's data in Datastore.")
+				userlib.DatastoreSet(userUUID, []byte("garbage_data"))
+
+				// Attempt to log in
+				userlib.DebugMsg("Attempting to log in as Alice.")
+				_, err = client.GetUser("alice", defaultPassword)
+				Expect(err).ToNot(BeNil())
+			})
+
+			Specify("Revoked-User Adversary: Replay Invitation", func() {
+				userlib.DebugMsg("Initializing users Alice and Bob.")
+				alice, err = client.InitUser("alice", defaultPassword)
+				Expect(err).To(BeNil())
+				bob, err = client.InitUser("bob", defaultPassword)
+				Expect(err).To(BeNil())
+
+				userlib.DebugMsg("Alice storing file.")
+				err = alice.StoreFile(aliceFile, []byte(contentOne))
+				Expect(err).To(BeNil())
+
+				userlib.DebugMsg("Alice shares to Bob.")
+				invite, err := alice.CreateInvitation(aliceFile, "bob")
+				Expect(err).To(BeNil())
+
+				userlib.DebugMsg("Bob accepts invite.")
+				err = bob.AcceptInvitation("alice", invite, bobFile)
+				Expect(err).To(BeNil())
+
+				userlib.DebugMsg("Alice revokes Bob.")
+				err = alice.RevokeAccess(aliceFile, "bob")
+				Expect(err).To(BeNil())
+
+				userlib.DebugMsg("Bob tries to accept the old invite again.")
+				// Note: Depending on implementation, this might fail or succeed but grant no access.
+				// We expect it to either fail OR if it succeeds, LoadFile should fail.
+				err = bob.AcceptInvitation("alice", invite, bobFile)
+
+				if err == nil {
+					userlib.DebugMsg("AcceptInvitation succeeded (unexpected but possible), checking LoadFile...")
+					_, err = bob.LoadFile(bobFile)
+					Expect(err).ToNot(BeNil())
+				} else {
+					userlib.DebugMsg("AcceptInvitation failed as expected.")
+				}
+			})
+
+			Specify("Revoked-User Adversary: Overwrite Attempt", func() {
+				userlib.DebugMsg("Initializing users Alice and Bob.")
+				alice, err = client.InitUser("alice", defaultPassword)
+				Expect(err).To(BeNil())
+				bob, err = client.InitUser("bob", defaultPassword)
+				Expect(err).To(BeNil())
+
+				userlib.DebugMsg("Alice storing file.")
+				err = alice.StoreFile(aliceFile, []byte(contentOne))
+				Expect(err).To(BeNil())
+
+				userlib.DebugMsg("Alice shares to Bob.")
+				invite, err := alice.CreateInvitation(aliceFile, "bob")
+				Expect(err).To(BeNil())
+				err = bob.AcceptInvitation("alice", invite, bobFile)
+				Expect(err).To(BeNil())
+
+				userlib.DebugMsg("Alice revokes Bob.")
+				err = alice.RevokeAccess(aliceFile, "bob")
+				Expect(err).To(BeNil())
+
+				userlib.DebugMsg("Bob tries to StoreFile (overwrite) on the shared filename.")
+				// Bob might have "bobFile" in his list.
+				// If he calls StoreFile, it should NOT affect Alice's file.
+				err = bob.StoreFile(bobFile, []byte(contentTwo))
+				// This might succeed (creating a NEW file for Bob) or fail.
+				// But Alice's file must remain unchanged.
+
+				userlib.DebugMsg("Checking Alice's file content.")
+				data, err := alice.LoadFile(aliceFile)
+				Expect(err).To(BeNil())
+				Expect(data).To(Equal([]byte(contentOne)))
+			})
 		})
 
 	})

@@ -1272,9 +1272,9 @@ func (userdata *User) RevokeAccess(filename string, recipientUsername string) (e
 		}
 	}
 
-	// delete revoke related entry
-	for i := len(relatedIdxList) - 1; i >= 0; i-- {
-		revokeIdx := relatedIdxList[i]
+	// delete all of revoke related share entry
+	for i := len(revokeIdxList) - 1; i >= 0; i-- {
+		revokeIdx := revokeIdxList[i]
 
 		// delete invitation
 		var invitationUUID uuid.UUID
